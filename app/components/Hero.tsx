@@ -17,7 +17,9 @@ export default function Hero() {
       const x = e.clientX / window.innerWidth;
       const y = e.clientY / window.innerHeight;
       mouseRef.current = { x, y };
-      window.dispatchEvent(new CustomEvent("perse-mouse", { detail: mouseRef.current }));
+      window.dispatchEvent(
+        new CustomEvent("perse-mouse", { detail: mouseRef.current })
+      );
     };
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
@@ -40,10 +42,9 @@ export default function Hero() {
 
             {/* Render stars in the background first */}
             <StarField hover={hover.stars} renderOrder={-1} />
-            
+
             {/* Render the gradient plane on top of the stars */}
             <DustPlane renderOrder={0} />
-
           </Suspense>
         </Canvas>
 
@@ -64,7 +65,7 @@ export default function Hero() {
         <div className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none overflow-hidden">
           <h2
             className="text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent opacity-40 select-none leading-none transform translate-y-[4rem]"
-            style={{ WebkitTextStroke: '1px white' }}
+            style={{ WebkitTextStroke: "1px white" }}
           >
             Persevex
           </h2>
@@ -77,22 +78,21 @@ export default function Hero() {
               <span className="block">with Real-World Skills</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl max-w-2xl opacity-90">
-              Experience hands-on learning with AI guidance, expert-curated projects,
-              and career-ready outcomes
+              Experience hands-on learning with AI guidance, expert-curated
+              projects, and career-ready outcomes
             </p>
-             <button
+            <button
               className="
-                pointer-events-auto mt-12 cursor-pointer 
-                px-12 py-4 
-                font-semibold text-white 
-                bg-white/10 
-                text-xl
-                border border-white/30 
-                rounded-lg 
-                backdrop-blur-sm 
-                transition-colors duration-300 
-                hover:bg-white/20 hover:border-white/40
-              "
+  relative px-8 py-3 mt-4 
+  text-lg font-semibold text-white 
+  rounded-xl border-none cursor-pointer
+  bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400
+  bg-[length:300%_300%]
+  animate-gradient-shift
+  transition-all duration-300 ease-in-out
+  hover:scale-105 hover:shadow-lg hover:shadow-orange-500/40
+  focus:outline-none focus:ring-4 focus:ring-orange-500/50
+"
             >
               Explore Courses
             </button>

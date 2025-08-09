@@ -1,10 +1,13 @@
+// Hero.tsx
+
 "use client";
 
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import Navbar from "./Appbar";
-import StarField from "./StarField";
-import DustPlane from "./DustPlane";
+import StarField from "./StarField";   // The background stars
+import DustPlane from "./DustPlane";   // The gradient (now with stars included)
+// import MovingStars from "./MovingStars"; // <-- REMOVE THIS LINE
 
 export default function Hero() {
   const [hover, setHover] = useState({ stars: false, dust: false });
@@ -31,11 +34,18 @@ export default function Hero() {
           camera={{ position: [0, 0, 6], fov: 50 }}
         >
           <Suspense fallback={null}>
+            {/* Original background stars (kept as is) */}
             <StarField hover={hover.stars} />
+            
+            {/* The orange gradient plane (now includes the moving stars) */}
             <DustPlane />
+
+            {/* The MovingStars component is no longer needed */}
+            {/* <MovingStars /> */} {/* <-- REMOVE THIS LINE */}
           </Suspense>
         </Canvas>
 
+        {/* --- The rest of your component remains unchanged --- */}
         <div
           onMouseEnter={() => setHover((s) => ({ ...s, stars: true }))}
           onMouseLeave={() => setHover((s) => ({ ...s, stars: false }))}
@@ -52,14 +62,14 @@ export default function Hero() {
         <div className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none overflow-hidden">
           <h2
             className="text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent opacity-40 select-none leading-none transform translate-y-[4rem]"
-            style={{ WebkitTextStroke: '3px white' }}
+            style={{ WebkitTextStroke: '1px white' }}
           >
             Persevex
           </h2>
         </div>
 
         <div className="absolute inset-0 z-20 pointer-events-none">
-          <div className="max-w-6xl   mx-8 my-54 ">
+          <div className="max-w-6xl mx-8 my-54">
             <h1 className="text-4xl md:text-6xl lg:text-5xl font-extrabold leading-tight">
               Empowering the Next Generation <br className="hidden md:block" />
               <span className="block">with Real-World Skills</span>
@@ -70,7 +80,7 @@ export default function Hero() {
             </p>
              <button
               className="
-                pointer-events-auto  mt-12 cursor-pointer 
+                pointer-events-auto mt-12 cursor-pointer 
                 px-12 py-4 
                 font-semibold text-white 
                 bg-white/10 

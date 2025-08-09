@@ -5,9 +5,8 @@
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import Navbar from "./Appbar";
-import StarField from "./StarField";   // The background stars
-import DustPlane from "./DustPlane";   // The gradient (now with stars included)
-// import MovingStars from "./MovingStars"; // <-- REMOVE THIS LINE
+import StarField from "./StarField";
+import DustPlane from "./DustPlane";
 
 export default function Hero() {
   const [hover, setHover] = useState({ stars: false, dust: false });
@@ -34,14 +33,17 @@ export default function Hero() {
           camera={{ position: [0, 0, 6], fov: 50 }}
         >
           <Suspense fallback={null}>
-            {/* Original background stars (kept as is) */}
-            <StarField hover={hover.stars} />
-            
-            {/* The orange gradient plane (now includes the moving stars) */}
-            <DustPlane />
+            {/* 
+              Set renderOrder to explicitly control layering.
+              Lower numbers are rendered first.
+            */}
 
-            {/* The MovingStars component is no longer needed */}
-            {/* <MovingStars /> */} {/* <-- REMOVE THIS LINE */}
+            {/* Render stars in the background first */}
+            <StarField hover={hover.stars} renderOrder={-1} />
+            
+            {/* Render the gradient plane on top of the stars */}
+            <DustPlane renderOrder={0} />
+
           </Suspense>
         </Canvas>
 

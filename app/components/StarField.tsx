@@ -1,17 +1,20 @@
+// components/StarField.tsx
+
 "use client";
 
 import * as THREE from "three";
 import { useRef, useMemo, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, ThreeElements } from "@react-three/fiber";
 
-type Props = { hover: boolean };
+// Update the Props type to include standard props for a <points> object
+type Props = { hover: boolean } & ThreeElements['points'];
 
-export default function StarField({ hover }: Props) {
+export default function StarField({ hover, ...props }: Props) { // Accept and spread the additional props
   const pointsRef = useRef<THREE.Points | null>(null);
   const mouse = useRef({ x: 0, y: 0 });
 
   const STAR_COUNT = 12000;
-  const BOUNDS_X = 80; 
+  const BOUNDS_X = 80;
   const BOUNDS_Y = 40;
   const BOUNDS_Z = 60;
 
@@ -71,7 +74,8 @@ export default function StarField({ hover }: Props) {
   });
 
   return (
-    <points ref={pointsRef}>
+    // Pass the received props down to the points object
+    <points ref={pointsRef} {...props}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[starPositions, 3]} />
       </bufferGeometry>
@@ -81,6 +85,8 @@ export default function StarField({ hover }: Props) {
         sizeAttenuation={true}
         transparent={true}
         opacity={0.9}
+        // Add depthWrite false to ensure proper layering with other transparent objects
+        depthWrite={false}
       />
     </points>
   );

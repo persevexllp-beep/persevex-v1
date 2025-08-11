@@ -33,14 +33,14 @@ const fragment = `
     vec3 colorYellowish = vec3(1.0, 0.8, 0.3);
     vec3 colorWhite = vec3(1.0);
 
-    float dipAmount = 0.15;
+    float dipAmount = 0.12;
     float pivotY = 0.5 - dipAmount * sin(progress * PI);
     float baseExpansion = pow(progress, 1.5) * 1.0;
     float symmetricalDist = abs(adjustedUv.y - pivotY) / (baseExpansion + 0.01);
 
     const float downwardSpreadFactor = 2.5; 
     float spreadFalloff = pow(1.0 - progress, 0.75);
-    float dynamicDownwardSpread = mix(1.0, downwardSpreadFactor, spreadFalloff);
+    float dynamicDownwardSpread = mix(0.04, downwardSpreadFactor, spreadFalloff);
     float isBelow = step(adjustedUv.y, pivotY);
     float asymmetryMultiplier = mix(1.0, dynamicDownwardSpread, isBelow);
     float asymmetricalDist = abs(adjustedUv.y - pivotY) / (baseExpansion * asymmetryMultiplier + 0.01);

@@ -2,7 +2,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useMemo } from "react";
+import { useMemo, forwardRef } from "react"; // Import forwardRef
 import { ThreeElements } from "@react-three/fiber";
 
 const vertex = `
@@ -17,67 +17,52 @@ const fragment = `
   precision highp float;
   varying vec2 vUv;
   uniform float uScrollProgress;
-
+  // ... rest of the fragment shader is unchanged ...
   const float PI = 3.1415926535;
-
   void main() {
-    // Shift gradient upward as we scroll (progress 0 → 1)
     vec2 adjustedUv = vUv;
-    adjustedUv.y -= uScrollProgress * 0.5; // Controls upward motion speed
-
+    adjustedUv.y -= uScrollProgress * 0.5;
     float progress = 1.0 - adjustedUv.x;
-
-    // Colors
     vec3 colorDarkOrange = vec3(0.949, 0.451, 0.110);
     vec3 colorLightOrange = vec3(0.933, 0.624, 0.212);
     vec3 colorYellowish = vec3(1.0, 0.8, 0.3);
     vec3 colorWhite = vec3(1.0);
-
     float dipAmount = 0.12;
     float pivotY = 0.5 - dipAmount * sin(progress * PI);
     float baseExpansion = pow(progress, 1.5) * 1.0;
     float symmetricalDist = abs(adjustedUv.y - pivotY) / (baseExpansion + 0.01);
-
     const float downwardSpreadFactor = 2.5; 
     float spreadFalloff = pow(1.0 - progress, 0.75);
     float dynamicDownwardSpread = mix(0.04, downwardSpreadFactor, spreadFalloff);
     float isBelow = step(adjustedUv.y, pivotY);
     float asymmetryMultiplier = mix(1.0, dynamicDownwardSpread, isBelow);
     float asymmetricalDist = abs(adjustedUv.y - pivotY) / (baseExpansion * asymmetryMultiplier + 0.01);
-
     float horizontalFadeRampUp = smoothstep(0.5, 0.9, progress);
     float horizontalFadeRampDown = 1.0 - smoothstep(0.7, 1.0, progress);
     float horizontalFade = horizontalFadeRampUp * horizontalFadeRampDown;
-
     vec3 coreColor = mix(colorDarkOrange, colorLightOrange, horizontalFade);
     vec3 edgeColor = mix(coreColor, colorWhite, 0.9);
-
     float startStrength = 0.7 + uScrollProgress * 0.2;
     float endStrength = 0.4 + uScrollProgress * 0.3;
     float whiteHaloStrength = mix(startStrength, endStrength, progress);
-
     float yellowRampUp = smoothstep(0.2, 0.6, progress);
     float yellowRampDown = 1.0 - smoothstep(0.85, 1.0, progress);
     float yellowHaloStrength = (yellowRampUp * yellowRampDown) * (1.0 + uScrollProgress * 0.5);
-
     float toYellowFade = smoothstep(0.05, 0.4, symmetricalDist) * yellowHaloStrength;
     vec3 coreLayerColor = mix(coreColor, colorYellowish, toYellowFade);
-
     float whiteHaloMask = smoothstep(0.2, 0.7, asymmetricalDist) * whiteHaloStrength;
-
     vec3 finalColor = mix(coreLayerColor, edgeColor, whiteHaloMask);
-
     float shapeMask = 1.0 - smoothstep(0.1, 0.8, asymmetricalDist);
     float rightEdgeFade = smoothstep(1.0, 0.8, adjustedUv.x);
-
     float scrollIntensity = 1.0 + uScrollProgress * 0.3;
     float alpha = shapeMask * rightEdgeFade * scrollIntensity;
-
     gl_FragColor = vec4(finalColor, alpha);
   }
 `;
 
-export default function DustPlane({ scrollProgress = 0, ...props }: ThreeElements['mesh'] & { scrollProgress?: number }) {
+// FIX: Wrap component in forwardRef
+// REMOVED: The scrollProgress prop is no longer needed here.
+const DustPlane = forwardRef<THREE.Mesh, ThreeElements['mesh']>((props, ref) => {
   const geom = useMemo(() => new THREE.PlaneGeometry(20, 12, 1, 1), []);
 
   const mat = useMemo(() => {
@@ -85,18 +70,24 @@ export default function DustPlane({ scrollProgress = 0, ...props }: ThreeElement
       vertexShader: vertex,
       fragmentShader: fragment,
       uniforms: {
-        uScrollProgress: { value: scrollProgress }
+        // Initialize with 0. The parent component will update this value.
+        uScrollProgress: { value: 0 } 
       },
       transparent: true,
       depthWrite: false,
     });
   }, []);
 
-  mat.uniforms.uScrollProgress.value = scrollProgress;
+  // REMOVED: This line is no longer needed as the parent controls the uniform directly.
+  // mat.uniforms.uScrollProgress.value = scrollProgress;
 
   return (
-    <mesh geometry={geom} position={[0, 0, -3]} {...props}>
+    // FIX: Attach the forwarded ref to the mesh
+    <mesh ref={ref} geometry={geom} position={[0, 0, -3]} {...props}>
       <primitive object={mat} attach="material" />
     </mesh>
   );
-}
+});
+
+DustPlane.displayName = "DustPlane";
+export default DustPlane;

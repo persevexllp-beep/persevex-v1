@@ -3,33 +3,74 @@
 
 import { Canvas } from "@react-three/fiber";
 import { ScrollControls, Scroll, useScroll } from "@react-three/drei";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import * as THREE from "three"; // Import THREE
 
-// Import all the building blocks
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 
+// This component now handles ALL scroll-based animations.
 function SceneContent() {
   const scroll = useScroll();
-  const [progress, setProgress] = useState(0);
+  
+  // FIX: Define the type for the mesh's material to be a ShaderMaterial for type safety
+  interface DustPlaneMesh extends THREE.Mesh {
+    material: THREE.ShaderMaterial;
+  }
+  
+  // FIX: Initialize all refs with null and provide correct types.
+  const dustPlaneRef = useRef<DustPlaneMesh | null>(null);
+  const heroH2Ref = useRef<HTMLHeadingElement | null>(null);
+  const coursesH2Ref = useRef<HTMLHeadingElement | null>(null);
 
   useFrame(() => {
-    setProgress(scroll.offset); // 0 → 1 across total pages
+    const progress = scroll.offset; // 0 -> 1
+
+    // 1. Animate the DustPlane shader
+    if (dustPlaneRef.current) {
+        // FIX: The uniforms are on the material property of the mesh.
+        dustPlaneRef.current.material.uniforms.uScrollProgress.value = progress;
+    }
+
+    // 2. Animate the "Persevex" watermark (Fade Out)
+    if (heroH2Ref.current) {
+      const opacity = Math.max(0, 1 - progress * 2);
+      heroH2Ref.current.style.opacity = `${opacity * 0.4}`;
+    }
+
+    // 3. Animate the "Courses" watermark (Fade In)
+    if (coursesH2Ref.current) {
+      const opacity = Math.max(0, (progress - 0.5) * 2);
+      coursesH2Ref.current.style.opacity = `${opacity * 0.4}`;
+    }
   });
 
   return (
     <>
+      {/* 3D Scene Content */}
       <StarField hover={false} />
-      <DustPlane scrollProgress={progress} renderOrder={-2} />
+      {/* Pass the ref to DustPlane, which now accepts it */}
+      <DustPlane ref={dustPlaneRef} renderOrder={-2} />
+
+      {/* HTML Content */}
+      <Scroll html style={{ width: "100%" }}>
+        <div className="w-full h-screen flex justify-center items-center">
+          <Hero ref={heroH2Ref} />
+        </div>
+        
+        <div className="w-full h-screen flex justify-center items-center">
+          <CoursesSection ref={coursesH2Ref} />
+        </div>
+      </Scroll>
     </>
   );
 }
 
 export default function LandingPage() {
+  // No changes here
   return (
     <main className="w-full h-screen bg-black">
       <Canvas
@@ -44,18 +85,7 @@ export default function LandingPage() {
       >
         <Suspense fallback={null}>
           <ScrollControls pages={2} damping={0.2}>
-            {/* 3D Content */}
             <SceneContent />
-
-            {/* HTML Content */}
-            <Scroll html style={{ width: "100%" }}>
-              <div className="w-full h-screen flex justify-center items-center">
-                <Hero />
-              </div>
-              <div className="w-full h-screen flex justify-center items-center">
-                <CoursesSection />
-              </div>
-            </Scroll>
           </ScrollControls>
         </Suspense>
       </Canvas>

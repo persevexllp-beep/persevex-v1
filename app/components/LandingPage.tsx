@@ -1,94 +1,110 @@
-// LandingPage.tsx
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import { ScrollControls, Scroll, useScroll } from "@react-three/drei";
-import { Suspense, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three"; // Import THREE
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useRef, useEffect } from "react";
+import * as THREE from "three";
 
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 
-// This component now handles ALL scroll-based animations.
-function SceneContent() {
-  const scroll = useScroll();
-  
-  // FIX: Define the type for the mesh's material to be a ShaderMaterial for type safety
-  interface DustPlaneMesh extends THREE.Mesh {
-    material: THREE.ShaderMaterial;
-  }
-  
-  // FIX: Initialize all refs with null and provide correct types.
-  const dustPlaneRef = useRef<DustPlaneMesh | null>(null);
-  const heroH2Ref = useRef<HTMLHeadingElement | null>(null);
-  const coursesH2Ref = useRef<HTMLHeadingElement | null>(null);
+function AnimationController({ scrollProgressRef, textContainerRef }: any) {
+  const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>>(null);
+  const animatedScroll = useRef(0);
 
   useFrame(() => {
-    const progress = scroll.offset; // 0 -> 1
+    animatedScroll.current = THREE.MathUtils.lerp(
+      animatedScroll.current,
+      scrollProgressRef.current,
+      0.1
+    );
+    const currentProgress = animatedScroll.current;
 
-    // 1. Animate the DustPlane shader
-    if (dustPlaneRef.current) {
-        // FIX: The uniforms are on the material property of the mesh.
-        dustPlaneRef.current.material.uniforms.uScrollProgress.value = progress;
+    if (dustPlaneRef.current && dustPlaneRef.current.material.uniforms.uScrollProgress) {
+      dustPlaneRef.current.material.uniforms.uScrollProgress.value = currentProgress;
     }
 
-    // 2. Animate the "Persevex" watermark (Fade Out)
-    if (heroH2Ref.current) {
-      const opacity = Math.max(0, 1 - progress * 2);
-      heroH2Ref.current.style.opacity = `${opacity * 0.4}`;
-    }
+    if (textContainerRef.current) {
+      const pageHeight = 1 / 3;
+      const persevexFadeStart = pageHeight;
+      const coursesFadeStart = pageHeight * 2;
+      
+      const persevexProgress = Math.max(0, (currentProgress - persevexFadeStart) / pageHeight);
+      const coursesProgress = Math.max(0, (currentProgress - coursesFadeStart) / pageHeight);
+      
+      const persevexOpacity = (1 - persevexProgress) * 0.4;
+      const coursesOpacity = coursesProgress * 0.4;
 
-    // 3. Animate the "Courses" watermark (Fade In)
-    if (coursesH2Ref.current) {
-      const opacity = Math.max(0, (progress - 0.5) * 2);
-      coursesH2Ref.current.style.opacity = `${opacity * 0.4}`;
+      textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
+      textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
     }
   });
 
   return (
     <>
-      {/* 3D Scene Content */}
+      <color attach="background" args={['black']} />
       <StarField hover={false} />
-      {/* Pass the ref to DustPlane, which now accepts it */}
       <DustPlane ref={dustPlaneRef} renderOrder={-2} />
-
-      {/* HTML Content */}
-      <Scroll html style={{ width: "100%" }}>
-        <div className="w-full h-screen flex justify-center items-center">
-          <Hero ref={heroH2Ref} />
-        </div>
-        
-        <div className="w-full h-screen flex justify-center items-center">
-          <CoursesSection ref={coursesH2Ref} />
-        </div>
-      </Scroll>
     </>
   );
 }
 
 export default function LandingPage() {
-  // No changes here
+  const scrollProgressRef = useRef(0);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      scrollProgressRef.current = totalScrollableHeight > 0 ? currentScroll / totalScrollableHeight : 0;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <main className="w-full h-screen bg-black">
-      <Canvas
-        camera={{ position: [0, 0, 6], fov: 50 }}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-        }}
+    <main>
+      <div className="fixed top-0 left-0 w-full h-full z-0">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+          <Suspense fallback={null}>
+            <AnimationController 
+              scrollProgressRef={scrollProgressRef} 
+              textContainerRef={textContainerRef} 
+            />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      <div
+        ref={textContainerRef}
+        className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
+        style={{ '--persevex-opacity': 0.4, '--courses-opacity': 0 } as any}
       >
-        <Suspense fallback={null}>
-          <ScrollControls pages={2} damping={0.2}>
-            <SceneContent />
-          </ScrollControls>
-        </Suspense>
-      </Canvas>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none transform -translate-x-1/2 translate-y-[4rem]"
+          style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white" }}
+        >
+          Persevex
+        </h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none transform -translate-x-1/2 translate-y-[4rem]"
+          style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white" }}
+        >
+          Courses
+        </h2>
+      </div>
+
+      <div className="relative z-20">
+        <div className="h-screen flex justify-center items-center">
+          <Hero />
+        </div>
+        <div className="h-screen" />
+        <div className="h-screen flex justify-center items-center">
+          <CoursesSection />
+        </div>
+      </div>
     </main>
   );
 }

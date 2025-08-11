@@ -1,28 +1,13 @@
+// CoursesSection.tsx
 "use client";
 
-// We need forwardRef to pass the ref from the parent to the h2 element
-import { forwardRef } from "react";
+// No longer needs forwardRef
 
-const CoursesSection = forwardRef<HTMLHeadingElement>((props, ref) => {
+export default function CoursesSection() {
+  // REMOVED: The watermark div is no longer here.
   return (
     <section className="relative w-full h-full">
-      {/* COURSES watermark that appears as you scroll */}
-      <div className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none overflow-hidden">
-        <h2
-          // The ref from the parent is attached here
-          ref={ref}
-          className="text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none transform translate-y-[4rem]"
-          // Start with opacity 0, the animation logic in LandingPage will fade it in
-          style={{ 
-            WebkitTextStroke: "1px white",
-            opacity: 0 
-          }}
-        >
-          Courses
-        </h2>
-      </div>
-      
-      {/* Main content container (unchanged) */}
+      {/* Main content container */}
       <div className="relative z-20 h-full flex flex-col justify-center">
         <div className="max-w-6xl mx-auto px-8 w-full">
           <h1 className="text-4xl md:text-6xl lg:text-5xl font-extrabold leading-tight mb-6">
@@ -51,8 +36,4 @@ const CoursesSection = forwardRef<HTMLHeadingElement>((props, ref) => {
       </div>
     </section>
   );
-});
-
-// Set a display name for easier debugging in React DevTools
-CoursesSection.displayName = 'CoursesSection';
-export default CoursesSection;
+}

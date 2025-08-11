@@ -1,25 +1,15 @@
+// Hero.tsx
 "use client";
 
-// We need forwardRef to pass the ref from the parent to the h2 element
-import { forwardRef } from "react";
+// No longer needs forwardRef
 
-// The component is wrapped in forwardRef
-const Hero = forwardRef<HTMLHeadingElement>((props, ref) => {
+export default function Hero() {
+  // REMOVED: The watermark div is no longer here.
   return (
+    // The parent div in LandingPage.tsx now controls the min-h-screen
     <section className="relative w-full h-full">
-      {/* Big outlined text */}
-      <div className="absolute inset-0 z-10 flex items-end justify-center pointer-events-none overflow-hidden">
-        <h2
-          // The ref from the parent is attached here
-          ref={ref}
-          className="text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent opacity-40 select-none leading-none transform translate-y-[4rem]"
-          style={{ WebkitTextStroke: "1px white" }}
-        >
-          Persevex
-        </h2>
-      </div>
-      
-      {/* Main content container (unchanged) */}
+      {/* Main content container */}
+      {/* The z-index is still important to keep content above the 3D scene */}
       <div className="relative z-20 h-full flex text-white flex-col justify-center">
         <div className=" mx-auto px-8 w-full">
           <h1 className="text-4xl md:text-6xl lg:text-5xl font-extrabold leading-tight">
@@ -50,8 +40,4 @@ const Hero = forwardRef<HTMLHeadingElement>((props, ref) => {
       </div>
     </section>
   );
-});
-
-// Set a display name for easier debugging in React DevTools
-Hero.displayName = 'Hero';
-export default Hero;
+}

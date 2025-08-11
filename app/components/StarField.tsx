@@ -1,22 +1,23 @@
-// components/StarField.tsx
-
 "use client";
 
 import * as THREE from "three";
 import { useRef, useMemo, useEffect } from "react";
 import { useFrame, ThreeElements } from "@react-three/fiber";
 
-// Update the Props type to include standard props for a <points> object
 type Props = { hover: boolean } & ThreeElements['points'];
 
-export default function StarField({ hover, ...props }: Props) { // Accept and spread the additional props
+export default function StarField({ hover, ...props }: Props) { 
   const pointsRef = useRef<THREE.Points | null>(null);
   const mouse = useRef({ x: 0, y: 0 });
 
   const STAR_COUNT = 12000;
   const BOUNDS_X = 80;
-  const BOUNDS_Y = 40;
+  // Make the starfield twice as tall (from 40 to 80)
+  const BOUNDS_Y = 80;
   const BOUNDS_Z = 60;
+
+  // ... (rest of the component is unchanged) ...
+  // ... useEffect, starPositions, useFrame logic remains the same ...
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -37,7 +38,7 @@ export default function StarField({ hover, ...props }: Props) { // Accept and sp
       );
     }
     return new Float32Array(positions);
-  }, []);
+  }, [BOUNDS_X, BOUNDS_Y, BOUNDS_Z]);
 
   useFrame((_, delta) => {
     if (!pointsRef.current) return;
@@ -74,8 +75,8 @@ export default function StarField({ hover, ...props }: Props) { // Accept and sp
   });
 
   return (
-    // Pass the received props down to the points object
-    <points ref={pointsRef} {...props}>
+    // Adjust initial Y position to match the DustPlane
+    <points ref={pointsRef} position={[0, 6, 0]} {...props}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[starPositions, 3]} />
       </bufferGeometry>
@@ -85,7 +86,6 @@ export default function StarField({ hover, ...props }: Props) { // Accept and sp
         sizeAttenuation={true}
         transparent={true}
         opacity={0.9}
-        // Add depthWrite false to ensure proper layering with other transparent objects
         depthWrite={false}
       />
     </points>

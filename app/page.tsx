@@ -1,5 +1,7 @@
-import Hero from "./components/Hero";
+// CORRECT CODE for app/page.tsx
+
+import LandingPage from "./components/LandingPage";
 
 export default function Page() {
-  return <Hero />;
+  return <LandingPage />;
 }

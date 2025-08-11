@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Appbar from "./components/Appbar";
+import Navbar from "./components/Appbar";
 
 const poppins = Poppins({
-  weight: ["400", "500", "600", "700"], // adjust weights as needed
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-poppins", // tailwind variable name
+  variable: "--font-poppins", 
 });
 
 export const metadata: Metadata = {
@@ -21,11 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" >
       <body
         className={`${poppins.variable} antialiased`}
       >
-        <Appbar />
+        <Navbar />
         {children}
       </body>
     </html>

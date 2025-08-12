@@ -41,7 +41,6 @@ const courses = [
 export default function CoursesSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  // --- FIX: Removed unused isInCoursesZone state ---
 
   useEffect(() => {
     let raf = 0;
@@ -57,7 +56,6 @@ export default function CoursesSection() {
       const coursesStartZone = sectionTop - viewportHeight * 0.8;
       const coursesEndZone = sectionTop + sectionHeight - viewportHeight;
       
-      // --- FIX: Simplified and corrected progress calculation ---
       let newProgress = 0;
       if (scrollY >= coursesStartZone && scrollY <= coursesEndZone) {
         const totalZoneHeight = coursesEndZone - coursesStartZone;
@@ -66,8 +64,6 @@ export default function CoursesSection() {
       } else if (scrollY > coursesEndZone) {
         newProgress = 1;
       }
-      // If scrollY is before the start zone, progress remains 0.
-      // This removes the need for the 0.001 hack and ensures the animation resets to 0.
       
       setProgress(newProgress);
     };
@@ -91,16 +87,12 @@ export default function CoursesSection() {
   }, []);
 
   const cardCount = courses.length;
-
-  // --- FIX: Adjusted animatedProgress calculation ---
-  // It now maps the scroll progress (0 to 1) to an animation range that starts
-  // with the cards off-screen (at -1) and ends with the last card on top.
   const animatedProgress = (progress * cardCount) - 1;
 
   return (
     <section ref={sectionRef} className="relative w-full text-white" style={{ height: `${120 + cardCount * 70}vh` }}>
-      <div className="sticky top-0 flex  flex-col md:flex-row  max-w-8xl mx-auto px-8 gap-12 h-screen items-center">
-        <div className="w-full md:w-full flex flex-col justify-center">
+      <div className="sticky top-0 flex flex-col md:flex-row max-w-7xl mx-auto px-8 gap-12 h-screen items-center">
+        <div className="w-full md:w-full mb-60 flex flex-col justify-center">
           <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
             Unlock Your Potential.
             <span className="block opacity-80">One Course at a Time.</span>
@@ -110,35 +102,43 @@ export default function CoursesSection() {
           </p>
         </div>
 
-        <div className="relative w-full md:w-1/2 h-[520px] flex items-center justify-center">
+        <div className="relative w-full md:w-1/2 h-[480px] flex items-center justify-center">
           {courses.map((course, i) => {
-            // The card animation logic now works correctly because animatedProgress has the correct range.
             const distance = animatedProgress - i;
 
             let translateY = 0;
             let scale = 1;
-            let opacity = 0;
+            let cardOpacity = 0;
 
             const initialY = 480;
             const stackOffset = 14; 
             const stackScale = 0.05;
 
+            // --- FIX: New progressive darkening logic ---
+            let overlayOpacity = 0;
+            const maxOverlayOpacity = 0.9; // Max darkness of cards deep in the stack
+            const baseDarknessFactor = 0.25; // How dark the card directly behind the top one becomes
+
+            if (distance > 0) {
+              // This condition is true for any card that is being covered or is already in the stack.
+              // The overlay opacity is now directly proportional to the card's distance from the top,
+              // creating a smooth transition as you scroll.
+              overlayOpacity = Math.min(maxOverlayOpacity, distance * baseDarknessFactor);
+            }
+
             if (distance >= 0) {
-              // Card is in the stack
               translateY = -distance * stackOffset;
               scale = 1 - distance * stackScale;
-              opacity = 1;
+              cardOpacity = 1;
             } else if (distance > -1 && distance < 0) {
-              // Card is animating IN
               const localProgress = 1 + distance;
               translateY = initialY * (1 - localProgress);
               scale = 0.8 + 0.2 * localProgress;
-              opacity = localProgress;
+              cardOpacity = localProgress;
             } else {
-              // Card is waiting off-screen (opacity remains 0)
               translateY = initialY;
               scale = 0.8;
-              opacity = 0;
+              cardOpacity = 0;
             }
 
             return (
@@ -147,16 +147,21 @@ export default function CoursesSection() {
                 initial={false}
                 style={{
                   transform: `translateY(${translateY}px) scale(${scale})`,
-                  opacity,
+                  opacity: cardOpacity,
                   zIndex: i,
                 }}
-                className="absolute top-0 w-full max-w-sm h-[450px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl"
+                className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl"
               >
                 <div className="w-full h-32 flex items-center justify-center mb-4">
                    <course.icon />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 text-center">{course.title}</h3>
                 <p className="text-gray-600 text-center mt-2">{course.description}</p>
+                
+                <div 
+                  className="absolute inset-0 bg-black rounded-2xl pointer-events-none transition-opacity duration-300"
+                  style={{ opacity: overlayOpacity }}
+                />
               </motion.div>
             );
           })}

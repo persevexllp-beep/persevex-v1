@@ -9,15 +9,16 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 
-// --- FIX: Restored the sequential fade logic for the watermarks ---
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
 
   useFrame(() => {
+    // --- FIX: Decreased the lerp factor to slow down the transition speed ---
+    // A smaller value (like 0.05) makes the animation smoother and more gradual.
     animatedProgress.current = THREE.MathUtils.lerp(
       animatedProgress.current,
       watermarkProgressRef.current,
-      0.1
+      0.05 // Changed from 0.1
     );
     const currentProgress = animatedProgress.current;
 
@@ -25,16 +26,11 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       let persevexOpacity = 0;
       let coursesOpacity = 0;
 
-      // This logic splits the 0-1 progress into two halves.
-      // First half (0 to 0.5): Persevex fades out.
-      // Second half (0.5 to 1): Courses fades in.
       if (currentProgress < 0.5) {
-        // Map the scroll from [0, 0.5] to an opacity from [0.4, 0]
         persevexOpacity = (1 - (currentProgress / 0.5)) * 0.4;
         coursesOpacity = 0;
       } else {
         persevexOpacity = 0;
-        // Map the scroll from [0.5, 1] to an opacity from [0, 0.4]
         coursesOpacity = ((currentProgress - 0.5) / 0.5) * 0.4;
       }
 
@@ -136,7 +132,7 @@ export default function LandingPage() {
           </div>
         </div>
         
-        <div style={{ height: '100vh' }} />
+        <div style={{ height: '10vh' }} />
 
         <div ref={coursesSectionWrapperRef}>
           <CoursesSection />

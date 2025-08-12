@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     // The parent div in LandingPage now controls animation and positioning.
     // This div just groups the content.
-    <div className="max-w-6xl mx-auto px-8 w-full">
+    <div className="max-w-6xl text-white mx-auto px-8 w-full">
       <h1 className="text-4xl md:text-6xl lg:text-5xl font-extrabold leading-tight">
         Empowering the Next Generation <br className="hidden md:block" />
         <span className="block">with Real-World Skills</span>

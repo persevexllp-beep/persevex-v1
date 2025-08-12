@@ -9,16 +9,14 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 
-// --- MODIFIED AnimationController ---
 function AnimationController({ 
   scrollProgressRef, 
   textContainerRef, 
-  contentContainerRef // Add ref for the main content
+  contentContainerRef
 }: any) {
   const animatedScroll = useRef(0);
 
   useFrame(() => {
-    // Smooth the scroll value
     animatedScroll.current = THREE.MathUtils.lerp(
       animatedScroll.current,
       scrollProgressRef.current,
@@ -26,12 +24,7 @@ function AnimationController({
     );
     const currentProgress = animatedScroll.current;
 
-    // --- CHANGE: The gradient is now STATIC. This line is removed. ---
-    // if (dustPlaneRef.current && dustPlaneRef.current.material.uniforms.uScrollProgress) {
-    //   dustPlaneRef.current.material.uniforms.uScrollProgress.value = currentProgress;
-    // }
-
-    // --- Watermark animation logic (UNCHANGED and CORRECT) ---
+    // Watermark animation logic (Unchanged)
     if (textContainerRef.current) {
       const pageHeight = 1 / 3;
       const persevexFadeStart = pageHeight;
@@ -53,22 +46,29 @@ function AnimationController({
       textContainerRef.current.style.setProperty('--courses-translate-y', `${coursesTranslateY}px`);
     }
 
-    // --- NEW: Animate the Hero and Courses Section content ---
+    // --- Content animation logic ---
     if (contentContainerRef.current) {
-        // The animation happens over the first two screens (progress 0 to 0.66)
         const animationEnd = 2 / 3;
         const contentProgress = Math.min(1, currentProgress / animationEnd);
 
-        const heroOpacity = 1 - contentProgress;
-        const heroTranslateY = contentProgress * -100; // Move up 100px
+        // --- THE KEY CHANGE: Animate over a larger, viewport-relative distance ---
+        const moveDistance = 50; // This means 50% of the viewport height (vh)
 
+        // Opacity is unchanged
+        const heroOpacity = 1 - contentProgress;
         const coursesOpacity = contentProgress;
-        const coursesTranslateY = (1 - contentProgress) * 100; // Move in from below
+        
+        // Hero moves up 50vh from center (disappears off the top)
+        const heroTranslateY = contentProgress * -moveDistance; 
+
+        // Courses moves from 50vh below center to the center
+        const coursesTranslateY = (1 - contentProgress) * moveDistance;
 
         contentContainerRef.current.style.setProperty('--hero-opacity', `${heroOpacity}`);
-        contentContainerRef.current.style.setProperty('--hero-translate-y', `${heroTranslateY}px`);
         contentContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
-        contentContainerRef.current.style.setProperty('--courses-translate-y', `${coursesTranslateY}px`);
+        // Apply the new values with the 'vh' unit
+        contentContainerRef.current.style.setProperty('--hero-translate-y', `${heroTranslateY}vh`);
+        contentContainerRef.current.style.setProperty('--courses-translate-y', `${coursesTranslateY}vh`);
     }
   });
 
@@ -76,7 +76,6 @@ function AnimationController({
     <>
       <color attach="background" args={['black']} />
       <StarField hover={false} />
-      {/* The DustPlane ref is no longer needed here as it's static */}
       <DustPlane renderOrder={-2} /> 
     </>
   );
@@ -86,7 +85,7 @@ function AnimationController({
 export default function LandingPage() {
   const scrollProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const contentContainerRef = useRef<HTMLDivElement>(null); // Ref for the new content container
+  const contentContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,7 +99,7 @@ export default function LandingPage() {
 
   return (
     <main>
-      {/* 1. Fixed 3D Background (Unchanged) */}
+      {/* Background and Watermark sections are unchanged */}
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
@@ -112,8 +111,6 @@ export default function LandingPage() {
           </Suspense>
         </Canvas>
       </div>
-
-      {/* 2. Fixed Watermark Text Container (Unchanged and Correct) */}
       <div
         ref={textContainerRef}
         className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
@@ -142,33 +139,32 @@ export default function LandingPage() {
         >Courses</h2>
       </div>
 
-      {/* 3. NEW: Fixed container for animated content */}
+      {/* --- CHANGE: Update initial style for the content container --- */}
       <div
         ref={contentContainerRef}
         className="fixed inset-0 z-20 flex justify-center items-center pointer-events-none"
         style={{
             '--hero-opacity': 1,
-            '--hero-translate-y': '0px',
+            '--hero-translate-y': '0vh',
             '--courses-opacity': 0,
-            '--courses-translate-y': '100px'
+            '--courses-translate-y': '50vh' // Start 50vh from the bottom
         } as any}
       >
-        {/* The components will be positioned absolutely to overlap */}
         <div 
-            className="w-full absolute"
+            className="w-full  mr-75 absolute"
             style={{ opacity: 'var(--hero-opacity)', transform: 'translateY(var(--hero-translate-y))' }}
         >
           <Hero />
         </div>
         <div 
-            className="w-full absolute"
+            className="w-full  mr-75 absolute"
             style={{ opacity: 'var(--courses-opacity)', transform: 'translateY(var(--courses-translate-y))' }}
         >
           <CoursesSection />
         </div>
       </div>
 
-      {/* 4. Scrollable area with EMPTY divs to create height */}
+      {/* Scrollable area (Unchanged) */}
       <div className="relative z-30">
         <div className="h-screen" />
         <div className="h-screen" />

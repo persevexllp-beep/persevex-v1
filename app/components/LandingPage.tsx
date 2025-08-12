@@ -24,7 +24,7 @@ function AnimationController({
     );
     const currentProgress = animatedScroll.current;
 
-    // Watermark animation logic (Unchanged)
+    // --- CHANGE 1: Watermark animation logic is now ONLY for opacity ---
     if (textContainerRef.current) {
       const pageHeight = 1 / 3;
       const persevexFadeStart = pageHeight;
@@ -36,37 +36,31 @@ function AnimationController({
       const persevexOpacity = (1 - persevexProgress) * 0.4;
       const coursesOpacity = coursesProgress * 0.4;
 
-      const moveDistance = 150; 
-      const persevexTranslateY = persevexProgress * -moveDistance;
-      const coursesTranslateY = (1 - coursesProgress) * moveDistance;
+      // --- DELETED: The code that calculated watermark movement is gone ---
+      // const moveDistance = 150; 
+      // const persevexTranslateY = ...
+      // const coursesTranslateY = ...
 
       textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
       textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
-      textContainerRef.current.style.setProperty('--persevex-translate-y', `${persevexTranslateY}px`);
-      textContainerRef.current.style.setProperty('--courses-translate-y', `${coursesTranslateY}px`);
+      
+      // --- DELETED: The code that applied the watermark movement is gone ---
+      // textContainerRef.current.style.setProperty('--persevex-translate-y', ...);
+      // textContainerRef.current.style.setProperty('--courses-translate-y', ...);
     }
 
-    // --- Content animation logic ---
+    // Content animation logic (Unchanged and Correct)
     if (contentContainerRef.current) {
         const animationEnd = 2 / 3;
         const contentProgress = Math.min(1, currentProgress / animationEnd);
-
-        // --- THE KEY CHANGE: Animate over a larger, viewport-relative distance ---
-        const moveDistance = 50; // This means 50% of the viewport height (vh)
-
-        // Opacity is unchanged
+        const moveDistance = 50; 
         const heroOpacity = 1 - contentProgress;
         const coursesOpacity = contentProgress;
-        
-        // Hero moves up 50vh from center (disappears off the top)
         const heroTranslateY = contentProgress * -moveDistance; 
-
-        // Courses moves from 50vh below center to the center
         const coursesTranslateY = (1 - contentProgress) * moveDistance;
 
         contentContainerRef.current.style.setProperty('--hero-opacity', `${heroOpacity}`);
         contentContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
-        // Apply the new values with the 'vh' unit
         contentContainerRef.current.style.setProperty('--hero-translate-y', `${heroTranslateY}vh`);
         contentContainerRef.current.style.setProperty('--courses-translate-y', `${coursesTranslateY}vh`);
     }
@@ -99,7 +93,7 @@ export default function LandingPage() {
 
   return (
     <main>
-      {/* Background and Watermark sections are unchanged */}
+      {/* Background Section (Unchanged) */}
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
@@ -111,14 +105,15 @@ export default function LandingPage() {
           </Suspense>
         </Canvas>
       </div>
+
+      {/* --- CHANGE 2: Simplified Watermark Container --- */}
       <div
         ref={textContainerRef}
         className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
         style={{ 
+          // Only opacity variables are needed now
           '--persevex-opacity': 0.4, 
-          '--courses-opacity': 0,
-          '--persevex-translate-y': '0px',
-          '--courses-translate-y': '150px'
+          '--courses-opacity': 0
         } as any}
       >
         <h2
@@ -126,7 +121,8 @@ export default function LandingPage() {
           style={{ 
             opacity: 'var(--persevex-opacity)', 
             WebkitTextStroke: "1px white",
-            transform: 'translateX(-50%) translateY(calc(4rem + var(--persevex-translate-y)))'
+            // The transform is now STATIC. No more calc() or CSS variable for movement.
+            transform: 'translateX(-50%) translateY(4rem)'
           }}
         >Persevex</h2>
         <h2
@@ -134,12 +130,13 @@ export default function LandingPage() {
           style={{ 
             opacity: 'var(--courses-opacity)', 
             WebkitTextStroke: "1px white",
-            transform: 'translateX(-50%) translateY(calc(4rem + var(--courses-translate-y)))'
+            // This also has a static transform.
+            transform: 'translateX(-50%) translateY(4rem)'
           }}
         >Courses</h2>
       </div>
 
-      {/* --- CHANGE: Update initial style for the content container --- */}
+      {/* Content Container (Unchanged and Correct) */}
       <div
         ref={contentContainerRef}
         className="fixed inset-0 z-20 flex justify-center items-center pointer-events-none"
@@ -147,24 +144,24 @@ export default function LandingPage() {
             '--hero-opacity': 1,
             '--hero-translate-y': '0vh',
             '--courses-opacity': 0,
-            '--courses-translate-y': '50vh' // Start 50vh from the bottom
+            '--courses-translate-y': '50vh'
         } as any}
       >
         <div 
-            className="w-full  mr-75 absolute"
+            className="w-full mr-74 absolute"
             style={{ opacity: 'var(--hero-opacity)', transform: 'translateY(var(--hero-translate-y))' }}
         >
           <Hero />
         </div>
         <div 
-            className="w-full  mr-75 absolute"
+            className="w-full mr-74 absolute"
             style={{ opacity: 'var(--courses-opacity)', transform: 'translateY(var(--courses-translate-y))' }}
         >
           <CoursesSection />
         </div>
       </div>
 
-      {/* Scrollable area (Unchanged) */}
+      {/* Scrollable Area (Unchanged) */}
       <div className="relative z-30">
         <div className="h-screen" />
         <div className="h-screen" />

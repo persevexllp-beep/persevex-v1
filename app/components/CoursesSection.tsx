@@ -19,21 +19,18 @@ const DataScienceIcon = () => (
   </svg>
 );
 const MobileDevIcon = () => (
-    // This icon is used in the original image for Mobile App Development
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-green-500">
       <rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" strokeWidth="2" />
       <circle cx="12" cy="18" r="1" fill="currentColor" />
     </svg>
 );
 const DesignIcon = () => (
-    // This icon is used in the original image for UI/UX Design
     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-orange-500">
         <path d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor" fillOpacity="0.2"/>
         <path d="M12 3C12 3 15 6 15 12C15 18 12 21 12 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );
 
-// --- Updated Course Data ---
 const courses = [
     { id: 1, title: "Web Development Mastery", description: "From HTML to advanced React, become a full-stack web developer.", icon: WebDevIcon },
     { id: 2, title: "Data Science & ML", description: "Dive into data analysis, machine learning, and Python.", icon: DataScienceIcon },
@@ -44,7 +41,7 @@ const courses = [
 export default function CoursesSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [isInCoursesZone, setIsInCoursesZone] = useState<boolean>(false);
+  // --- FIX: Removed unused isInCoursesZone state ---
 
   useEffect(() => {
     let raf = 0;
@@ -57,26 +54,22 @@ export default function CoursesSection() {
       const sectionHeight = rect.height;
       const viewportHeight = window.innerHeight;
       
-      const coursesStartZone = sectionTop - viewportHeight * 0.8; 
-      
-      // --- FIX: Correct calculation for the end of the scroll zone ---
-      // The animation should conclude when the bottom of the section aligns with the bottom of the viewport.
-      // This ensures the sticky container is still fully visible when the animation finishes (progress = 1).
-      // The original calculation (sectionHeight - viewportHeight * 0.1) caused the animation to end
-      // too late, after the sticky container had already started scrolling off-screen.
+      const coursesStartZone = sectionTop - viewportHeight * 0.8;
       const coursesEndZone = sectionTop + sectionHeight - viewportHeight;
       
-      const inCoursesZone = scrollY >= coursesStartZone && scrollY <= coursesEndZone;
-      setIsInCoursesZone(inCoursesZone);
-      
-      if (scrollY < coursesStartZone) {
-        setProgress(0);
+      // --- FIX: Simplified and corrected progress calculation ---
+      let newProgress = 0;
+      if (scrollY >= coursesStartZone && scrollY <= coursesEndZone) {
+        const totalZoneHeight = coursesEndZone - coursesStartZone;
+        const progressInZone = scrollY - coursesStartZone;
+        newProgress = progressInZone / totalZoneHeight;
       } else if (scrollY > coursesEndZone) {
-        setProgress(1);
-      } else {
-        const zoneProgress = (scrollY - coursesStartZone) / (coursesEndZone - coursesStartZone);
-        setProgress(Math.max(0.001, Math.min(1, zoneProgress)));
+        newProgress = 1;
       }
+      // If scrollY is before the start zone, progress remains 0.
+      // This removes the need for the 0.001 hack and ensures the animation resets to 0.
+      
+      setProgress(newProgress);
     };
     
     const onScroll = () => {
@@ -98,12 +91,16 @@ export default function CoursesSection() {
   }, []);
 
   const cardCount = courses.length;
-  const displayProgress = isInCoursesZone ? Math.max(0.001, progress) : progress;
+
+  // --- FIX: Adjusted animatedProgress calculation ---
+  // It now maps the scroll progress (0 to 1) to an animation range that starts
+  // with the cards off-screen (at -1) and ends with the last card on top.
+  const animatedProgress = (progress * cardCount) - 1;
 
   return (
     <section ref={sectionRef} className="relative w-full text-white" style={{ height: `${120 + cardCount * 70}vh` }}>
-      <div className="sticky top-0 flex flex-col md:flex-row max-w-7xl mx-auto px-8 gap-12 h-screen items-center">
-        <div className="w-full md:w-1/2 flex flex-col justify-center">
+      <div className="sticky top-0 flex  flex-col md:flex-row  max-w-8xl mx-auto px-8 gap-12 h-screen items-center">
+        <div className="w-full md:w-full flex flex-col justify-center">
           <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
             Unlock Your Potential.
             <span className="block opacity-80">One Course at a Time.</span>
@@ -115,7 +112,7 @@ export default function CoursesSection() {
 
         <div className="relative w-full md:w-1/2 h-[520px] flex items-center justify-center">
           {courses.map((course, i) => {
-            const animatedProgress = displayProgress * (cardCount - 1);
+            // The card animation logic now works correctly because animatedProgress has the correct range.
             const distance = animatedProgress - i;
 
             let translateY = 0;
@@ -138,7 +135,7 @@ export default function CoursesSection() {
               scale = 0.8 + 0.2 * localProgress;
               opacity = localProgress;
             } else {
-              // Card is waiting off-screen
+              // Card is waiting off-screen (opacity remains 0)
               translateY = initialY;
               scale = 0.8;
               opacity = 0;
@@ -153,7 +150,7 @@ export default function CoursesSection() {
                   opacity,
                   zIndex: i,
                 }}
-                className="absolute top-0 w-full max-w-sm h-[480px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl"
+                className="absolute top-0 w-full max-w-sm h-[450px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl"
               >
                 <div className="w-full h-32 flex items-center justify-center mb-4">
                    <course.icon />

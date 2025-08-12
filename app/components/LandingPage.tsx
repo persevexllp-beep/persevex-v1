@@ -9,27 +9,34 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 
-function AnimationController({ scrollProgressRef, textContainerRef }: any) {
-  const animatedScroll = useRef(0);
+// --- FIX: Restored the sequential fade logic for the watermarks ---
+function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
+  const animatedProgress = useRef(0);
 
   useFrame(() => {
-    animatedScroll.current = THREE.MathUtils.lerp(
-      animatedScroll.current,
-      scrollProgressRef.current,
+    animatedProgress.current = THREE.MathUtils.lerp(
+      animatedProgress.current,
+      watermarkProgressRef.current,
       0.1
     );
-    const currentProgress = animatedScroll.current;
+    const currentProgress = animatedProgress.current;
 
     if (textContainerRef.current) {
-      const pageHeight = 1 / 3;
-      const persevexFadeStart = pageHeight * 0.5;
-      const coursesFadeStart = pageHeight * 2;
-      
-      const persevexProgress = Math.max(0, (currentProgress - persevexFadeStart) / pageHeight);
-      const coursesProgress = Math.max(0, (currentProgress - coursesFadeStart) / pageHeight);
-      
-      const persevexOpacity = (1 - persevexProgress) * 0.4;
-      const coursesOpacity = coursesProgress * 0.4;
+      let persevexOpacity = 0;
+      let coursesOpacity = 0;
+
+      // This logic splits the 0-1 progress into two halves.
+      // First half (0 to 0.5): Persevex fades out.
+      // Second half (0.5 to 1): Courses fades in.
+      if (currentProgress < 0.5) {
+        // Map the scroll from [0, 0.5] to an opacity from [0.4, 0]
+        persevexOpacity = (1 - (currentProgress / 0.5)) * 0.4;
+        coursesOpacity = 0;
+      } else {
+        persevexOpacity = 0;
+        // Map the scroll from [0.5, 1] to an opacity from [0, 0.4]
+        coursesOpacity = ((currentProgress - 0.5) / 0.5) * 0.4;
+      }
 
       textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
       textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
@@ -46,19 +53,41 @@ function AnimationController({ scrollProgressRef, textContainerRef }: any) {
 }
 
 export default function LandingPage() {
-  const scrollProgressRef = useRef(0);
+  const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [heroOpacity, setHeroOpacity] = useState(1);
+  const [heroTranslateY, setHeroTranslateY] = useState(0);
+  
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const totalScrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
       const currentScroll = window.scrollY;
-      const scrollFraction = totalScrollableHeight > 0 ? currentScroll / totalScrollableHeight : 0;
-      scrollProgressRef.current = scrollFraction;
+      const viewportHeight = window.innerHeight;
 
-      const heroFade = 1 - Math.min(1, currentScroll / (window.innerHeight * 0.8));
-      setHeroOpacity(heroFade);
+      const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
+      setHeroOpacity(1 - heroAnimationProgress);
+      setHeroTranslateY(heroAnimationProgress * -250);
+
+      if (coursesSectionWrapperRef.current) {
+        const coursesTop = coursesSectionWrapperRef.current.offsetTop;
+        
+        const transitionStart = viewportHeight;
+        const transitionEnd = coursesTop;
+        const transitionDuration = transitionEnd - transitionStart;
+        
+        let newWatermarkProgress = 0;
+        if (transitionDuration > 0) {
+            if (currentScroll <= transitionStart) {
+                newWatermarkProgress = 0;
+            } else if (currentScroll >= transitionEnd) {
+                newWatermarkProgress = 1;
+            } else {
+                newWatermarkProgress = (currentScroll - transitionStart) / transitionDuration;
+            }
+        }
+        watermarkProgressRef.current = newWatermarkProgress;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -72,7 +101,7 @@ export default function LandingPage() {
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
             <AnimationController 
-              scrollProgressRef={scrollProgressRef} 
+              watermarkProgressRef={watermarkProgressRef} 
               textContainerRef={textContainerRef} 
             />
           </Suspense>
@@ -97,14 +126,21 @@ export default function LandingPage() {
       <div className="relative z-20">
         <div 
           className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
-          style={{ opacity: heroOpacity }}
+          style={{ 
+            opacity: heroOpacity, 
+            transform: `translateY(${heroTranslateY}px)` 
+          }}
         >
-          <div className="w-full pointer-events-auto">
+          <div className="w-full mr-74 pointer-events-auto">
             <Hero />
           </div>
         </div>
         
-        <CoursesSection />
+        <div style={{ height: '100vh' }} />
+
+        <div ref={coursesSectionWrapperRef}>
+          <CoursesSection />
+        </div>
       </div>
     </main>
   );

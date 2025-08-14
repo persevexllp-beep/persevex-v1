@@ -162,8 +162,13 @@ const CoursesSection: React.FC = () => {
 
   const totalCount = managementCourses.length + technicalCourses.length;
   const managementCount = managementCourses.length;
-  const transitionEndPoint = (managementCount + 0.5) / totalCount;
-
+  
+  // --- TIMING LOGIC ---
+  // The point at which the last management card is fully revealed.
+  const managementEndProgress = managementCount / totalCount;
+  // The point at which the first technical card starts to become prominent.
+  const technicalStartProgress = (managementCount + 1) / totalCount;
+  
   useEffect(() => {
     let raf = 0;
     const onScroll = () => {
@@ -190,7 +195,8 @@ const CoursesSection: React.FC = () => {
         }
         
         setProgress(Math.max(0, Math.min(1, newProgress)));
-        setActiveView(newProgress >= transitionEndPoint ? 'technical' : 'management');
+        // Set active view based on when the management cards finish.
+        setActiveView(newProgress >= managementEndProgress ? 'technical' : 'management');
         raf = 0;
       });
     };
@@ -204,7 +210,7 @@ const CoursesSection: React.FC = () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [transitionEndPoint]);
+  }, [managementEndProgress]);
 
   const handleSwitch = (view: 'management' | 'technical') => {
     if (!sectionRef.current) return;
@@ -221,24 +227,20 @@ const CoursesSection: React.FC = () => {
     const totalZoneHeight = coursesEndZone - coursesStartZone;
 
     if (view === 'management') {
-        // Position for management content - early in the scroll zone
-        const managementPosition = coursesStartZone + (totalZoneHeight * 0.13); // 10% into the zone
-        window.scrollTo({
-            top: managementPosition,
-            behavior: 'smooth'
-        });
+        const managementPosition = coursesStartZone + (totalZoneHeight * 0.13); 
+        window.scrollTo({ top: managementPosition, behavior: 'smooth' });
     } else {
-        // Position for technical content - later in the scroll zone
-        const technicalPosition = coursesStartZone + (totalZoneHeight * 0.5); // 90% into the zone
-        window.scrollTo({
-            top: technicalPosition,
-            behavior: 'smooth'
-        });
+        const technicalPosition = coursesStartZone + (totalZoneHeight * 0.5); 
+        window.scrollTo({ top: technicalPosition, behavior: 'smooth' });
     }
   };
 
   const overallAnimatedProgress = (progress * totalCount) - 1;
-  const transitionStartPoint = (managementCount - 0.5) / totalCount;
+  
+  // --- CORRECTED TEXT TRANSITION LOGIC ---
+  // The fade now happens in the space between the last management card and the first technical card.
+  const transitionStartPoint = managementEndProgress;
+  const transitionEndPoint = technicalStartProgress;
   
   let textTransitionProgress = 0;
   if (progress >= transitionStartPoint && progress <= transitionEndPoint) {
@@ -253,65 +255,80 @@ const CoursesSection: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full  text-white"
+      className="relative w-full text-white"
       style={{ height: `${120 + totalCount * 70}vh` }}
     >
-      <div className="sticky top-0 flex flex-col md:flex-row gap-12  justify-center mx-auto px-8 h-screen items-center">
-        <div className="relative mb-28 w-full md:w-full flex flex-col justify-center">
-          <div className="relative w-full  h-80">
+      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-center mx-auto px-8 h-screen items-center relative">
+        {/* TOGGLE SWITCH */}
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
+          <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
             <motion.div
-              className="absolute ml-24 top-0 left-0 w-full"
+              className="absolute left-1 top-1 h-[calc(100%-0.5rem)] w-[110px] rounded-full bg-white"
+              animate={{ x: activeView === 'management' ? '0%' : '100%' }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+            />
+            <button
+              onClick={() => handleSwitch('management')}
+              className={`relative z-10 w-[110px] cursor-pointer rounded-full py-2 text-sm font-semibold transition-colors duration-300 ${
+                activeView === 'management' ? 'text-gray-900' : 'text-white'
+              }`}
+            >
+              Management
+            </button>
+            <button
+              onClick={() => handleSwitch('technical')}
+              className={`relative z-10 w-[110px] cursor-pointer rounded-full py-2 text-sm font-semibold transition-colors duration-300 ${
+                activeView === 'technical' ? 'text-gray-900' : 'text-white'
+              }`}
+            >
+              Technical
+            </button>
+          </div>
+        </div>
+        
+        {/* Left Side: Text Content */}
+        <div className="w-full md:w-full flex mb-44 items-center justify-center">
+          <div className="relative w-full  ml-24 h-80">
+            <motion.div
+              className="absolute top-0 left-0 w-full"
               animate={{
                 opacity: 1 - textTransitionProgress,
                 y: -20 * textTransitionProgress,
               }}
               transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
             >
-              <h2 className="text-4xl md:text-6xl  font-extrabold leading-tight">
+              <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
                 {managementContent.heading}
                 <span className="block opacity-80">{managementContent.subheading}</span>
               </h2>
-              <p className="text-lg md:text-xl max-w-xl opacity-90 mt-6">
+              <p className="text-lg md:text-xl opacity-90 mt-6">
                 {managementContent.paragraph}
               </p>
             </motion.div>
             
             <motion.div
-              className="absolute top-0 ml-24 left-0 w-full"
+              className="absolute top-0 left-0 w-full"
               animate={{
                 opacity: textTransitionProgress,
                 y: 20 * (1 - textTransitionProgress),
               }}
               transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
             >
-              <h2 className="text-4xl md:text-6xl  font-extrabold leading-tight">
+              <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
                 {technicalContent.heading}
                 <span className="block opacity-80">{technicalContent.subheading}</span>
               </h2>
-              <p className="text-lg md:text-xl max-w-xl opacity-90 mt-6">
+              <p className="text-lg md:text-xl opacity-90 mt-6">
                 {technicalContent.paragraph}
               </p>
             </motion.div>
           </div>
-
-         <div className="flex items-center ml-24 pt-18">
-  <button
-    onClick={() =>
-      handleSwitch(activeView === "management" ? "technical" : "management")
-    }
-    className="px-8 py-2 rounded-full text-base md:text-lg font-semibold 
-               bg-white text-gray-900 shadow-lg transition-all duration-300 
-               transform active:scale-95"
-  >
-    {activeView === "management" ? "Switch to Technical" : "Switch to Management"}
-  </button>
-</div>
-
         </div>
 
+        {/* Right Side: Card Stack */}
         <div className="relative w-full md:w-1/2 h-[480px] flex items-center justify-center">
             <motion.div
-              className="absolute inset-0"
+              className="absolute inset-0 flex justify-center items-center"
               animate={{ opacity: 1 - textTransitionProgress }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
@@ -321,7 +338,7 @@ const CoursesSection: React.FC = () => {
             </motion.div>
 
             <motion.div
-              className="absolute inset-0"
+              className="absolute inset-0 flex justify-center items-center"
               animate={{ opacity: textTransitionProgress }}
               transition={{ duration: 0.3, ease: 'easeIn' }}
             >

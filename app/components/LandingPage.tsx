@@ -1,3 +1,5 @@
+// app/page.tsx or your main landing page file
+
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -8,34 +10,55 @@ import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
+import OurEdgeSection from "./OurEdgeSection";
 
+
+// --- AnimationController component is unchanged ---
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
+  const dustPlaneRef = useRef<THREE.Mesh>(null!);
 
   useFrame(() => {
-    // --- FIX: Decreased the lerp factor to slow down the transition speed ---
-    // A smaller value (like 0.05) makes the animation smoother and more gradual.
     animatedProgress.current = THREE.MathUtils.lerp(
       animatedProgress.current,
       watermarkProgressRef.current,
-      0.05 // Changed from 0.1
+      0.05
     );
     const currentProgress = animatedProgress.current;
+
+    if (dustPlaneRef.current) {
+        let dustOpacity = 1.0;
+        if (currentProgress > 1.0) {
+          dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
+        }
+        
+        const material = dustPlaneRef.current.material as THREE.ShaderMaterial;
+        if (material.uniforms.uOpacity) {
+            material.uniforms.uOpacity.value = dustOpacity;
+        }
+    }
 
     if (textContainerRef.current) {
       let persevexOpacity = 0;
       let coursesOpacity = 0;
+      let ourEdgeOpacity = 0;
 
-      if (currentProgress < 0.5) {
-        persevexOpacity = (1 - (currentProgress / 0.5)) * 0.4;
-        coursesOpacity = 0;
+      if (currentProgress < 1.0) {
+        persevexOpacity = (1 - currentProgress) * 0.4;
+        coursesOpacity = currentProgress * 0.4;
       } else {
-        persevexOpacity = 0;
-        coursesOpacity = ((currentProgress - 0.5) / 0.5) * 0.4;
+        const phase2Progress = currentProgress - 1.0;
+        coursesOpacity = (1 - phase2Progress) * 0.4;
+        ourEdgeOpacity = phase2Progress * 0.4;
       }
+      
+      persevexOpacity = THREE.MathUtils.clamp(persevexOpacity, 0, 0.4);
+      coursesOpacity = THREE.MathUtils.clamp(coursesOpacity, 0, 0.4);
+      ourEdgeOpacity = THREE.MathUtils.clamp(ourEdgeOpacity, 0, 0.4);
 
       textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
       textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
+      textContainerRef.current.style.setProperty('--our-edge-opacity', `${ourEdgeOpacity}`);
     }
   });
 
@@ -43,11 +66,12 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
     <>
       <color attach="background" args={['black']} />
       <StarField hover={false} />
-      <DustPlane renderOrder={-2} /> 
+      <DustPlane ref={dustPlaneRef} renderOrder={-2} /> 
     </>
   );
 }
 
+// --- The LandingPage component with the updated style ---
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
@@ -55,6 +79,7 @@ export default function LandingPage() {
   const [heroTranslateY, setHeroTranslateY] = useState(0);
   
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,23 +90,26 @@ export default function LandingPage() {
       setHeroOpacity(1 - heroAnimationProgress);
       setHeroTranslateY(heroAnimationProgress * -250);
 
-      if (coursesSectionWrapperRef.current) {
+      if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
         const coursesTop = coursesSectionWrapperRef.current.offsetTop;
-        
-        const transitionStart = viewportHeight;
-        const transitionEnd = coursesTop;
-        const transitionDuration = transitionEnd - transitionStart;
+        const edgeTop = ourEdgeSectionWrapperRef.current.offsetTop;
+
+        const t1_start = coursesTop - viewportHeight;
+        const t1_duration = coursesTop - t1_start;
+
+        const t2_start = edgeTop - viewportHeight;
+        const t2_duration = edgeTop - t2_start;
         
         let newWatermarkProgress = 0;
-        if (transitionDuration > 0) {
-            if (currentScroll <= transitionStart) {
-                newWatermarkProgress = 0;
-            } else if (currentScroll >= transitionEnd) {
-                newWatermarkProgress = 1;
-            } else {
-                newWatermarkProgress = (currentScroll - transitionStart) / transitionDuration;
-            }
+
+        if (currentScroll > t2_start && t2_duration > 0) {
+            const rawProgress = (currentScroll - t2_start) / t2_duration;
+            newWatermarkProgress = 1 + Math.min(1, rawProgress);
+        } else if (currentScroll > t1_start && t1_duration > 0) {
+            const rawProgress = (currentScroll - t1_start) / t1_duration;
+            newWatermarkProgress = Math.min(1, rawProgress);
         }
+        
         watermarkProgressRef.current = newWatermarkProgress;
       }
     };
@@ -107,7 +135,7 @@ export default function LandingPage() {
       <div
         ref={textContainerRef}
         className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-        style={{ '--persevex-opacity': 0.4, '--courses-opacity': 0 } as any}
+        style={{ '--persevex-opacity': 0.4, '--courses-opacity': 0, '--our-edge-opacity': 0 } as any}
       >
         <h2
           className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
@@ -117,6 +145,16 @@ export default function LandingPage() {
           className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
           style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}
         >Courses</h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{ 
+            opacity: 'var(--our-edge-opacity)', 
+            WebkitTextStroke: "1px white", 
+            transform: 'translateX(-50%) translateY(4rem)',
+            // --- FIX: Prevent the text from wrapping to a new line ---
+            whiteSpace: 'nowrap'
+          }}
+        >Our Edge</h2>
       </div>
       
       <div className="relative z-20">
@@ -137,6 +175,14 @@ export default function LandingPage() {
         <div ref={coursesSectionWrapperRef}>
           <CoursesSection />
         </div>
+        
+        <div style={{ height: '50vh' }} />
+
+        <div ref={ourEdgeSectionWrapperRef}>
+          <OurEdgeSection />
+        </div>
+
+        <div style={{ height: '50vh' }} />
       </div>
     </main>
   );

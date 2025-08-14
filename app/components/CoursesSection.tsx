@@ -163,10 +163,7 @@ const CoursesSection: React.FC = () => {
   const totalCount = managementCourses.length + technicalCourses.length;
   const managementCount = managementCourses.length;
   
-  // --- TIMING LOGIC ---
-  // The point at which the last management card is fully revealed.
   const managementEndProgress = managementCount / totalCount;
-  // The point at which the first technical card starts to become prominent.
   const technicalStartProgress = (managementCount + 1) / totalCount;
   
   useEffect(() => {

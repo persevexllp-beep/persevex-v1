@@ -1,8 +1,9 @@
-// DustPlane.tsx
+// app/DustPlane.tsx
+
 "use client";
 
 import * as THREE from "three";
-import { useMemo, forwardRef } from "react"; // Import forwardRef
+import { useMemo, forwardRef } from "react";
 import { ThreeElements } from "@react-three/fiber";
 
 const vertex = `
@@ -17,7 +18,10 @@ const fragment = `
   precision highp float;
   varying vec2 vUv;
   uniform float uScrollProgress;
-  // ... rest of the fragment shader is unchanged ...
+  
+  // --- FIX: Declare the new opacity uniform ---
+  uniform float uOpacity;
+
   const float PI = 3.1415926535;
   void main() {
     vec2 adjustedUv = vUv;
@@ -56,12 +60,12 @@ const fragment = `
     float rightEdgeFade = smoothstep(1.0, 0.8, adjustedUv.x);
     float scrollIntensity = 1.0 + uScrollProgress * 0.3;
     float alpha = shapeMask * rightEdgeFade * scrollIntensity;
-    gl_FragColor = vec4(finalColor, alpha);
+
+    // --- FIX: Multiply the final alpha by our external opacity uniform ---
+    gl_FragColor = vec4(finalColor, alpha * uOpacity);
   }
 `;
 
-// FIX: Wrap component in forwardRef
-// REMOVED: The scrollProgress prop is no longer needed here.
 const DustPlane = forwardRef<THREE.Mesh, ThreeElements['mesh']>((props, ref) => {
   const geom = useMemo(() => new THREE.PlaneGeometry(20, 12, 1, 1), []);
 
@@ -70,19 +74,16 @@ const DustPlane = forwardRef<THREE.Mesh, ThreeElements['mesh']>((props, ref) => 
       vertexShader: vertex,
       fragmentShader: fragment,
       uniforms: {
-        // Initialize with 0. The parent component will update this value.
-        uScrollProgress: { value: 0 } 
+        uScrollProgress: { value: 0 },
+        // --- FIX: Initialize the new uniform ---
+        uOpacity: { value: 1.0 }
       },
       transparent: true,
       depthWrite: false,
     });
   }, []);
 
-  // REMOVED: This line is no longer needed as the parent controls the uniform directly.
-  // mat.uniforms.uScrollProgress.value = scrollProgress;
-
   return (
-    // FIX: Attach the forwarded ref to the mesh
     <mesh ref={ref} geometry={geom} position={[0, 0, -3]} {...props}>
       <primitive object={mat} attach="material" />
     </mesh>

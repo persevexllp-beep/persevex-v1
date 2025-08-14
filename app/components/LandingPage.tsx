@@ -27,15 +27,14 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
     const currentProgress = animatedProgress.current;
 
     if (dustPlaneRef.current) {
-        let dustOpacity = 1.0;
-        if (currentProgress > 1.0) {
-          dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
-        }
-        
-        const material = dustPlaneRef.current.material as THREE.ShaderMaterial;
-        if (material.uniforms.uOpacity) {
-            material.uniforms.uOpacity.value = dustOpacity;
-        }
+      let dustOpacity = 1.0;
+      if (currentProgress > 1.0) {
+        dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
+      }
+      const material = dustPlaneRef.current.material as THREE.ShaderMaterial;
+      if (material.uniforms.uOpacity) {
+        material.uniforms.uOpacity.value = dustOpacity;
+      }
     }
 
     if (textContainerRef.current) {
@@ -71,13 +70,16 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   );
 }
 
-// --- The LandingPage component with the updated style ---
+// --- The LandingPage component ---
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [heroOpacity, setHeroOpacity] = useState(1);
   const [heroTranslateY, setHeroTranslateY] = useState(0);
   
+  // --- NEW: State to hold the progress of the edge section animation ---
+  const [edgeProgress, setEdgeProgress] = useState(0);
+
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
   const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -86,31 +88,42 @@ export default function LandingPage() {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
 
+      // Hero animation
       const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       setHeroOpacity(1 - heroAnimationProgress);
       setHeroTranslateY(heroAnimationProgress * -250);
 
+      // Watermark animation logic (unchanged)
       if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
         const coursesTop = coursesSectionWrapperRef.current.offsetTop;
         const edgeTop = ourEdgeSectionWrapperRef.current.offsetTop;
 
         const t1_start = coursesTop - viewportHeight;
         const t1_duration = coursesTop - t1_start;
-
         const t2_start = edgeTop - viewportHeight;
         const t2_duration = edgeTop - t2_start;
         
         let newWatermarkProgress = 0;
-
         if (currentScroll > t2_start && t2_duration > 0) {
-            const rawProgress = (currentScroll - t2_start) / t2_duration;
-            newWatermarkProgress = 1 + Math.min(1, rawProgress);
+            newWatermarkProgress = 1 + Math.min(1, (currentScroll - t2_start) / t2_duration);
         } else if (currentScroll > t1_start && t1_duration > 0) {
-            const rawProgress = (currentScroll - t1_start) / t1_duration;
-            newWatermarkProgress = Math.min(1, rawProgress);
+            newWatermarkProgress = Math.min(1, (currentScroll - t1_start) / t1_duration);
         }
-        
         watermarkProgressRef.current = newWatermarkProgress;
+
+        // --- NEW: "Our Edge" card animation logic ---
+        const edgeAnimStart = edgeTop;
+        // Each card gets roughly a full viewport height to animate
+        const edgeAnimDuration = viewportHeight * 6; 
+        const scrollInZone = currentScroll - edgeAnimStart;
+        
+        if (scrollInZone > 0 && scrollInZone < edgeAnimDuration) {
+          setEdgeProgress(scrollInZone / edgeAnimDuration);
+        } else if (scrollInZone >= edgeAnimDuration) {
+          setEdgeProgress(1);
+        } else {
+          setEdgeProgress(0);
+        }
       }
     };
 
@@ -151,7 +164,6 @@ export default function LandingPage() {
             opacity: 'var(--our-edge-opacity)', 
             WebkitTextStroke: "1px white", 
             transform: 'translateX(-50%) translateY(4rem)',
-            // --- FIX: Prevent the text from wrapping to a new line ---
             whiteSpace: 'nowrap'
           }}
         >Our Edge</h2>
@@ -178,8 +190,9 @@ export default function LandingPage() {
         
         <div style={{ height: '50vh' }} />
 
-        <div ref={ourEdgeSectionWrapperRef}>
-          <OurEdgeSection />
+        {/* --- FIX: This is now the tall "scroll track" for the animation --- */}
+        <div ref={ourEdgeSectionWrapperRef} style={{ height: '600vh' }}>
+          <OurEdgeSection progress={edgeProgress} />
         </div>
 
         <div style={{ height: '50vh' }} />

@@ -1,11 +1,9 @@
-// app/OurEdgeSection.tsx
-
 "use client";
 
 import { BrainCircuit, Zap, Users, Code, ShieldCheck, Rocket } from 'lucide-react';
 import { useMemo } from 'react';
 
-// Data and finalPositions are unchanged...
+// Data and finalPositions are unchanged
 const edgeData = [
   { icon: <BrainCircuit size={48} className="text-cyan-400 flex-shrink-0" />, title: 'Expert-Led Curriculum', description: 'Our courses are designed and taught by industry veterans with years of real-world experience.' },
   { icon: <Zap size={48} className="text-cyan-400 flex-shrink-0" />, title: 'Hands-On Projects', description: 'Learn by doing. Build a portfolio of impressive projects that showcase your skills to employers.' },
@@ -20,48 +18,72 @@ const finalPositions = [
   { x: '-120%', y: '5rem' }, { x: '0%', y: '5rem' }, { x: '120%', y: '5rem' },
 ];
 
+// NEW: Easing function for smoother animations
+// This function makes motion start and end slowly, accelerating in the middle.
+const easeInOutCubic = (t: number): number => {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+};
+
 
 const OurEdgeSection = ({ progress }: { progress: number }) => {
   const NUM_CARDS = edgeData.length;
 
   const cardStyles = useMemo(() => {
     return edgeData.map((_, index) => {
-      // === FIX 1: Go back to NUM_CARDS multiplier ===
-      // This ensures the animation for the final card completes exactly when progress hits 1.
       const cardProgress = progress * NUM_CARDS - index;
 
       let opacity = 0;
       let scale = 0.5;
       let translateX = 0;
       let translateY = 500;
+      // NEW: Add rotation and blur for more dynamic movement
+      let rotate = 10;
+      let blur = 4;
 
-      // Logic for phases is unchanged...
-      if (cardProgress > 0 && cardProgress < 0.5) {
+      if (cardProgress > 0 && cardProgress < 0.5) { // Phase 1: Appear
         const phaseProgress = cardProgress / 0.5;
-        opacity = phaseProgress;
-        scale = 0.5 + 1.0 * phaseProgress;
-        translateY = 500 * (1 - phaseProgress);
-      } 
-      else if (cardProgress >= 0.5 && cardProgress < 1) {
+        // MODIFIED: Apply easing to all animated properties
+        const easedProgress = easeInOutCubic(phaseProgress);
+
+        opacity = easedProgress;
+        scale = 0.5 + 1.0 * easedProgress;
+        translateY = 500 * (1 - easedProgress);
+        rotate = 10 * (1 - easedProgress);
+        blur = 4 * (1 - easedProgress);
+
+      } else if (cardProgress >= 0.5 && cardProgress < 1) { // Phase 2: Move to final spot
         const phaseProgress = (cardProgress - 0.5) / 0.5;
+        // MODIFIED: Apply easing here as well
+        const easedProgress = easeInOutCubic(phaseProgress);
+        
         const targetX = parseFloat(finalPositions[index].x);
         const targetY = parseFloat(finalPositions[index].y.replace('rem', '')) * 16;
+        
         opacity = 1;
-        scale = 1.5 - 0.5 * phaseProgress;
-        translateX = targetX * phaseProgress;
-        translateY = targetY * phaseProgress;
-      } 
-      else if (cardProgress >= 1) {
+        scale = 1.5 - 0.5 * easedProgress;
+        translateX = targetX * easedProgress;
+        translateY = targetY * easedProgress;
+        // NEW: Make rotation react to horizontal movement for a nice touch
+        rotate = (targetX / 50) * (1 - easedProgress); // Rotate away from the direction of travel
+        blur = 0;
+
+      } else if (cardProgress >= 1) { // Phase 3: In final position
         const targetX = parseFloat(finalPositions[index].x);
         const targetY = parseFloat(finalPositions[index].y.replace('rem', '')) * 16;
+        
         opacity = 1;
         scale = 1;
         translateX = targetX;
         translateY = targetY;
+        rotate = 0;
+        blur = 0;
       }
       
-      const transform = `translateX(${translateX}%) translateY(${translateY}px) scale(${scale})`;
-      return { transform, opacity };
+      // MODIFIED: Add rotation and blur to the final style object
+      const transform = `translateX(${translateX}%) translateY(${translateY}px) scale(${scale}) rotate(${rotate}deg)`;
+      const filter = `blur(${blur}px)`;
+      
+      return { transform, opacity, filter };
     });
   }, [progress]);
 
@@ -77,10 +99,10 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
             <div
               key={index}
               className="absolute top-1/2 left-1/2 w-full md:w-1/3 lg/w-1/4 p-4"
-              style={{ transform: `translateX(-50%) translateY(-50%)`, willChange: 'transform, opacity' }}
+              style={{ transform: `translateX(-50%) translateY(-50%)`, willChange: 'transform, opacity, filter' }}
             >
               <div
-                className="backdrop-blur-xl backdrop-saturate-150 backdrop-brightness-110 bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56"
+                className="backdrop-blur-xl backdrop-saturate-150 backdrop-brightness-110 bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56 transition-transform duration-100 ease-linear" // Added a subtle transition for even more smoothness
                 style={cardStyles[index]}
               >
                 <div className='text-base'>{item.icon}</div>

@@ -4,19 +4,19 @@ import React from 'react';
 import Image from 'next/image'; 
 
 const partners = [
-  { name: 'Amazon', src: '/Amazon.jpg', top: '30%', left: '80%', speed: 1.2 },
-  { name: 'Accenture', src: '/Accenture.png', top: '45%', left: '15%', speed: 0.9 },
+  { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 1.2 },
+  { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 0.9 },
   { name: 'Dell', src: '/Dell.png', top: '14%', left: '50%', speed: 1.25 },
   { name: 'Deloitte', src: '/Deloitte.png', top: '75%', left: '70%', speed: 1.0 },
   { name: 'ey', src: '/ey.png', top: '5%', left: '40%', speed: 1.8 },
-  { name: 'Harman', src: '/Harman.jpg', top: '20%', left: '15%', speed: 1.1 },
-  { name: 'Infosys', src: '/Infosys.jpg', top: '60%', left: '85%', speed: 1.05 },
+  { name: 'Harman', src: '/harman.png', top: '20%', left: '15%', speed: 1.1 },
+  { name: 'Infosys', src: '/infosys.png', top: '60%', left: '65%', speed: 1.05 },
   { name: 'KPMG', src: '/kpmg.png', top: '85%', left: '50%', speed: 1.3 },
-  { name: 'MindTree', src: '/mindtree.png', top: '10%', left: '78%', speed: 1.15 },
-  { name: 'PWC', src: '/PwC.png', top: '65%', left: '50%', speed: 1.4 },
+  { name: 'MindTree', src: '/mind.png', top: '10%', left: '78%', speed: 1.15 },
+  { name: 'PWC', src: '/pwclogo.png', top: '65%', left: '50%', speed: 1.4 },
   { name: 'TCS', src: '/TCS.png', top: '5%', left: '70%', speed: 1.28 },
-  { name: 'Walmart', src: '/walmart.jpg', top: '80%', left: '25%', speed: 1.9 },
-  { name: 'Wipro', src: '/wipro.jpg', top: '60%', left: '85%', speed: 1.06 },
+  { name: 'Walmart', src: '/wal.png', top: '80%', left: '25%', speed: 1.9 },
+  { name: 'Wipro', src: '/wipr.png', top: '60%', left: '85%', speed: 1.06 },
 ];
 
 interface PartnersSectionProps {

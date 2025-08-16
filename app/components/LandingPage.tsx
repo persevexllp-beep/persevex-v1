@@ -1,5 +1,3 @@
-// app/page.tsx or your main landing page file
-
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -12,8 +10,8 @@ import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
 
+const NUM_CARDS = 6;
 
-// --- AnimationController component is unchanged ---
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
@@ -70,14 +68,12 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   );
 }
 
-// --- The LandingPage component ---
+
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [heroOpacity, setHeroOpacity] = useState(1);
   const [heroTranslateY, setHeroTranslateY] = useState(0);
-  
-  // --- NEW: State to hold the progress of the edge section animation ---
   const [edgeProgress, setEdgeProgress] = useState(0);
 
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
@@ -88,21 +84,18 @@ export default function LandingPage() {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
 
-      // Hero animation
       const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       setHeroOpacity(1 - heroAnimationProgress);
       setHeroTranslateY(heroAnimationProgress * -250);
 
-      // Watermark animation logic (unchanged)
       if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
         const coursesTop = coursesSectionWrapperRef.current.offsetTop;
         const edgeTop = ourEdgeSectionWrapperRef.current.offsetTop;
-
         const t1_start = coursesTop - viewportHeight;
         const t1_duration = coursesTop - t1_start;
         const t2_start = edgeTop - viewportHeight;
         const t2_duration = edgeTop - t2_start;
-        
+
         let newWatermarkProgress = 0;
         if (currentScroll > t2_start && t2_duration > 0) {
             newWatermarkProgress = 1 + Math.min(1, (currentScroll - t2_start) / t2_duration);
@@ -110,20 +103,19 @@ export default function LandingPage() {
             newWatermarkProgress = Math.min(1, (currentScroll - t1_start) / t1_duration);
         }
         watermarkProgressRef.current = newWatermarkProgress;
-
-        // --- NEW: "Our Edge" card animation logic ---
+        
         const edgeAnimStart = edgeTop;
-        // Each card gets roughly a full viewport height to animate
-        const edgeAnimDuration = viewportHeight * 6; 
+        const scrollDurationInVH = NUM_CARDS;
+        const edgeAnimDuration = viewportHeight * scrollDurationInVH;
+        
         const scrollInZone = currentScroll - edgeAnimStart;
         
-        if (scrollInZone > 0 && scrollInZone < edgeAnimDuration) {
-          setEdgeProgress(scrollInZone / edgeAnimDuration);
-        } else if (scrollInZone >= edgeAnimDuration) {
-          setEdgeProgress(1);
-        } else {
-          setEdgeProgress(0);
+        let newEdgeProgress = 0;
+        if (scrollInZone > 0) {
+            newEdgeProgress = Math.min(1, scrollInZone / edgeAnimDuration);
         }
+        
+        setEdgeProgress(newEdgeProgress);
       }
     };
 
@@ -189,9 +181,8 @@ export default function LandingPage() {
         </div>
         
         <div style={{ height: '50vh' }} />
-
-        {/* --- FIX: This is now the tall "scroll track" for the animation --- */}
-        <div ref={ourEdgeSectionWrapperRef} style={{ height: '600vh' }}>
+        
+        <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}>
           <OurEdgeSection progress={edgeProgress} />
         </div>
 

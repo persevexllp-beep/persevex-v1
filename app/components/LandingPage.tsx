@@ -12,6 +12,7 @@ import OurEdgeSection from "./OurEdgeSection";
 
 const NUM_CARDS = 6;
 
+// AnimationController remains unchanged as it's already performant (uses R3F's loop)
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
@@ -72,14 +73,16 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const heroWrapperRef = useRef<HTMLDivElement>(null); // Ref for direct Hero manipulation
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
   const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
   
   const [edgeProgress, setEdgeProgress] = useState(0);
   
+  // State to hold the pre-calculated layout positions
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0 });
 
+  // Effect to calculate layout ONCE, not on every scroll
   useEffect(() => {
     const calculateLayout = () => {
       if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
@@ -93,23 +96,27 @@ export default function LandingPage() {
     calculateLayout();
     window.addEventListener('resize', calculateLayout);
     return () => window.removeEventListener('resize', calculateLayout);
-  }, []);
+  }, []); // Empty dependency array means this runs only on mount
 
+  // Effect for the scroll listener, now much more performant
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
 
+      // 1. Hero Animation (now using a ref to avoid re-renders)
       const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       if (heroWrapperRef.current) {
         heroWrapperRef.current.style.opacity = `${1 - heroAnimationProgress}`;
         heroWrapperRef.current.style.transform = `translateY(${heroAnimationProgress * -250}px)`;
       }
 
+      // Check if layout has been calculated
       if (layout.coursesTop === 0) return;
 
       const { coursesTop, edgeTop } = layout;
 
+      // 2. Background/Watermark Animation
       const backgroundAnimDuration = viewportHeight;
       const coursesAnimStart = coursesTop - viewportHeight;
       const edgeAnimStartForBackground = edgeTop - viewportHeight;
@@ -124,6 +131,7 @@ export default function LandingPage() {
       }
       watermarkProgressRef.current = newWatermarkProgress;
       
+      // 3. OurEdgeSection Card Animation
       const edgeCardAnimStart = edgeTop;
       const cardAnimScrollDistance = viewportHeight * NUM_CARDS;
       const scrollInCardZone = currentScroll - edgeCardAnimStart;
@@ -136,9 +144,9 @@ export default function LandingPage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    handleScroll(); // Initial call
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [layout]);
+  }, [layout]); // Re-run this effect only when layout changes
 
   return (
     <main>
@@ -179,7 +187,7 @@ export default function LandingPage() {
       
       <div className="relative z-20">
         <div 
-          ref={heroWrapperRef}
+          ref={heroWrapperRef} // Attach ref here
           className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
         >
           <div className="w-full mr-74 mb-36 pointer-events-auto">

@@ -1,5 +1,3 @@
-// app/page.tsx or your main landing page file
-
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -12,8 +10,8 @@ import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
 
+const NUM_CARDS = 6;
 
-// --- AnimationController component is unchanged ---
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
@@ -70,14 +68,12 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   );
 }
 
-// --- The LandingPage component ---
+
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [heroOpacity, setHeroOpacity] = useState(1);
   const [heroTranslateY, setHeroTranslateY] = useState(0);
-  
-  // --- NEW: State to hold the progress of the edge section animation ---
   const [edgeProgress, setEdgeProgress] = useState(0);
 
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
@@ -88,42 +84,46 @@ export default function LandingPage() {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
 
-      // Hero animation
       const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       setHeroOpacity(1 - heroAnimationProgress);
       setHeroTranslateY(heroAnimationProgress * -250);
 
-      // Watermark animation logic (unchanged)
       if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
         const coursesTop = coursesSectionWrapperRef.current.offsetTop;
         const edgeTop = ourEdgeSectionWrapperRef.current.offsetTop;
 
-        const t1_start = coursesTop - viewportHeight;
-        const t1_duration = coursesTop - t1_start;
-        const t2_start = edgeTop - viewportHeight;
-        const t2_duration = edgeTop - t2_start;
-        
+        // --- THIS IS THE SMOOTH ANIMATION LOGIC FROM THE OLD CODEBASE ---
+        // It ensures the background animation is paced correctly and feels responsive.
+        // We explicitly define the duration to be one screen height for a snappy feel.
+        const backgroundAnimDuration = viewportHeight; 
+
+        const coursesAnimStart = coursesTop - viewportHeight;
+        const edgeAnimStartForBackground = edgeTop - viewportHeight;
+
         let newWatermarkProgress = 0;
-        if (currentScroll > t2_start && t2_duration > 0) {
-            newWatermarkProgress = 1 + Math.min(1, (currentScroll - t2_start) / t2_duration);
-        } else if (currentScroll > t1_start && t1_duration > 0) {
-            newWatermarkProgress = Math.min(1, (currentScroll - t1_start) / t1_duration);
+        if (currentScroll >= edgeAnimStartForBackground) {
+          const progress = (currentScroll - edgeAnimStartForBackground) / backgroundAnimDuration;
+          newWatermarkProgress = 1 + Math.min(1, progress); // Phase 2: "Courses" -> "Our Edge"
+        } else if (currentScroll >= coursesAnimStart) {
+          const progress = (currentScroll - coursesAnimStart) / backgroundAnimDuration;
+          newWatermarkProgress = Math.min(1, progress); // Phase 1: "Persevex" -> "Courses"
         }
         watermarkProgressRef.current = newWatermarkProgress;
-
-        // --- NEW: "Our Edge" card animation logic ---
-        const edgeAnimStart = edgeTop;
-        // Each card gets roughly a full viewport height to animate
-        const edgeAnimDuration = viewportHeight * 6; 
-        const scrollInZone = currentScroll - edgeAnimStart;
+        // --- END OF SMOOTH ANIMATION LOGIC ---
         
-        if (scrollInZone > 0 && scrollInZone < edgeAnimDuration) {
-          setEdgeProgress(scrollInZone / edgeAnimDuration);
-        } else if (scrollInZone >= edgeAnimDuration) {
-          setEdgeProgress(1);
-        } else {
-          setEdgeProgress(0);
+        // --- THIS IS THE PERFECT CARD ANIMATION LOGIC FROM THE NEW CODEBASE ---
+        // This part remains unchanged because it works perfectly for the cards.
+        const edgeCardAnimStart = edgeTop;
+        const cardAnimScrollDistance = viewportHeight * NUM_CARDS;
+        
+        const scrollInCardZone = currentScroll - edgeCardAnimStart;
+        
+        let newEdgeProgress = 0;
+        if (scrollInCardZone > 0) {
+            newEdgeProgress = Math.min(1, scrollInCardZone / cardAnimScrollDistance);
         }
+        setEdgeProgress(newEdgeProgress);
+        // --- END OF CARD ANIMATION LOGIC ---
       }
     };
 
@@ -177,7 +177,7 @@ export default function LandingPage() {
             transform: `translateY(${heroTranslateY}px)` 
           }}
         >
-          <div className="w-full mr-74 pointer-events-auto">
+          <div className="w-full mr-74 mb-36 pointer-events-auto">
             <Hero />
           </div>
         </div>
@@ -189,9 +189,8 @@ export default function LandingPage() {
         </div>
         
         <div style={{ height: '50vh' }} />
-
-        {/* --- FIX: This is now the tall "scroll track" for the animation --- */}
-        <div ref={ourEdgeSectionWrapperRef} style={{ height: '600vh' }}>
+        
+        <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}>
           <OurEdgeSection progress={edgeProgress} />
         </div>
 

@@ -169,7 +169,7 @@ export default function LandingPage() {
             transform: `translateY(${heroTranslateY}px)` 
           }}
         >
-          <div className="w-full mr-74 pointer-events-auto">
+          <div className="w-full mr-74 mb-36 pointer-events-auto">
             <Hero />
           </div>
         </div>

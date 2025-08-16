@@ -9,15 +9,17 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
+import PartnersSection from "./PartnersSection"; // 1. Import the new component
 
 const NUM_CARDS = 6;
 
-// AnimationController remains unchanged as it's already performant (uses R3F's loop)
+// AnimationController is updated to handle the new "Partners" watermark
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
 
   useFrame(() => {
+    // Lerp for smooth animation
     animatedProgress.current = THREE.MathUtils.lerp(
       animatedProgress.current,
       watermarkProgressRef.current,
@@ -25,6 +27,7 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
     );
     const currentProgress = animatedProgress.current;
 
+    // Dust plane opacity (fades out after Hero)
     if (dustPlaneRef.current) {
       let dustOpacity = 1.0;
       if (currentProgress > 1.0) {
@@ -36,27 +39,40 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       }
     }
 
+    // Watermark opacity logic
     if (textContainerRef.current) {
       let persevexOpacity = 0;
       let coursesOpacity = 0;
       let ourEdgeOpacity = 0;
+      let partnersOpacity = 0; // New variable for partners watermark
 
       if (currentProgress < 1.0) {
+        // Phase 1: Hero -> Courses
         persevexOpacity = (1 - currentProgress) * 0.4;
         coursesOpacity = currentProgress * 0.4;
-      } else {
+      } else if (currentProgress < 2.0) {
+        // Phase 2: Courses -> Our Edge
         const phase2Progress = currentProgress - 1.0;
         coursesOpacity = (1 - phase2Progress) * 0.4;
         ourEdgeOpacity = phase2Progress * 0.4;
+      } else {
+        // Phase 3: Our Edge -> Partners
+        const phase3Progress = currentProgress - 2.0;
+        ourEdgeOpacity = (1 - phase3Progress) * 0.4;
+        partnersOpacity = phase3Progress * 0.4;
       }
       
+      // Clamp values to avoid going out of 0-0.4 range
       persevexOpacity = THREE.MathUtils.clamp(persevexOpacity, 0, 0.4);
       coursesOpacity = THREE.MathUtils.clamp(coursesOpacity, 0, 0.4);
       ourEdgeOpacity = THREE.MathUtils.clamp(ourEdgeOpacity, 0, 0.4);
+      partnersOpacity = THREE.MathUtils.clamp(partnersOpacity, 0, 0.4);
 
+      // Set CSS variables for opacity
       textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
       textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
       textContainerRef.current.style.setProperty('--our-edge-opacity', `${ourEdgeOpacity}`);
+      textContainerRef.current.style.setProperty('--partners-opacity', `${partnersOpacity}`);
     }
   });
 
@@ -73,22 +89,25 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
 export default function LandingPage() {
   const watermarkProgressRef = useRef(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const heroWrapperRef = useRef<HTMLDivElement>(null); // Ref for direct Hero manipulation
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
   const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null); // 2. Ref for Partners section
   
   const [edgeProgress, setEdgeProgress] = useState(0);
+  const [partnersProgress, setPartnersProgress] = useState(0); // 3. State for Partners animation
   
-  // State to hold the pre-calculated layout positions
-  const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0 });
+  // State to hold pre-calculated layout positions, now including partners
+  const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0 });
 
   // Effect to calculate layout ONCE, not on every scroll
   useEffect(() => {
     const calculateLayout = () => {
-      if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current) {
+      if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current) {
         setLayout({
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
           edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
+          partnersTop: partnersSectionWrapperRef.current.offsetTop, // Calculate partners top
         });
       }
     };
@@ -96,38 +115,41 @@ export default function LandingPage() {
     calculateLayout();
     window.addEventListener('resize', calculateLayout);
     return () => window.removeEventListener('resize', calculateLayout);
-  }, []); // Empty dependency array means this runs only on mount
+  }, []);
 
-  // Effect for the scroll listener, now much more performant
+  // Effect for the scroll listener, now more performant
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
 
-      // 1. Hero Animation (now using a ref to avoid re-renders)
+      // 1. Hero Animation
       const heroAnimationProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       if (heroWrapperRef.current) {
         heroWrapperRef.current.style.opacity = `${1 - heroAnimationProgress}`;
         heroWrapperRef.current.style.transform = `translateY(${heroAnimationProgress * -250}px)`;
       }
 
-      // Check if layout has been calculated
       if (layout.coursesTop === 0) return;
 
-      const { coursesTop, edgeTop } = layout;
+      const { coursesTop, edgeTop, partnersTop } = layout;
 
-      // 2. Background/Watermark Animation
+      // 2. Background/Watermark Animation (now includes partners section)
       const backgroundAnimDuration = viewportHeight;
       const coursesAnimStart = coursesTop - viewportHeight;
       const edgeAnimStartForBackground = edgeTop - viewportHeight;
+      const partnersAnimStartForBackground = partnersTop - viewportHeight;
 
       let newWatermarkProgress = 0;
-      if (currentScroll >= edgeAnimStartForBackground) {
+      if (currentScroll >= partnersAnimStartForBackground) {
+        const progress = (currentScroll - partnersAnimStartForBackground) / backgroundAnimDuration;
+        newWatermarkProgress = 2 + Math.min(1, progress); // Progress into phase 3
+      } else if (currentScroll >= edgeAnimStartForBackground) {
         const progress = (currentScroll - edgeAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 1 + Math.min(1, progress);
+        newWatermarkProgress = 1 + Math.min(1, progress); // Progress into phase 2
       } else if (currentScroll >= coursesAnimStart) {
         const progress = (currentScroll - coursesAnimStart) / backgroundAnimDuration;
-        newWatermarkProgress = Math.min(1, progress);
+        newWatermarkProgress = Math.min(1, progress); // Progress into phase 1
       }
       watermarkProgressRef.current = newWatermarkProgress;
       
@@ -141,12 +163,23 @@ export default function LandingPage() {
           newEdgeProgress = Math.min(1, scrollInCardZone / cardAnimScrollDistance);
       }
       setEdgeProgress(newEdgeProgress);
+
+      // 4. PartnersSection Animation
+      const partnersAnimStart = partnersTop;
+      const partnersAnimDuration = viewportHeight; // Animate over 1 screen height
+      const scrollInPartnersZone = currentScroll - partnersAnimStart;
+
+      let newPartnersProgress = 0;
+      if (scrollInPartnersZone > 0) {
+          newPartnersProgress = Math.min(1, scrollInPartnersZone / partnersAnimDuration);
+      }
+      setPartnersProgress(newPartnersProgress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial call
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [layout]); // Re-run this effect only when layout changes
+  }, [layout]);
 
   return (
     <main>
@@ -162,32 +195,46 @@ export default function LandingPage() {
       </div>
 
      <div
-    ref={textContainerRef}
-    className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-    style={{ '--persevex-opacity': 0.4, '--courses-opacity': 0, '--our-edge-opacity': 0 } as any}
-  >
-    <h2
-      className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-      style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}
-    >Persevex</h2>
-    <h2
-      className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-      style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}
-    >Courses</h2>
-    <h2
-      className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+      ref={textContainerRef}
+      className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
       style={{ 
-        opacity: 'var(--our-edge-opacity)', 
-        WebkitTextStroke: "1px white", 
-        transform: 'translateX(-50%) translateY(4rem)',
-        whiteSpace: 'nowrap'
-      }}
-    >Our Edge</h2>
-  </div>
+        '--persevex-opacity': 0.4, 
+        '--courses-opacity': 0, 
+        '--our-edge-opacity': 0,
+        '--partners-opacity': 0 // Add new CSS variable for partners
+      } as any}
+    >
+      <h2
+        className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+        style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}
+      >Persevex</h2>
+      <h2
+        className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+        style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}
+      >Courses</h2>
+      <h2
+        className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+        style={{ 
+          opacity: 'var(--our-edge-opacity)', 
+          WebkitTextStroke: "1px white", 
+          transform: 'translateX(-50%) translateY(4rem)',
+          whiteSpace: 'nowrap'
+        }}
+      >Our Edge</h2>
+      {/* 4. Add the "Partners" watermark text */}
+      <h2
+        className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+        style={{ 
+          opacity: 'var(--partners-opacity)', 
+          WebkitTextStroke: "1px white", 
+          transform: 'translateX(-50%) translateY(4rem)',
+        }}
+      >Partners</h2>
+    </div>
       
       <div className="relative z-20">
         <div 
-          ref={heroWrapperRef} // Attach ref here
+          ref={heroWrapperRef}
           className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
         >
           <div className="w-full mr-74 mb-36 pointer-events-auto">
@@ -197,8 +244,7 @@ export default function LandingPage() {
         
         <div style={{ height: '10vh' }} />
 
-                <div ref={coursesSectionWrapperRef}>
-
+        <div ref={coursesSectionWrapperRef}>
           <CoursesSection />
         </div>
         
@@ -206,6 +252,13 @@ export default function LandingPage() {
         
         <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}>
           <OurEdgeSection progress={edgeProgress} />
+        </div>
+
+        <div style={{ height: '50vh' }} />
+        
+        {/* 5. Add the PartnersSection with a wrapper to control scroll height */}
+        <div ref={partnersSectionWrapperRef} style={{ height: '200vh' }}>
+          <PartnersSection progress={partnersProgress} />
         </div>
 
         <div style={{ height: '50vh' }} />

@@ -102,7 +102,7 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
               style={{ transform: `translateX(-50%) translateY(-50%)`, willChange: 'transform, opacity, filter' }}
             >
               <div
-                className="backdrop-blur-xl backdrop-saturate-150 backdrop-brightness-110 bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56 transition-transform duration-100 ease-linear" // Added a subtle transition for even more smoothness
+                className="  bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56 transition-transform duration-100 ease-linear" // Added a subtle transition for even more smoothness
                 style={cardStyles[index]}
               >
                 <div className='text-base'>{item.icon}</div>

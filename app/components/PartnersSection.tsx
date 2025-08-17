@@ -29,6 +29,8 @@ interface PartnersSectionProps {
   progress: number;
 }
 
+// new section
+
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const animationStartProgress = 0.3;
   const centerPointProgress = 0.6; 

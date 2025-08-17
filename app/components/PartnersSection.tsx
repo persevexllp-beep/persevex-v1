@@ -3,25 +3,26 @@
 import React from 'react';
 import Image from 'next/image'; 
 
+// Enhanced parallax with more natural speed variations
 const partners = [
-  { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 1.2 },
-  { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 0.9 },
-  { name: 'Dell', src: '/Dell.png', top: '14%', left: '50%', speed: 1.25 },
-  { name: 'Deloitte', src: '/Deloitte.png', top: '75%', left: '70%', speed: 1.0 },
-  { name: 'ey', src: '/ey.png', top: '5%', left: '40%', speed: 1.8 },
-  { name: 'TS', src: '/TCS.png', top: '15%', left: '30%', speed: 3 },
-  { name: 'Harman', src: '/harman.png', top: '20%', left: '15%', speed: 5 },
-  { name: 'Infosys', src: '/infosys.png', top: '60%', left: '65%', speed: 1.05 },
-  { name: 'KPMG', src: '/kpmg.png', top: '85%', left: '50%', speed: 1.3 },
-  { name: 'MindTree', src: '/mind.png', top: '10%', left: '78%', speed: 1.15 },
-  { name: 'PWC', src: '/pwclogo.png', top: '65%', left: '50%', speed: 1.4 },
-  { name: 'TCS', src: '/TCS.png', top: '5%', left: '70%', speed: 1.28 },
-  { name: 'Walmart', src: '/wal.png', top: '80%', left: '25%', speed: 1.9 },
-  { name: 'Wipro', src: '/wipr.png', top: '60%', left: '85%', speed: 1.06 },
-  { name: 'MindTre', src: '/mind.png', top: '10%', left: '78%', speed: 1.15 },
-  { name: 'PC', src: '/pwclogo.png', top: '5%', left: '20%', speed: 1.4 },
-  { name: 'Walart', src: '/wal.png', top: '80%', left: '25%', speed: 1.9 },
-  { name: 'Wipo', src: '/wal.png', top: '40%', left: '85%', speed: 1.06 },
+  { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 2.8 },
+  { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 1.4 },
+  { name: 'Dell', src: '/Dell.png', top: '14%', left: '50%', speed: 3.2 },
+  { name: 'Deloitte', src: '/Deloitte.png', top: '75%', left: '70%', speed: 1.8 },
+  { name: 'ey', src: '/ey.png', top: '5%', left: '40%', speed: 4.5 },
+  { name: 'TS', src: '/TCS.png', top: '15%', left: '30%', speed: 6.2 },
+  { name: 'Harman', src: '/harman.png', top: '20%', left: '15%', speed: 8.5 },
+  { name: 'Infosys', src: '/infosys.png', top: '60%', left: '65%', speed: 2.1 },
+  { name: 'KPMG', src: '/kpmg.png', top: '85%', left: '50%', speed: 3.4 },
+  { name: 'MindTree', src: '/mind.png', top: '10%', left: '38%', speed: 2.6 },
+  { name: 'PWC', src: '/pwclogo.png', top: '65%', left: '50%', speed: 3.8 },
+  { name: 'TCS', src: '/TCS.png', top: '5%', left: '70%', speed: 3.1 },
+  { name: 'Walmart', src: '/wal.png', top: '80%', left: '25%', speed: 4.8 },
+  { name: 'Wipro', src: '/wipr.png', top: '60%', left: '85%', speed: 2.3 },
+  { name: 'MindTre', src: '/mind.png', top: '10%', left: '78%', speed: 2.9 },
+  { name: 'PC', src: '/pwclogo.png', top: '5%', left: '20%', speed: 3.7 },
+  { name: 'Walart', src: '/wal.png', top: '60%', left: '35%', speed: 2.2 },
+  { name: 'Wipo', src: '/wal.png', top: '40%', left: '85%', speed: 2.4 },
 ];
 
 interface PartnersSectionProps {
@@ -63,7 +64,7 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
             Partnering with leading institutions and innovators.
           </h2>
           <p className="text-4xl font-semibold text-white md:text-5xl">
-            Together, we’re shaping the future of learning.
+            Together, we're shaping the future of learning.
           </p>
         </div>
 
@@ -71,6 +72,11 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
           const initialOffset = 500;
           const totalTravel = 900; 
           const translateY = initialOffset - (progress * totalTravel);
+          
+          const logoFadeStart = 0.5;
+          const logoFadeDuration = 1.0 - logoFadeStart;
+          const logoFadeProgress = Math.max(0, (progress - logoFadeStart) / logoFadeDuration);
+          const logoOpacity = 1 - logoFadeProgress;
           
           return (
             <div
@@ -80,13 +86,10 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
                 top: partner.top,
                 left: partner.left,
                 transform: `translate(-50%, -50%) translateY(${translateY * partner.speed}px)`,
-                // ======================= FIX IS HERE =======================
-                // Removed the `* 1.2` multiplier to make the fade-out last the entire scroll.
-                opacity: Math.max(0, 1 - progress),
-                // =========================================================
+                opacity: logoOpacity,
               }}
             >
-              <div className="relative h-16 w-32 filter grayscale hover:grayscale-0 transition-all">
+              <div className="relative h-16 w-32 transition-all">
                  <Image
                     src={partner.src}
                     alt={`${partner.name} logo`}

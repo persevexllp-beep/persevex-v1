@@ -29,17 +29,29 @@ interface PartnersSectionProps {
 }
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
+  // ======================= FIX IS HERE =======================
+
+  // 1. Define the key moments of the animation.
   const animationStartProgress = 0.3;
+  // This is the point where the text is physically in the center and should be fully opaque.
   const centerPointProgress = 0.6; 
   const animationEndProgress = 1.0;
 
+  // 2. Recalculate durations based on the new center point.
   const fadeInDuration = centerPointProgress - animationStartProgress;
   const fadeOutDuration = animationEndProgress - centerPointProgress;
 
+  // 3. Calculate opacity phases.
+  // `fadeInProgress` goes from 0 to 1 during the first part of the animation.
   const fadeInProgress = Math.min(1, Math.max(0, (progress - animationStartProgress) / fadeInDuration));
+  // `fadeOutProgress` goes from 0 to 1 during the second part.
   const fadeOutProgress = Math.max(0, (progress - centerPointProgress) / fadeOutDuration);
 
+  // Final opacity is the result of fading in and then fading out.
   const textOpacity = Math.max(0, fadeInProgress - fadeOutProgress);
+  
+  // 4. The movement calculation can remain the same, as it already passes through the center correctly.
+  // We use the original animation duration for movement speed consistency.
   const movementAnimationDuration = 0.75 - 0.3; 
   const movementProgress = Math.max(0, (progress - animationStartProgress) / movementAnimationDuration);
   
@@ -47,6 +59,7 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const textTravelDistance = 600; 
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 
+  // =========================================================
 
   return (
     <div className="sticky top-0 flex text-white h-screen w-full items-center justify-center overflow-hidden">

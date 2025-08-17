@@ -29,29 +29,18 @@ interface PartnersSectionProps {
 }
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
-  // ======================= FIX IS HERE =======================
-
-  // 1. Define the key moments of the animation.
   const animationStartProgress = 0.3;
-  // This is the point where the text is physically in the center and should be fully opaque.
   const centerPointProgress = 0.6; 
   const animationEndProgress = 1.0;
 
-  // 2. Recalculate durations based on the new center point.
   const fadeInDuration = centerPointProgress - animationStartProgress;
   const fadeOutDuration = animationEndProgress - centerPointProgress;
 
-  // 3. Calculate opacity phases.
-  // `fadeInProgress` goes from 0 to 1 during the first part of the animation.
   const fadeInProgress = Math.min(1, Math.max(0, (progress - animationStartProgress) / fadeInDuration));
-  // `fadeOutProgress` goes from 0 to 1 during the second part.
   const fadeOutProgress = Math.max(0, (progress - centerPointProgress) / fadeOutDuration);
 
-  // Final opacity is the result of fading in and then fading out.
   const textOpacity = Math.max(0, fadeInProgress - fadeOutProgress);
   
-  // 4. The movement calculation can remain the same, as it already passes through the center correctly.
-  // We use the original animation duration for movement speed consistency.
   const movementAnimationDuration = 0.75 - 0.3; 
   const movementProgress = Math.max(0, (progress - animationStartProgress) / movementAnimationDuration);
   
@@ -59,14 +48,12 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const textTravelDistance = 600; 
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 
-  // =========================================================
-
   return (
     <div className="sticky top-0 flex text-white h-screen w-full items-center justify-center overflow-hidden">
       <div className="relative h-full w-full">
         
         <div
-          className="absolute ml-84 left-1/2 top-1/2 z-10 w-4/5 max-w-2xl -translate-x-1/2 -translate-y-1/2 text-center"
+          className="absolute ml-84 left-1/2 top-1/2 z-10 w-4/5 max-w-2xl -translate-x-1/2 -translate-y-12 text-center"
           style={{
             opacity: textOpacity,
             transform: `translate(-50%, -50%) translateY(${textTranslateY}px)`,
@@ -93,10 +80,13 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
                 top: partner.top,
                 left: partner.left,
                 transform: `translate(-50%, -50%) translateY(${translateY * partner.speed}px)`,
-                opacity: Math.max(0, 1 - progress * 1.2),
+                // ======================= FIX IS HERE =======================
+                // Removed the `* 1.2` multiplier to make the fade-out last the entire scroll.
+                opacity: Math.max(0, 1 - progress),
+                // =========================================================
               }}
             >
-              <div className="relative h-16 w-32 filter grayscale hover-grayscale-0 transition-all">
+              <div className="relative h-16 w-32 filter grayscale hover:grayscale-0 transition-all">
                  <Image
                     src={partner.src}
                     alt={`${partner.name} logo`}

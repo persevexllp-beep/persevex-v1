@@ -165,10 +165,7 @@ export default function LandingPage() {
       setEdgeProgress(newEdgeProgress);
 
       // 4. PartnersSection Animation
-      // ======================= FIX IS HERE =======================
-      // Start the animation when the top of the section hits the BOTTOM of the viewport
-      const partnersAnimStart = partnersTop - viewportHeight; 
-      // =========================================================
+      const partnersAnimStart = partnersTop;
       const partnersAnimDuration = viewportHeight; // Animate over 1 screen height
       const scrollInPartnersZone = currentScroll - partnersAnimStart;
 

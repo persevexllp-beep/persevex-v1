@@ -254,10 +254,8 @@ export default function LandingPage() {
           <OurEdgeSection progress={edgeProgress} />
         </div>
 
-        <div style={{ height: '50vh' }} />
-        
-        {/* 5. Add the PartnersSection with a wrapper to control scroll height */}
-        <div ref={partnersSectionWrapperRef} style={{ height: '200vh' }}>
+        {/* 5. Add the PartnersSection with a wrapper to control scroll height - overlapping with OurEdgeSection */}
+        <div ref={partnersSectionWrapperRef} style={{ height: '200vh', marginTop: '-50vh' }}>
           <PartnersSection progress={partnersProgress} />
         </div>
 

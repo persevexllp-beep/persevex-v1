@@ -32,8 +32,10 @@ interface PartnersSectionProps {
 // new section
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
-  const animationStartProgress = 0.3;
-  const centerPointProgress = 0.6; 
+  // The text animation will now start when the scroll is 50% through the section
+  const animationStartProgress = 0.45;
+  // The text will be fully visible and centered at 75%
+  const centerPointProgress = 0.75; 
   const animationEndProgress = 1.0;
 
   const fadeInDuration = centerPointProgress - animationStartProgress;
@@ -44,10 +46,12 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
 
   const textOpacity = Math.max(0, fadeInProgress - fadeOutProgress);
   
-  const movementAnimationDuration = 0.75 - 0.3; 
+  // The movement will now happen between 50% and 75% of the scroll
+  const movementAnimationDuration = centerPointProgress - animationStartProgress; 
   const movementProgress = Math.max(0, (progress - animationStartProgress) / movementAnimationDuration);
   
-  const textInitialOffset = 400; 
+  // Kept the previous change to start the text slightly higher up
+  const textInitialOffset = 200; 
   const textTravelDistance = 600; 
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 

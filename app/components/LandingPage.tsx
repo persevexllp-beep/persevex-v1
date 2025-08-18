@@ -5,7 +5,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 
-// --- SECTION IMPORTS ---
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -17,7 +16,6 @@ import { testimonialsData } from "../constants/TestimonialsData";
 
 const NUM_CARDS = 6;
 
-// AnimationController remains unchanged
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
@@ -100,13 +98,11 @@ export default function LandingPage() {
   
   const [edgeProgress, setEdgeProgress] = useState(0);
   const [partnersProgress, setPartnersProgress] = useState(0);
-  // State changed from discrete index to continuous progress
   const [testimonialProgress, setTestimonialProgress] = useState(0);
   
-  // --- ADDED REFS FOR WHEEL CONTROL ---
-  const isAnimatingTestimonial = useRef(false);
+  const [targetTestimonialIndex, setTargetTestimonialIndex] = useState(0);
   const lastScrollTime = useRef(0);
-  const scrollAccumulator = useRef(0);
+  const isInitialLoad = useRef(true);
   
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0 });
 
@@ -153,7 +149,6 @@ export default function LandingPage() {
 
       const { coursesTop, edgeTop, partnersTop, testimonialsTop } = layout;
 
-      // Watermark logic remains the same...
       const trustWatermarkAnimStart = testimonialsTop - viewportHeight; 
       const trustWatermarkAnimDuration = viewportHeight / 2; 
 
@@ -200,11 +195,9 @@ export default function LandingPage() {
       const scrollInTestimonialsZone = currentScroll - testimonialsAnimStart;
 
       if (scrollInTestimonialsZone >= 0) {
-        // Calculate and set the continuous progress value
         const progress = Math.min(1, scrollInTestimonialsZone / testimonialsAnimDurationPx);
         setTestimonialProgress(progress);
       } else {
-        // Reset progress when scrolling above the section
         setTestimonialProgress(0);
       }
     };
@@ -214,95 +207,89 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
 
-  // --- ADDED WHEEL EVENT HANDLER ---
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       const wrapper = testimonialsSectionWrapperRef.current;
-      if (!wrapper) return;
+      if (!wrapper || layout.testimonialsTop === 0) return;
 
-      const top = wrapper.offsetTop;
+      const top = layout.testimonialsTop;
       const bottom = top + wrapper.offsetHeight;
-      const isTestimonialSectionActive = window.scrollY >= top && window.scrollY < bottom;
+      const viewportHeight = window.innerHeight;
 
-      if (isTestimonialSectionActive) {
-        const now = Date.now();
-        const currentIndex = Math.round(testimonialProgress * (formattedTestimonials.length - 1));
-        const maxIndex = formattedTestimonials.length - 1;
-        const scrollDirection = event.deltaY;
-        
-        // Allow natural scrolling at boundaries to exit the section
-        const isAtFirstTestimonial = currentIndex === 0;
-        const isAtLastTestimonial = currentIndex === maxIndex;
-        
-        // If scrolling up at first testimonial, allow natural page scroll to go to previous section
-        if (isAtFirstTestimonial && scrollDirection < 0) {
-          scrollAccumulator.current = 0; // Reset accumulator
-          return; // Don't prevent default, allow natural scroll
-        }
-        
-        // If scrolling down at last testimonial, allow natural page scroll to go to next section
-        if (isAtLastTestimonial && scrollDirection > 0) {
-          scrollAccumulator.current = 0; // Reset accumulator
-          return; // Don't prevent default, allow natural scroll
-        }
-        
-        // If we're currently animating, prevent all scroll
-        if (isAnimatingTestimonial.current) {
-          event.preventDefault();
-          return;
-        }
+      const isTestimonialSectionActive =
+        window.scrollY >= top && window.scrollY < bottom - viewportHeight;
 
-        // Debounce: ignore scroll events that are too close together (within 100ms)
-        if (now - lastScrollTime.current < 100) {
-          event.preventDefault();
-          return;
-        }
+      if (!isTestimonialSectionActive) return;
 
-        // Accumulate scroll delta to detect intentional scroll gestures
-        scrollAccumulator.current += event.deltaY;
-        
-        // Only trigger change when accumulated scroll exceeds threshold
-        const scrollThreshold = 250;
-        let shouldAnimate = false;
-        let newProgress = testimonialProgress;
+      const now = Date.now();
+      if (now - lastScrollTime.current < 1000) {
+        event.preventDefault();
+        return;
+      }
+      
+      if (Math.abs(event.deltaY) < 20) {
+         event.preventDefault();
+         return;
+      }
+      
+      const maxIndex = formattedTestimonials.length - 1;
+      const scrollDirection = event.deltaY;
 
-        if (scrollAccumulator.current > scrollThreshold && currentIndex < maxIndex) {
-          // Scrolling down - next testimonial
-          newProgress = (currentIndex + 1) / (formattedTestimonials.length - 1);
-          shouldAnimate = true;
-          scrollAccumulator.current = 0;
-        } else if (scrollAccumulator.current < -scrollThreshold && currentIndex > 0) {
-          // Scrolling up - previous testimonial
-          newProgress = (currentIndex - 1) / (formattedTestimonials.length - 1);
-          shouldAnimate = true;
-          scrollAccumulator.current = 0;
-        }
+      // --- REVISED LOGIC TO ALLOW EXITING THE SECTION ---
+      if (scrollDirection < 0 && targetTestimonialIndex === 0) {
+        // User is at the first slide and scrolling up, so let them.
+        return;
+      }
+      if (scrollDirection > 0 && targetTestimonialIndex === maxIndex) {
+        // User is at the last slide and scrolling down, so let them.
+        return;
+      }
 
-        if (shouldAnimate) {
-          event.preventDefault();
-          
-          // Set all control variables
-          isAnimatingTestimonial.current = true;
-          lastScrollTime.current = now;
-          
-          // Update the testimonial progress
-          setTestimonialProgress(newProgress);
-          
-          // Clear the lock after animation completes
-          setTimeout(() => {
-            isAnimatingTestimonial.current = false;
-            scrollAccumulator.current = 0;
-          }, 800);
-        } else {
-          // Only prevent default if we're not at boundaries
-          event.preventDefault();
-        }
+      // If we've gotten this far, we intend to hijack the scroll.
+      event.preventDefault();
+      
+      let newIndex = targetTestimonialIndex;
+      if (scrollDirection > 0 && targetTestimonialIndex < maxIndex) {
+        newIndex = targetTestimonialIndex + 1;
+      } else if (scrollDirection < 0 && targetTestimonialIndex > 0) {
+        newIndex = targetTestimonialIndex - 1;
+      }
+      
+      if (newIndex !== targetTestimonialIndex) {
+        lastScrollTime.current = now;
+        setTargetTestimonialIndex(newIndex);
       }
     };
-
+    
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [testimonialProgress, formattedTestimonials.length, layout]);
+  }, [layout.testimonialsTop, targetTestimonialIndex, formattedTestimonials.length]);
+
+  useEffect(() => {
+    // --- REVISED LOGIC TO PREVENT SCROLL ON LOAD ---
+    if (isInitialLoad.current && layout.testimonialsTop > 0) {
+      isInitialLoad.current = false;
+      return;
+    }
+    
+    if (layout.testimonialsTop === 0) return;
+
+    const maxIndex = formattedTestimonials.length - 1;
+    if (maxIndex <= 0) return;
+
+    const testimonialsAnimDurationPx = (testimonialsAnimationDurationVh / 100) * window.innerHeight;
+    
+    const targetProgress = targetTestimonialIndex / maxIndex;
+    const targetScrollY = layout.testimonialsTop + (targetProgress * testimonialsAnimDurationPx);
+
+    if (Math.abs(window.scrollY - targetScrollY) > 5) {
+        window.scrollTo({
+          top: targetScrollY,
+          behavior: "smooth",
+        });
+    }
+  }, [targetTestimonialIndex, layout.testimonialsTop, formattedTestimonials.length, testimonialsAnimationDurationVh]);
+
 
   return (
     <main>
@@ -351,7 +338,6 @@ export default function LandingPage() {
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <AnimatedTestimonials 
               testimonials={formattedTestimonials} 
-              // Pass the continuous progress value to the component
               progress={testimonialProgress} 
             />
           </div>

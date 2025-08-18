@@ -262,7 +262,7 @@ export default function LandingPage() {
         scrollAccumulator.current += event.deltaY;
         
         // Only trigger change when accumulated scroll exceeds threshold
-        const scrollThreshold = 200;
+        const scrollThreshold = 250;
         let shouldAnimate = false;
         let newProgress = testimonialProgress;
 

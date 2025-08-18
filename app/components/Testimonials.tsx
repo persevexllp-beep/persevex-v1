@@ -1,8 +1,7 @@
 // Filename: Testimonials.tsx
 "use client";
 
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
-// It's standard to import from 'framer-motion' directly
+// Removed Icon imports as buttons are no longer needed
 import { motion, AnimatePresence } from "framer-motion"; 
 import { useEffect, useState } from "react";
 
@@ -13,46 +12,31 @@ type Testimonial = {
   src: string;
 };
 
+// Component props updated: `autoplay` removed, `activeIndex` added.
 export const AnimatedTestimonials = ({
   testimonials,
-  autoplay = false,
+  activeIndex,
 }: {
   testimonials: Testimonial[];
-  autoplay?: boolean;
+  activeIndex: number;
 }) => {
-  const [active, setActive] = useState(0);
-  
-  // --- FIX: Start ---
-  // 1. Add state to track if the component is mounted on the client
+  // isMounted state is kept to prevent hydration errors from the random rotation
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // 2. Set isMounted to true only after the component mounts on the client
     setIsMounted(true);
   }, []);
-  // --- FIX: End ---
 
-
-  const handleNext = () => {
-    setActive((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const handlePrev = () => {
-    setActive((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
+  // Removed `active` state, `handleNext`, and `handlePrev` functions.
+  // The component is now controlled by the `activeIndex` prop.
 
   const isActive = (index: number) => {
-    return index === active;
+    // Logic now uses the activeIndex prop
+    return index === activeIndex;
   };
 
-  useEffect(() => {
-    if (autoplay) {
-      const interval = setInterval(handleNext, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [autoplay, testimonials.length]); 
+  // Removed the `useEffect` for autoplay functionality.
 
-  // This function is the cause of the hydration error
   const randomRotateY = () => {
     return Math.floor(Math.random() * 21) - 10;
   };
@@ -63,8 +47,6 @@ export const AnimatedTestimonials = ({
         <div className="">
           <div className="relative  h-80 w-full">
             <AnimatePresence>
-              {/* --- FIX: --- */}
-              {/* 3. Only render the children when isMounted is true */}
               {isMounted && testimonials.map((testimonial, index) => (
                 <motion.div
                   key={testimonial.name}
@@ -78,7 +60,8 @@ export const AnimatedTestimonials = ({
                     opacity: isActive(index) ? 1 : 0.5,
                     scale: isActive(index) ? 1 : 0.95,
                     y: isActive(index) ? 0 : -50,
-                    zIndex: isActive(index) ? testimonials.length : testimonials.length - Math.abs(index - active),
+                    // Logic now uses activeIndex prop
+                    zIndex: isActive(index) ? testimonials.length : testimonials.length - Math.abs(index - activeIndex),
                     rotate: isActive(index) ? 0 : randomRotateY(),
                   }}
                   exit={{
@@ -108,8 +91,9 @@ export const AnimatedTestimonials = ({
         </div>
         <div className="flex flex-col justify-between py-4">
           <AnimatePresence mode="wait">
+            {/* The key is now derived from the activeIndex prop */}
             <motion.div
-              key={active}
+              key={activeIndex}
               initial={{
                 y: 20,
                 opacity: 0,
@@ -127,14 +111,15 @@ export const AnimatedTestimonials = ({
                 ease: "easeInOut",
               }}
             >
+              {/* All data is now accessed using activeIndex */}
               <h3 className="text-2xl font-bold text-white">
-                {testimonials[active].name}
+                {testimonials[activeIndex].name}
               </h3>
               <p className="text-sm text-neutral-400">
-                {testimonials[active].designation}
+                {testimonials[activeIndex].designation}
               </p>
               <motion.p className="mt-8 text-lg text-neutral-300">
-                {testimonials[active].quote.split(" ").map((word, index) => (
+                {testimonials[activeIndex].quote.split(" ").map((word, index) => (
                   <motion.span
                     key={`${word}-${index}`}
                     initial={{
@@ -160,20 +145,7 @@ export const AnimatedTestimonials = ({
               </motion.p>
             </motion.div>
           </AnimatePresence>
-          <div className="flex gap-4 pt-12 md:pt-0">
-            <button
-              onClick={handlePrev}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800"
-            >
-              <IconArrowLeft className="h-5 w-5 text-neutral-400 transition-transform duration-300 group-hover/button:rotate-12" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800"
-            >
-              <IconArrowRight className="h-5 w-5 text-neutral-400 transition-transform duration-300 group-hover/button:-rotate-12" />
-            </button>
-          </div>
+          {/* Removed the div containing the next/prev buttons */}
         </div>
       </div>
     </div>

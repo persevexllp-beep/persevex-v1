@@ -17,7 +17,7 @@ import { testimonialsData } from "../constants/TestimonialsData";
 
 const NUM_CARDS = 6;
 
-// AnimationController now handles the "Trust" watermark
+// AnimationController remains unchanged
 function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
   const animatedProgress = useRef(0);
   const dustPlaneRef = useRef<THREE.Mesh>(null!);
@@ -41,26 +41,25 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       }
     }
 
-    // Watermark opacity logic is extended for the new "Trust" section
     if (textContainerRef.current) {
       let persevexOpacity = 0;
       let coursesOpacity = 0;
       let ourEdgeOpacity = 0;
       let partnersOpacity = 0;
-      let trustOpacity = 0; // New variable for the Trust watermark
+      let trustOpacity = 0;
 
-      if (currentProgress < 1.0) { // Phase 1: Hero -> Courses
+      if (currentProgress < 1.0) {
         persevexOpacity = (1 - currentProgress) * 0.4;
         coursesOpacity = currentProgress * 0.4;
-      } else if (currentProgress < 2.0) { // Phase 2: Courses -> Our Edge
+      } else if (currentProgress < 2.0) {
         const phase2Progress = currentProgress - 1.0;
         coursesOpacity = (1 - phase2Progress) * 0.4;
         ourEdgeOpacity = phase2Progress * 0.4;
-      } else if (currentProgress < 3.0) { // Phase 3: Our Edge -> Partners
+      } else if (currentProgress < 3.0) {
         const phase3Progress = currentProgress - 2.0;
         ourEdgeOpacity = (1 - phase3Progress) * 0.4;
         partnersOpacity = phase3Progress * 0.4;
-      } else { // Phase 4: Partners -> Trust
+      } else {
         const phase4Progress = currentProgress - 3.0;
         partnersOpacity = (1 - phase4Progress) * 0.4;
         trustOpacity = phase4Progress * 0.4;
@@ -101,6 +100,7 @@ export default function LandingPage() {
   
   const [edgeProgress, setEdgeProgress] = useState(0);
   const [partnersProgress, setPartnersProgress] = useState(0);
+  const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0 });
 
@@ -111,6 +111,9 @@ export default function LandingPage() {
     src: testimonial.image,
   }));
 
+  const SCROLL_DISTANCE_PER_CARD_VH = 35;
+  const testimonialsAnimationDurationVh = SCROLL_DISTANCE_PER_CARD_VH * (formattedTestimonials.length - 1);
+  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -129,7 +132,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('resize', calculateLayout);
   }, []);
 
-  // 4. Scroll listener updated for the new watermark phase
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
@@ -145,36 +147,49 @@ export default function LandingPage() {
 
       const { coursesTop, edgeTop, partnersTop, testimonialsTop } = layout;
 
-      // --- Watermark Animation Logic ---
       const backgroundAnimDuration = viewportHeight;
       const coursesAnimStart = coursesTop - viewportHeight;
       const edgeAnimStartForBackground = edgeTop - viewportHeight;
       const partnersAnimStartForBackground = partnersTop;
       
-      // Define specific start and end points for the Partners -> Trust transition
-      // Start: When the testimonials section begins to enter the viewport from the bottom.
-      const trustTransitionStartScroll = testimonialsTop - viewportHeight;
-      // End: When the testimonials section's top is at the vertical center of the viewport.
-      const trustTransitionEndScroll = testimonialsTop - (viewportHeight / 2);
-      const trustTransitionDuration = trustTransitionEndScroll - trustTransitionStartScroll;
+      // --- MODIFIED WATERMARK LOGIC START ---
+
+      // 1. Define the specific start and duration for the "Trust" watermark transition.
+      // Start when the top of the testimonials section enters the bottom of the viewport.
+      const trustWatermarkAnimStart = testimonialsTop - viewportHeight; 
+      // End when the top of the testimonials section reaches the center of the viewport.
+      // The duration is therefore half the viewport height.
+      const trustWatermarkAnimDuration = viewportHeight / 2; 
 
       let newWatermarkProgress = 0;
-      // The 'if/else' chain must check for the highest scroll values first.
-      if (currentScroll >= trustTransitionStartScroll) {
-        // Calculate progress specifically for the final transition's duration.
-        const progress = (currentScroll - trustTransitionStartScroll) / trustTransitionDuration;
-        newWatermarkProgress = 3 + Math.min(1, Math.max(0, progress)); // Phase 4: Partners -> Trust
-      } else if (currentScroll >= partnersAnimStartForBackground) {
-        const progress = (currentScroll - partnersAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 2 + Math.min(1, progress); // Phase 3: Our Edge -> Partners
-      } else if (currentScroll >= edgeAnimStartForBackground) {
+      
+      // Phase 4: Partners -> Trust
+      // This check must come first because its start point (`testimonialsTop - vh`)
+      // can occur while still in the partners section's scroll area.
+      if (currentScroll >= trustWatermarkAnimStart) {
+        const progress = (currentScroll - trustWatermarkAnimStart) / trustWatermarkAnimDuration;
+        newWatermarkProgress = 3 + Math.min(1, progress);
+      } 
+      // Phase 3: Our Edge -> Partners
+      // This transition now ends precisely where the "Trust" transition begins.
+      else if (currentScroll >= partnersAnimStartForBackground) {
+        const duration = trustWatermarkAnimStart - partnersAnimStartForBackground;
+        const progress = (currentScroll - partnersAnimStartForBackground) / duration;
+        newWatermarkProgress = 2 + Math.min(1, progress);
+      } 
+      // Phase 2: Courses -> Our Edge
+      else if (currentScroll >= edgeAnimStartForBackground) {
         const progress = (currentScroll - edgeAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 1 + Math.min(1, progress); // Phase 2: Courses -> Our Edge
-      } else if (currentScroll >= coursesAnimStart) {
+        newWatermarkProgress = 1 + Math.min(1, progress);
+      } 
+      // Phase 1: Hero -> Courses
+      else if (currentScroll >= coursesAnimStart) {
         const progress = (currentScroll - coursesAnimStart) / backgroundAnimDuration;
-        newWatermarkProgress = Math.min(1, progress); // Phase 1: Hero -> Courses
+        newWatermarkProgress = Math.min(1, progress);
       }
       watermarkProgressRef.current = newWatermarkProgress;
+      
+      // --- MODIFIED WATERMARK LOGIC END ---
       
       const edgeCardAnimStart = edgeTop;
       const cardAnimScrollDistance = viewportHeight * NUM_CARDS;
@@ -193,12 +208,27 @@ export default function LandingPage() {
           newPartnersProgress = Math.min(1, scrollInPartnersZone / partnersAnimDuration);
       }
       setPartnersProgress(newPartnersProgress);
+
+      const testimonialsAnimStart = testimonialsTop;
+      const testimonialsAnimDurationPx = (testimonialsAnimationDurationVh / 100) * viewportHeight;
+      const scrollInTestimonialsZone = currentScroll - testimonialsAnimStart;
+
+      if (scrollInTestimonialsZone >= 0) {
+        const progress = Math.min(1, scrollInTestimonialsZone / testimonialsAnimDurationPx);
+        const newIndex = Math.min(
+          Math.floor(progress * formattedTestimonials.length),
+          formattedTestimonials.length - 1
+        );
+        setActiveTestimonialIndex(newIndex);
+      } else {
+        setActiveTestimonialIndex(0);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [layout]);
+  }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
 
   return (
     <main>
@@ -242,9 +272,14 @@ export default function LandingPage() {
         <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}><OurEdgeSection progress={edgeProgress} /></div>
         <div ref={partnersSectionWrapperRef} style={{ height: '200vh', marginTop: '-50vh' }}><PartnersSection progress={partnersProgress} /></div>
         
-        <div style={{ height: '30vh' }} />
-        <div className="mb-40" ref={testimonialsSectionWrapperRef}>
-          <AnimatedTestimonials testimonials={formattedTestimonials} autoplay={true} />
+          <div style={{ height: '10vh' }} />
+        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <AnimatedTestimonials 
+              testimonials={formattedTestimonials} 
+              activeIndex={activeTestimonialIndex} 
+            />
+          </div>
         </div>
 
       </div>

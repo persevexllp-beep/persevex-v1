@@ -32,20 +32,34 @@ interface PartnersSectionProps {
 // new section
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
-  const animationStartProgress = 0.45;
-  const centerPointProgress = 0.75; 
-  const animationEndProgress = 1.0;
+  // Define keyframes for the text's movement. These remain unchanged.
+  const movementStartProgress = 0.45;
+  const movementEndProgress = 0.75; 
 
-  const fadeInDuration = centerPointProgress - animationStartProgress;
-  const fadeOutDuration = animationEndProgress - centerPointProgress;
+  // --- MODIFIED OPACITY LOGIC ---
+  // THE ONLY CHANGE IS ON THE NEXT LINE:
+  // Set the text to be fully opaque (1.0) slightly before the visual midpoint of its journey.
+  const opacityPeakProgress = 0.55; // Changed from (start + end) / 2
 
-  const fadeInProgress = Math.min(1, Math.max(0, (progress - animationStartProgress) / fadeInDuration));
-  const fadeOutProgress = Math.max(0, (progress - centerPointProgress) / fadeOutDuration);
+  // Calculate the duration of the fade-in and fade-out phases based on the new peak.
+  const fadeInDuration = opacityPeakProgress - movementStartProgress;
+  const fadeOutDuration = movementEndProgress - opacityPeakProgress;
 
-  const textOpacity = Math.max(0, fadeInProgress - fadeOutProgress);
-  
-  const movementAnimationDuration = centerPointProgress - animationStartProgress; 
-  const movementProgress = Math.max(0, (progress - animationStartProgress) / movementAnimationDuration);
+  let textOpacity = 0;
+  if (progress >= movementStartProgress && progress < opacityPeakProgress) {
+    // Phase 1: Fading IN.
+    textOpacity = (progress - movementStartProgress) / fadeInDuration;
+  } else if (progress >= opacityPeakProgress && progress <= movementEndProgress) {
+    // Phase 2: Fading OUT.
+    textOpacity = 1 - ((progress - opacityPeakProgress) / fadeOutDuration);
+  }
+  // Ensure opacity doesn't go below 0.
+  textOpacity = Math.max(0, textOpacity);
+  // --- END OF MODIFICATION ---
+
+  // Movement logic remains the same.
+  const movementAnimationDuration = movementEndProgress - movementStartProgress; 
+  const movementProgress = Math.max(0, Math.min(1, (progress - movementStartProgress) / movementAnimationDuration));
   
   const textInitialOffset = 200; 
   const textTravelDistance = 600; 

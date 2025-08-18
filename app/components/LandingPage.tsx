@@ -138,7 +138,8 @@ export default function LandingPage() {
       const backgroundAnimDuration = viewportHeight;
       const coursesAnimStart = coursesTop - viewportHeight;
       const edgeAnimStartForBackground = edgeTop - viewportHeight;
-      const partnersAnimStartForBackground = partnersTop - viewportHeight;
+      // THE ONLY CHANGE IS ON THE NEXT LINE:
+      const partnersAnimStartForBackground = partnersTop; // Starts transition when the section appears
 
       let newWatermarkProgress = 0;
       if (currentScroll >= partnersAnimStartForBackground) {
@@ -166,7 +167,7 @@ export default function LandingPage() {
 
       // 4. PartnersSection Animation
       const partnersAnimStart = partnersTop;
-      const partnersAnimDuration = viewportHeight * 2; // Animate over 1 screen height
+      const partnersAnimDuration = viewportHeight * 2; // Animate over 2 screen heights
       const scrollInPartnersZone = currentScroll - partnersAnimStart;
 
       let newPartnersProgress = 0;

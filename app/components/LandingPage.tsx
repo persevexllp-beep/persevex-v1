@@ -112,7 +112,7 @@ export default function LandingPage() {
     src: testimonial.image,
   }));
 
-  const SCROLL_DISTANCE_PER_CARD_VH = 75;
+  const SCROLL_DISTANCE_PER_CARD_VH = 150;
   const testimonialsAnimationDurationVh = SCROLL_DISTANCE_PER_CARD_VH * (formattedTestimonials.length - 1);
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 

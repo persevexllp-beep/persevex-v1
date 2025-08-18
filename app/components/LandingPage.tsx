@@ -103,6 +103,11 @@ export default function LandingPage() {
   // State changed from discrete index to continuous progress
   const [testimonialProgress, setTestimonialProgress] = useState(0);
   
+  // --- ADDED REFS FOR WHEEL CONTROL ---
+  const isAnimatingTestimonial = useRef(false);
+  const lastScrollTime = useRef(0);
+  const scrollAccumulator = useRef(0);
+  
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0 });
 
   const formattedTestimonials = testimonialsData.map(testimonial => ({
@@ -208,6 +213,96 @@ export default function LandingPage() {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
+
+  // --- ADDED WHEEL EVENT HANDLER ---
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      const wrapper = testimonialsSectionWrapperRef.current;
+      if (!wrapper) return;
+
+      const top = wrapper.offsetTop;
+      const bottom = top + wrapper.offsetHeight;
+      const isTestimonialSectionActive = window.scrollY >= top && window.scrollY < bottom;
+
+      if (isTestimonialSectionActive) {
+        const now = Date.now();
+        const currentIndex = Math.round(testimonialProgress * (formattedTestimonials.length - 1));
+        const maxIndex = formattedTestimonials.length - 1;
+        const scrollDirection = event.deltaY;
+        
+        // Allow natural scrolling at boundaries to exit the section
+        const isAtFirstTestimonial = currentIndex === 0;
+        const isAtLastTestimonial = currentIndex === maxIndex;
+        
+        // If scrolling up at first testimonial, allow natural page scroll to go to previous section
+        if (isAtFirstTestimonial && scrollDirection < 0) {
+          scrollAccumulator.current = 0; // Reset accumulator
+          return; // Don't prevent default, allow natural scroll
+        }
+        
+        // If scrolling down at last testimonial, allow natural page scroll to go to next section
+        if (isAtLastTestimonial && scrollDirection > 0) {
+          scrollAccumulator.current = 0; // Reset accumulator
+          return; // Don't prevent default, allow natural scroll
+        }
+        
+        // If we're currently animating, prevent all scroll
+        if (isAnimatingTestimonial.current) {
+          event.preventDefault();
+          return;
+        }
+
+        // Debounce: ignore scroll events that are too close together (within 100ms)
+        if (now - lastScrollTime.current < 100) {
+          event.preventDefault();
+          return;
+        }
+
+        // Accumulate scroll delta to detect intentional scroll gestures
+        scrollAccumulator.current += event.deltaY;
+        
+        // Only trigger change when accumulated scroll exceeds threshold
+        const scrollThreshold = 50;
+        let shouldAnimate = false;
+        let newProgress = testimonialProgress;
+
+        if (scrollAccumulator.current > scrollThreshold && currentIndex < maxIndex) {
+          // Scrolling down - next testimonial
+          newProgress = (currentIndex + 1) / (formattedTestimonials.length - 1);
+          shouldAnimate = true;
+          scrollAccumulator.current = 0;
+        } else if (scrollAccumulator.current < -scrollThreshold && currentIndex > 0) {
+          // Scrolling up - previous testimonial
+          newProgress = (currentIndex - 1) / (formattedTestimonials.length - 1);
+          shouldAnimate = true;
+          scrollAccumulator.current = 0;
+        }
+
+        if (shouldAnimate) {
+          event.preventDefault();
+          
+          // Set all control variables
+          isAnimatingTestimonial.current = true;
+          lastScrollTime.current = now;
+          
+          // Update the testimonial progress
+          setTestimonialProgress(newProgress);
+          
+          // Clear the lock after animation completes
+          setTimeout(() => {
+            isAnimatingTestimonial.current = false;
+            scrollAccumulator.current = 0;
+          }, 800);
+        } else {
+          // Only prevent default if we're not at boundaries
+          event.preventDefault();
+        }
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [testimonialProgress, formattedTestimonials.length, layout]);
 
   return (
     <main>

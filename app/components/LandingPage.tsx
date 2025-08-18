@@ -1,3 +1,4 @@
+// LandingPage.tsx
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -11,7 +12,8 @@ import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
 import PartnersSection from "./PartnersSection";
-import TestimonialsParallax from "./Testimonials";
+import { AnimatedTestimonials } from "./Testimonials";
+import { testimonialsData } from "../constants/TestimonialsData";
 
 const NUM_CARDS = 6;
 
@@ -95,13 +97,20 @@ export default function LandingPage() {
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
   const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
   const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null); // 2. Ref for Testimonials section
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
   
   const [edgeProgress, setEdgeProgress] = useState(0);
   const [partnersProgress, setPartnersProgress] = useState(0);
   
-  // 3. Layout state updated to include the new section's position
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0 });
+
+  const formattedTestimonials = testimonialsData.map(testimonial => ({
+    quote: testimonial.quote,
+    name: testimonial.name,
+    designation: testimonial.title,
+    src: testimonial.image,
+  }));
+
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -110,7 +119,7 @@ export default function LandingPage() {
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
           edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
           partnersTop: partnersSectionWrapperRef.current.offsetTop,
-          testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop, // Calculate testimonials top
+          testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
         });
       }
     };
@@ -136,25 +145,34 @@ export default function LandingPage() {
 
       const { coursesTop, edgeTop, partnersTop, testimonialsTop } = layout;
 
+      // --- Watermark Animation Logic ---
       const backgroundAnimDuration = viewportHeight;
       const coursesAnimStart = coursesTop - viewportHeight;
       const edgeAnimStartForBackground = edgeTop - viewportHeight;
       const partnersAnimStartForBackground = partnersTop;
-      const testimonialsAnimStartForBackground = testimonialsTop; // New animation trigger point
+      
+      // Define specific start and end points for the Partners -> Trust transition
+      // Start: When the testimonials section begins to enter the viewport from the bottom.
+      const trustTransitionStartScroll = testimonialsTop - viewportHeight;
+      // End: When the testimonials section's top is at the vertical center of the viewport.
+      const trustTransitionEndScroll = testimonialsTop - (viewportHeight / 2);
+      const trustTransitionDuration = trustTransitionEndScroll - trustTransitionStartScroll;
 
       let newWatermarkProgress = 0;
-      if (currentScroll >= testimonialsAnimStartForBackground) {
-        const progress = (currentScroll - testimonialsAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 3 + Math.min(1, progress); // Progress into phase 4
+      // The 'if/else' chain must check for the highest scroll values first.
+      if (currentScroll >= trustTransitionStartScroll) {
+        // Calculate progress specifically for the final transition's duration.
+        const progress = (currentScroll - trustTransitionStartScroll) / trustTransitionDuration;
+        newWatermarkProgress = 3 + Math.min(1, Math.max(0, progress)); // Phase 4: Partners -> Trust
       } else if (currentScroll >= partnersAnimStartForBackground) {
         const progress = (currentScroll - partnersAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 2 + Math.min(1, progress); // Progress into phase 3
+        newWatermarkProgress = 2 + Math.min(1, progress); // Phase 3: Our Edge -> Partners
       } else if (currentScroll >= edgeAnimStartForBackground) {
         const progress = (currentScroll - edgeAnimStartForBackground) / backgroundAnimDuration;
-        newWatermarkProgress = 1 + Math.min(1, progress); // Progress into phase 2
+        newWatermarkProgress = 1 + Math.min(1, progress); // Phase 2: Courses -> Our Edge
       } else if (currentScroll >= coursesAnimStart) {
         const progress = (currentScroll - coursesAnimStart) / backgroundAnimDuration;
-        newWatermarkProgress = Math.min(1, progress); // Progress into phase 1
+        newWatermarkProgress = Math.min(1, progress); // Phase 1: Hero -> Courses
       }
       watermarkProgressRef.current = newWatermarkProgress;
       
@@ -203,14 +221,13 @@ export default function LandingPage() {
         '--courses-opacity': 0, 
         '--our-edge-opacity': 0,
         '--partners-opacity': 0,
-        '--trust-opacity': 0 // Add new CSS variable for trust
+        '--trust-opacity': 0
       } as any}
     >
       <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Courses</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--our-edge-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Edge</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
-      {/* 5. Add the "Trust" watermark text */}
       <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
     </div>
       
@@ -225,10 +242,9 @@ export default function LandingPage() {
         <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}><OurEdgeSection progress={edgeProgress} /></div>
         <div ref={partnersSectionWrapperRef} style={{ height: '200vh', marginTop: '-50vh' }}><PartnersSection progress={partnersProgress} /></div>
         
-        {/* 6. Add the TestimonialsParallax section with its wrapper */}
-        
-        <div ref={testimonialsSectionWrapperRef}>
-          <TestimonialsParallax />
+        <div style={{ height: '30vh' }} />
+        <div className="mb-40" ref={testimonialsSectionWrapperRef}>
+          <AnimatedTestimonials testimonials={formattedTestimonials} autoplay={true} />
         </div>
 
       </div>

@@ -1,74 +1,181 @@
-// Filename: TestimonialsParallax.tsx
+// Filename: Testimonials.tsx
 "use client";
 
-import React from 'react';
-import Image from 'next/image';
-import { Testimonial, testimonialsData } from '../constants/TestimonialsData';
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+// It's standard to import from 'framer-motion' directly
+import { motion, AnimatePresence } from "framer-motion"; 
+import { useEffect, useState } from "react";
+
+type Testimonial = {
+  quote: string;
+  name: string;
+  designation: string;
+  src: string;
+};
+
+export const AnimatedTestimonials = ({
+  testimonials,
+  autoplay = false,
+}: {
+  testimonials: Testimonial[];
+  autoplay?: boolean;
+}) => {
+  const [active, setActive] = useState(0);
+  
+  // --- FIX: Start ---
+  // 1. Add state to track if the component is mounted on the client
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // 2. Set isMounted to true only after the component mounts on the client
+    setIsMounted(true);
+  }, []);
+  // --- FIX: End ---
 
 
-const VerifiedIcon = () => (
-  <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.25 17.292l-4.5-4.364 1.857-1.858 2.643 2.506 5.643-5.784 1.857 1.858-7.5 7.642z" />
-  </svg>
-);
+  const handleNext = () => {
+    setActive((prev) => (prev + 1) % testimonials.length);
+  };
 
-const TestimonialCard: React.FC<Testimonial> = ({ headline, quote, name, title, image }) => (
-  <div className="bg-gray-800/20 p-8 rounded-3xl shadow-lg border border-gray-100/10 backdrop-blur-sm">
-    <h3 className="text-xl font-bold mb-4 text-white">{headline}</h3>
-    <p className="text-gray-400 mb-6">{quote}</p>
-    <div className="flex items-center gap-4">
-      <Image src={image} alt={name} width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
-      <div>
-        <div className="flex items-center gap-2"><h4 className="font-semibold text-white">{name}</h4><VerifiedIcon /></div>
-        <p className="text-sm text-gray-500">{title}</p>
-      </div>
-    </div>
-  </div>
-);
+  const handlePrev = () => {
+    setActive((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
 
-// --- Main Testimonials Section (Parallax Removed) ---
-export default function TestimonialsParallax() {
-  // Simple distribution for balanced columns
-  const columns: Testimonial[][] = [[], [], []];
-  testimonialsData.forEach((testimonial, i) => {
-    columns[i % 3].push(testimonial);
-  });
+  const isActive = (index: number) => {
+    return index === active;
+  };
+
+  useEffect(() => {
+    if (autoplay) {
+      const interval = setInterval(handleNext, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [autoplay, testimonials.length]); 
+
+  // This function is the cause of the hydration error
+  const randomRotateY = () => {
+    return Math.floor(Math.random() * 21) - 10;
+  };
 
   return (
-    <section className="relative w-full bg-transparent py-24 px-4 sm:px-6 lg:px-8">
-      <div className="relative z-10 max-w-6xl mx-auto">
-        
-        {/* Header Section */}
-        <div 
-          className="text-center mb-20 max-w-3xl mx-auto"
-        >
-          <div className="inline-block p-2 mb-4 bg-gray-700/50 rounded-lg">
-            <svg className="w-6 h-6 text-gray-300" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M5 10h14M5 14h14" />
-            </svg>
+    <div className="mx-auto max-w-sm px-4 py-20 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
+      <div className="relative grid grid-cols-1 gap-24 md:grid-cols-2">
+        <div className="">
+          <div className="relative  h-80 w-full">
+            <AnimatePresence>
+              {/* --- FIX: --- */}
+              {/* 3. Only render the children when isMounted is true */}
+              {isMounted && testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={testimonial.name}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.9,
+                    y: -100,
+                    rotate: randomRotateY(),
+                  }}
+                  animate={{
+                    opacity: isActive(index) ? 1 : 0.5,
+                    scale: isActive(index) ? 1 : 0.95,
+                    y: isActive(index) ? 0 : -50,
+                    zIndex: isActive(index) ? testimonials.length : testimonials.length - Math.abs(index - active),
+                    rotate: isActive(index) ? 0 : randomRotateY(),
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.9,
+                    y: 100,
+                    rotate: randomRotateY(),
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 origin-bottom"
+                >
+                  <img
+                    src={testimonial.src}
+                    alt={testimonial.name}
+                    width={500}
+                    height={500}
+                    draggable={false}
+                    className="h-full w-full rounded-3xl object-cover object-center"
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
-          <h2 className="text-5xl md:text-6xl font-bold text-white md:leading-tight">
-            Proven track of satisfied clients
-          </h2>
-          <p className="mt-4 text-lg text-gray-400">
-            We cherish relations to blossom and last
-          </p>
         </div>
-
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {columns.map((col, colIndex) => (
-              <div
-                key={colIndex}
-                className="flex flex-col gap-8"
-              >
-                {col.map((testimonial) => (
-                  <TestimonialCard key={testimonial.name} {...testimonial} />
+        <div className="flex flex-col justify-between py-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              initial={{
+                y: 20,
+                opacity: 0,
+              }}
+              animate={{
+                y: 0,
+                opacity: 1,
+              }}
+              exit={{
+                y: -20,
+                opacity: 0,
+              }}
+              transition={{
+                duration: 0.2,
+                ease: "easeInOut",
+              }}
+            >
+              <h3 className="text-2xl font-bold text-white">
+                {testimonials[active].name}
+              </h3>
+              <p className="text-sm text-neutral-400">
+                {testimonials[active].designation}
+              </p>
+              <motion.p className="mt-8 text-lg text-neutral-300">
+                {testimonials[active].quote.split(" ").map((word, index) => (
+                  <motion.span
+                    key={`${word}-${index}`}
+                    initial={{
+                      filter: "blur(10px)",
+                      opacity: 0,
+                      y: 5,
+                    }}
+                    animate={{
+                      filter: "blur(0px)",
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      duration: 0.2,
+                      ease: "easeInOut",
+                      delay: 0.02 * index,
+                    }}
+                    className="inline-block"
+                  >
+                    {word}&nbsp;
+                  </motion.span>
                 ))}
-              </div>
-          ))}
+              </motion.p>
+            </motion.div>
+          </AnimatePresence>
+          <div className="flex gap-4 pt-12 md:pt-0">
+            <button
+              onClick={handlePrev}
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800"
+            >
+              <IconArrowLeft className="h-5 w-5 text-neutral-400 transition-transform duration-300 group-hover/button:rotate-12" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-neutral-800"
+            >
+              <IconArrowRight className="h-5 w-5 text-neutral-400 transition-transform duration-300 group-hover/button:-rotate-12" />
+            </button>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
-}
+};

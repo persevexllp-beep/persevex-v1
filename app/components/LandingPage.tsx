@@ -166,7 +166,7 @@ export default function LandingPage() {
 
       // 4. PartnersSection Animation
       const partnersAnimStart = partnersTop;
-      const partnersAnimDuration = viewportHeight; // Animate over 1 screen height
+      const partnersAnimDuration = viewportHeight * 2; // Animate over 1 screen height
       const scrollInPartnersZone = currentScroll - partnersAnimStart;
 
       let newPartnersProgress = 0;

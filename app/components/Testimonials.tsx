@@ -1,8 +1,7 @@
 // Filename: Testimonials.tsx
 "use client";
 
-// Removed Icon imports as buttons are no longer needed
-import { motion, AnimatePresence } from "framer-motion"; 
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 type Testimonial = {
@@ -12,88 +11,84 @@ type Testimonial = {
   src: string;
 };
 
-// Component props updated: `autoplay` removed, `activeIndex` added.
+// Component props updated: `activeIndex` is replaced with `progress`.
 export const AnimatedTestimonials = ({
   testimonials,
-  activeIndex,
+  progress,
 }: {
   testimonials: Testimonial[];
-  activeIndex: number;
+  progress: number;
 }) => {
-  // isMounted state is kept to prevent hydration errors from the random rotation
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Removed `active` state, `handleNext`, and `handlePrev` functions.
-  // The component is now controlled by the `activeIndex` prop.
+  // --- SMOOTH ANIMATION LOGIC ---
+  // 1. Calculate a continuous index based on scroll progress.
+  // This will be a float, e.g., 0.5 when halfway between card 0 and 1.
+  const continuousIndex = progress * (testimonials.length - 1);
 
-  const isActive = (index: number) => {
-    // Logic now uses the activeIndex prop
-    return index === activeIndex;
-  };
-
-  // Removed the `useEffect` for autoplay functionality.
-
-  const randomRotateY = () => {
-    return Math.floor(Math.random() * 21) - 10;
-  };
+  // 2. Determine the current discrete index for displaying text and images.
+  // We round to the nearest whole number to decide which one to show.
+  const currentIndex = Math.round(continuousIndex);
 
   return (
     <div className="mx-auto max-w-sm px-4 py-20 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
       <div className="relative grid grid-cols-1 gap-24 md:grid-cols-2">
         <div className="">
-          <div className="relative  h-80 w-full">
+          <div className="relative h-80 w-full">
+            {/* --- MODIFICATION START --- */}
+            {/*
+              Instead of mapping all images and animating them based on distance,
+              we use AnimatePresence to show only ONE image at a time (the one at currentIndex).
+              This creates a clean cross-fade effect as you scroll, preventing the blend.
+            */}
             <AnimatePresence>
-              {isMounted && testimonials.map((testimonial, index) => (
+              {isMounted && (
                 <motion.div
-                  key={testimonial.name}
+                  key={currentIndex} // The key tells AnimatePresence when to animate
                   initial={{
                     opacity: 0,
-                    scale: 0.9,
-                    y: -100,
-                    rotate: randomRotateY(),
+                    y: 20,
+                    scale: 0.95,
                   }}
                   animate={{
-                    opacity: isActive(index) ? 1 : 0.5,
-                    scale: isActive(index) ? 1 : 0.95,
-                    y: isActive(index) ? 0 : -50,
-                    // Logic now uses activeIndex prop
-                    zIndex: isActive(index) ? testimonials.length : testimonials.length - Math.abs(index - activeIndex),
-                    rotate: isActive(index) ? 0 : randomRotateY(),
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
                   }}
                   exit={{
                     opacity: 0,
-                    scale: 0.9,
-                    y: 100,
-                    rotate: randomRotateY(),
+                    y: -20,
+                    scale: 0.95,
                   }}
                   transition={{
-                    duration: 0.4,
+                    duration: 0.3,
                     ease: "easeInOut",
                   }}
-                  className="absolute inset-0 origin-bottom"
+                  className="absolute inset-0"
                 >
                   <img
-                    src={testimonial.src}
-                    alt={testimonial.name}
+                    src={testimonials[currentIndex].src}
+                    alt={testimonials[currentIndex].name}
                     width={500}
                     height={500}
                     draggable={false}
                     className="h-full w-full rounded-3xl object-cover object-center"
                   />
                 </motion.div>
-              ))}
+              )}
             </AnimatePresence>
+            {/* --- MODIFICATION END --- */}
           </div>
         </div>
         <div className="flex flex-col justify-between py-4">
           <AnimatePresence mode="wait">
-            {/* The key is now derived from the activeIndex prop */}
+            {/* The key is now the rounded currentIndex, so text transitions at the halfway point */}
             <motion.div
-              key={activeIndex}
+              key={currentIndex}
               initial={{
                 y: 20,
                 opacity: 0,
@@ -111,15 +106,15 @@ export const AnimatedTestimonials = ({
                 ease: "easeInOut",
               }}
             >
-              {/* All data is now accessed using activeIndex */}
+              {/* Data is accessed using the rounded currentIndex */}
               <h3 className="text-2xl font-bold text-white">
-                {testimonials[activeIndex].name}
+                {testimonials[currentIndex].name}
               </h3>
               <p className="text-sm text-neutral-400">
-                {testimonials[activeIndex].designation}
+                {testimonials[currentIndex].designation}
               </p>
               <motion.p className="mt-8 text-lg text-neutral-300">
-                {testimonials[activeIndex].quote.split(" ").map((word, index) => (
+                {testimonials[currentIndex].quote.split(" ").map((word, index) => (
                   <motion.span
                     key={`${word}-${index}`}
                     initial={{
@@ -145,7 +140,6 @@ export const AnimatedTestimonials = ({
               </motion.p>
             </motion.div>
           </AnimatePresence>
-          {/* Removed the div containing the next/prev buttons */}
         </div>
       </div>
     </div>

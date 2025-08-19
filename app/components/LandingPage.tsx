@@ -13,6 +13,7 @@ import OurEdgeSection from "./OurEdgeSection";
 import PartnersSection from "./PartnersSection";
 import { AnimatedTestimonials } from "./Testimonials";
 import { testimonialsData } from "../constants/TestimonialsData";
+import RecognizedBySection from "./RecognizedBySection"; // Import the new component
 
 const NUM_CARDS = 6;
 
@@ -30,6 +31,7 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
 
     if (dustPlaneRef.current) {
       let dustOpacity = 1.0;
+      // Fade out dust plane after the first section
       if (currentProgress > 1.0) {
         dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
       }
@@ -45,6 +47,7 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       let ourEdgeOpacity = 0;
       let partnersOpacity = 0;
       let trustOpacity = 0;
+      let recognizedByOpacity = 0; // New opacity variable
 
       if (currentProgress < 1.0) {
         persevexOpacity = (1 - currentProgress) * 0.4;
@@ -57,10 +60,14 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
         const phase3Progress = currentProgress - 2.0;
         ourEdgeOpacity = (1 - phase3Progress) * 0.4;
         partnersOpacity = phase3Progress * 0.4;
-      } else {
+      } else if (currentProgress < 4.0) { // Extended phase for Trust
         const phase4Progress = currentProgress - 3.0;
         partnersOpacity = (1 - phase4Progress) * 0.4;
         trustOpacity = phase4Progress * 0.4;
+      } else { // New phase for Recognized By
+        const phase5Progress = currentProgress - 4.0;
+        trustOpacity = (1 - phase5Progress) * 0.4;
+        recognizedByOpacity = phase5Progress * 0.4;
       }
       
       persevexOpacity = THREE.MathUtils.clamp(persevexOpacity, 0, 0.4);
@@ -68,12 +75,14 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       ourEdgeOpacity = THREE.MathUtils.clamp(ourEdgeOpacity, 0, 0.4);
       partnersOpacity = THREE.MathUtils.clamp(partnersOpacity, 0, 0.4);
       trustOpacity = THREE.MathUtils.clamp(trustOpacity, 0, 0.4);
+      recognizedByOpacity = THREE.MathUtils.clamp(recognizedByOpacity, 0, 0.4); // Clamp new opacity
 
       textContainerRef.current.style.setProperty('--persevex-opacity', `${persevexOpacity}`);
       textContainerRef.current.style.setProperty('--courses-opacity', `${coursesOpacity}`);
       textContainerRef.current.style.setProperty('--our-edge-opacity', `${ourEdgeOpacity}`);
       textContainerRef.current.style.setProperty('--partners-opacity', `${partnersOpacity}`);
       textContainerRef.current.style.setProperty('--trust-opacity', `${trustOpacity}`);
+      textContainerRef.current.style.setProperty('--recognized-by-opacity', `${recognizedByOpacity}`); // Set new CSS variable
     }
   });
 
@@ -95,16 +104,19 @@ export default function LandingPage() {
   const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
   const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
   const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null); // New ref
   
   const [edgeProgress, setEdgeProgress] = useState(0);
   const [partnersProgress, setPartnersProgress] = useState(0);
   const [testimonialProgress, setTestimonialProgress] = useState(0);
+  const [recognizedByProgress, setRecognizedByProgress] = useState(0); // New state
   
   const [targetTestimonialIndex, setTargetTestimonialIndex] = useState(0);
   const lastScrollTime = useRef(0);
   const isInitialLoad = useRef(true);
   
-  const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0 });
+  // New property for recognizedByTop in layout state
+  const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0 });
 
   const formattedTestimonials = testimonialsData.map(testimonial => ({
     quote: testimonial.quote,
@@ -119,19 +131,31 @@ export default function LandingPage() {
 
   useEffect(() => {
     const calculateLayout = () => {
-      if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current && testimonialsSectionWrapperRef.current) {
+      // Add new ref to the check
+      if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current && testimonialsSectionWrapperRef.current && recognizedBySectionWrapperRef.current) {
         setLayout({
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
           edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
           partnersTop: partnersSectionWrapperRef.current.offsetTop,
           testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
+          recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop, // Calculate new section's top
         });
       }
     };
 
     calculateLayout();
+    const resizeObserver = new ResizeObserver(calculateLayout);
+    document.body.childNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            resizeObserver.observe(node as Element);
+        }
+    });
     window.addEventListener('resize', calculateLayout);
-    return () => window.removeEventListener('resize', calculateLayout);
+    
+    return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', calculateLayout);
+    };
   }, []);
 
   useEffect(() => {
@@ -147,14 +171,24 @@ export default function LandingPage() {
 
       if (layout.coursesTop === 0) return;
 
-      const { coursesTop, edgeTop, partnersTop, testimonialsTop } = layout;
+      // Destructure new layout property
+      const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop } = layout;
 
       const trustWatermarkAnimStart = testimonialsTop - viewportHeight; 
-      const trustWatermarkAnimDuration = viewportHeight / 2; 
+      // This animation now happens between the start of trust and the start of recognized by
+      const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
+      const recognizedByWatermarkAnimDuration = viewportHeight / 2;
 
       let newWatermarkProgress = 0;
-      if (currentScroll >= trustWatermarkAnimStart) {
-        const progress = (currentScroll - trustWatermarkAnimStart) / trustWatermarkAnimDuration;
+      // New condition for the "Recognized By" watermark
+      if (currentScroll >= recognizedByWatermarkAnimStart) {
+        const progress = (currentScroll - recognizedByWatermarkAnimStart) / recognizedByWatermarkAnimDuration;
+        newWatermarkProgress = 4 + Math.min(1, progress);
+      }
+      // Updated condition for the "Trust" watermark transition
+      else if (currentScroll >= trustWatermarkAnimStart) {
+        const duration = recognizedByWatermarkAnimStart - trustWatermarkAnimStart;
+        const progress = (currentScroll - trustWatermarkAnimStart) / duration;
         newWatermarkProgress = 3 + Math.min(1, progress);
       } 
       else if (currentScroll >= partnersTop) {
@@ -200,6 +234,16 @@ export default function LandingPage() {
       } else {
         setTestimonialProgress(0);
       }
+
+      // Calculate progress for the new section
+      const recognizedByAnimStart = recognizedByTop;
+      const recognizedByAnimDuration = viewportHeight * 2; // Animation occurs over 200vh of scrolling
+      const scrollInRecognizedByZone = currentScroll - recognizedByAnimStart;
+      let newRecognizedByProgress = 0;
+      if (scrollInRecognizedByZone > 0) {
+          newRecognizedByProgress = Math.min(1, scrollInRecognizedByZone / recognizedByAnimDuration);
+      }
+      setRecognizedByProgress(newRecognizedByProgress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -207,6 +251,7 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
 
+  // The rest of your useEffects for wheel and scroll snapping remain unchanged
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       const wrapper = testimonialsSectionWrapperRef.current;
@@ -235,17 +280,13 @@ export default function LandingPage() {
       const maxIndex = formattedTestimonials.length - 1;
       const scrollDirection = event.deltaY;
 
-      // --- REVISED LOGIC TO ALLOW EXITING THE SECTION ---
       if (scrollDirection < 0 && targetTestimonialIndex === 0) {
-        // User is at the first slide and scrolling up, so let them.
         return;
       }
       if (scrollDirection > 0 && targetTestimonialIndex === maxIndex) {
-        // User is at the last slide and scrolling down, so let them.
         return;
       }
 
-      // If we've gotten this far, we intend to hijack the scroll.
       event.preventDefault();
       
       let newIndex = targetTestimonialIndex;
@@ -266,7 +307,6 @@ export default function LandingPage() {
   }, [layout.testimonialsTop, targetTestimonialIndex, formattedTestimonials.length]);
 
   useEffect(() => {
-    // --- REVISED LOGIC TO PREVENT SCROLL ON LOAD ---
     if (isInitialLoad.current && layout.testimonialsTop > 0) {
       isInitialLoad.current = false;
       return;
@@ -312,7 +352,8 @@ export default function LandingPage() {
         '--courses-opacity': 0, 
         '--our-edge-opacity': 0,
         '--partners-opacity': 0,
-        '--trust-opacity': 0
+        '--trust-opacity': 0,
+        '--recognized-by-opacity': 0 // Add new CSS variable initial state
       } as any}
     >
       <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
@@ -320,6 +361,8 @@ export default function LandingPage() {
       <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--our-edge-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Edge</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
+      {/* New watermark text */}
+      <h2 className="absolute bottom-0 left-1/2 z-[-3] text-[16vw] md:text-[14vw] lg:text-[12rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Recognized By</h2>
     </div>
       
       <div className="relative z-20">
@@ -340,6 +383,13 @@ export default function LandingPage() {
               testimonials={formattedTestimonials} 
               progress={testimonialProgress} 
             />
+          </div>
+        </div>
+
+        {/* Add the new section here */}
+        <div ref={recognizedBySectionWrapperRef} style={{ height: '300vh' }}>
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <RecognizedBySection progress={recognizedByProgress} />
           </div>
         </div>
 

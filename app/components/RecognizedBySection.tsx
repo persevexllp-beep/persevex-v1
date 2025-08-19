@@ -6,11 +6,11 @@ import AnimatedLogo from "./AnimatedLogo";
 
 // Define the logos with their final positions and animation types
 const logos = [
-  { src: "/r5.jpg", alt: "MSME", animation: "from-top-left" },
-  { src: "/r2.png", alt: "Skill India", animation: "from-bottom-left" },
-  { src: "/r1.jpg", alt: "Ministry of Corporate Affairs", animation: "from-top" },
-  { src: "/r3.jpeg", alt: "Startup India", animation: "from-bottom-right" },
-  { src: "/r4.png", alt: "Mood Indigo IIT Bombay", animation: "from-top-right" },
+  { src: "/startup.png", alt: "MSME", animation: "from-top-left" },
+  { src: "/skill.png", alt: "Skill India", animation: "from-bottom-left" },
+  { src: "/msme.png", alt: "Ministry of Corporate Affairs", animation: "from-top" },
+  { src: "/iso.png", alt: "Startup India", animation: "from-bottom-right" },
+  { src: "/aicte.png", alt: "Mood Indigo IIT Bombay", animation: "from-top-right" },
 ];
 
 const RecognizedBySection = ({ progress }: { progress: number }) => {

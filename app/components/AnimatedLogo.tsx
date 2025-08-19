@@ -2,154 +2,197 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
+import { createNoise2D } from "simplex-noise"; 
 
-// Helper hook to generate a random set of box-shadows for the sparkle effect.
-// `useMemo` is crucial for performance, preventing recalculation on every render.
-const useSparkles = (count: number, width: number, height: number, color: string) => {
-  return useMemo(() => {
-    return Array.from({ length: count })
-      .map(() => {
-        // Position the sparkle randomly within the given area
-        const x = Math.floor(Math.random() * width);
-        const y = Math.floor(Math.random() * height - height / 2);
-        // Randomize the size of the sparkle
-        const size = Math.random() * 0.5 + 0.5;
-        // Randomize the opacity for a twinkling effect
-        const opacity = Math.random() * 0.7 + 0.3;
-        // Create the box-shadow string for a single sparkle
-        return `${x}px ${y}px 0 ${size}px rgba(${color}, ${opacity})`;
-      })
-      .join(", ");
-  }, [count, width, height, color]);
-};
+// --- Helper Class for Particles (NO CHANGES) ---
+class Particle {
+  x: number;
+  y: number;
+  size: number;
+  vx: number;
+  vy: number;
+  life: number;
+  
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    this.size = Math.random() * 3 + 1;
+    this.vx = -(Math.random() * 1.5 + 1);
+    this.vy = (Math.random() - 0.5) * 2;
+    this.life = 1;
+  }
 
-// A dedicated component for rendering a layer of sparkles.
-const SparkleLayer = ({ count, width, height, color, className = "" }: { count: number; width: number; height: number; color: string; className?: string }) => {
-  const sparkles = useSparkles(count, width, height, color);
-  return (
-    <div className={`absolute pointer-events-none ${className}`}>
-      {/* A 1x1 pixel div that acts as an anchor for the box-shadows */}
-      <div className="w-px h-px" style={{ boxShadow: sparkles }} />
-    </div>
-  );
-};
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= 0.015;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = `rgba(253, 224, 71, ${this.life * 0.8})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
 
 
-// The multi-layered CometTrail component to match the reference image.
+// --- Updated CometTrail with Wider Tip ---
 const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const opacityRef = useRef(opacity);
+
+  useEffect(() => {
+    opacityRef.current = opacity;
+  }, [opacity]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    
+    const simplex = createNoise2D();
+    
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    let animationFrameId: number;
+    const particles: Particle[] = [];
+    const maxParticles = 150;
+    
+    const coreX = canvas.width / dpr - 50; 
+    const coreY = canvas.height / dpr / 2;
+    
+    let tick = 0;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = opacityRef.current;
+      
+      ctx.globalCompositeOperation = 'lighter';
+      
+      const tailLength = 400;
+
+      const noiseScale1 = 0.01, noiseSpeed1 = 0.005, amplitude1 = 80;
+      const noiseScale2 = 0.05, noiseSpeed2 = 0.01, amplitude2 = 35;
+
+      for (let i = 0; i < tailLength; i += 4) {
+        const progress = i / tailLength;
+        const x = coreX - i;
+        
+        // --- UPDATED: Modified width factor for wider tip ---
+        // Using a curve that starts wide (tip), narrows in the middle, then widens at core
+        // This creates a more consistent and visually appealing trail
+        const widthFactor = 0.4 + 0.6 * (1 - Math.abs(Math.sin(progress * Math.PI * 0.7)));
+
+        // Apply the widthFactor to the noise amplitude
+        const yOffset1 = simplex(i * noiseScale1, tick * noiseSpeed1) * amplitude1 * widthFactor;
+        const yOffset2 = simplex(i * noiseScale2, tick * noiseSpeed2) * amplitude2 * widthFactor;
+        
+        const y = coreY + yOffset1 + yOffset2;
+
+        const randomSizeFactor = Math.random() * 0.4 + 0.8;
+        const randomAlphaFactor = Math.random() * 0.5 + 0.75;
+
+        // Apply the widthFactor to the radius of the cloud puffs
+        const baseRadius = 80;
+        const radius = baseRadius * widthFactor * randomSizeFactor;
+        // Also tie alpha to the width factor to make the middle appear denser
+        const alpha = 0.15 * widthFactor * randomAlphaFactor;
+
+        const tailPartGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        tailPartGradient.addColorStop(0, `rgba(253, 224, 71, ${alpha})`);
+        tailPartGradient.addColorStop(1, `rgba(217, 119, 6, 0)`);
+        
+        ctx.fillStyle = tailPartGradient;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      ctx.globalCompositeOperation = 'source-over';
+
+      // Update particle spawning to use the new shaping logic
+      if (particles.length < maxParticles && Math.random() > 0.5) {
+        for (let i = 0; i < 3; i++) {
+            const spawnDist = Math.random() * tailLength * 0.9;
+            const progress = spawnDist / tailLength;
+            const spawnX = coreX - spawnDist;
+
+            // Use the same widthFactor calculation for particle spawning
+            const spawnWidthFactor = 0.4 + 0.6 * (1 - Math.abs(Math.sin(progress * Math.PI * 0.7)));
+
+            const spawnYOffset1 = simplex(spawnDist * noiseScale1, tick * noiseSpeed1) * amplitude1 * spawnWidthFactor;
+            const spawnYOffset2 = simplex(spawnDist * noiseScale2, tick * noiseSpeed2) * amplitude2 * spawnWidthFactor;
+
+            const spawnY = coreY + spawnYOffset1 + spawnYOffset2;
+            particles.push(new Particle(spawnX, spawnY));
+        }
+      }
+
+      // Update and draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.update();
+        p.draw(ctx);
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Draw the core
+      const coreGradient = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, 30);
+      coreGradient.addColorStop(0, "rgba(255, 255, 224, 1)");
+      coreGradient.addColorStop(0.3, "rgba(253, 224, 71, 0.8)");
+      coreGradient.addColorStop(1, "rgba(217, 119, 6, 0)");
+      
+      ctx.fillStyle = coreGradient;
+      ctx.beginPath();
+      ctx.arc(coreX, coreY, 30, 0, Math.PI * 2);
+      ctx.fill();
+
+      tick++;
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   return (
     <div
       className="absolute top-1/2 left-1/2 w-[800px] h-[200px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
       style={{
-        opacity,
-        // The container is centered on the logo. The rotation pivots around this center point.
-        transform: `rotate(${rotation}deg)`,
-        transition: "opacity 0.8s ease-out",
+        transform: `rotate(${rotation}deg) translate(-400px, 0)`,
       }}
     >
-      <div className="relative w-full h-full">
-        {/*
-          The comet is built in layers from back to front.
-          The "head" of the comet is positioned at the horizontal center of this container (400px),
-          which aligns it perfectly with the animated logo.
-        */}
-
-        {/* Layer 1: Sparse Background Sparkles */}
-        {/* <SparkleLayer
-          count={50}
-          width={50}
-          height={50}
-          color="253, 200, 100" // Deeper orange-yellow
-          className="top-1/2 left-[0px] -translate-y-1/2"
-        /> */}
-
-        {/* Layer 2: Wavy Tail Body */}
-        {/* Part A: Forms the bottom curve of the S-shape */}
-        <div
-          className="absolute top-1/2 w-[350px] h-[80px] -translate-y-[70%]"
-          style={{
-            left: '50px',
-            background: "linear-gradient(to right, transparent 20%, rgba(217, 119, 6, 0.5) 80%, rgba(253, 224, 71, 0.7))",
-            borderRadius: '50%',
-            filter: 'blur(30px)',
-            transform: 'rotate(-10deg)'
-          }}
-        />
-        <div
-          className="absolute top-1/2 w-[350px] h-[80px] -translate-y-[70%]"
-          style={{
-            left: '50px',
-            background: "linear-gradient(to right, transparent 20%, rgba(217, 119, 6, 0.5) 80%, rgba(253, 224, 71, 0.7))",
-            borderRadius: '50%',
-            filter: 'blur(30px)',
-            transform: 'rotate(-10deg)'
-          }}
-        />
-        <div
-          className="absolute top-1/2 w-[350px] h-[80px] -translate-y-[70%]"
-          style={{
-            left: '50px',
-            background: "linear-gradient(to right, transparent 20%, rgba(217, 119, 6, 0.5) 80%, rgba(253, 224, 71, 0.7))",
-            borderRadius: '50%',
-            filter: 'blur(30px)',
-            transform: 'rotate(-10deg)'
-          }}
-        />
-        {/* Part B: Forms the top curve of the S-shape */}
-        <div
-          className="absolute top-1/2 w-[300px] h-[70px] -translate-y-[30%]"
-          style={{
-            left: '100px',
-            background: "linear-gradient(to right, transparent 20%, rgba(253, 224, 71, 0.4) 80%, rgba(253, 235, 150, 0.6))",
-            borderRadius: '50%',
-            filter: 'blur(30px)',
-            transform: 'rotate(10deg)'
-          }}
-        />
-
-        {/* Layer 3: Dense Foreground Sparkles */}
-        <SparkleLayer
-          count={80}
-          width={300}
-          height={150}
-          color="253, 230, 150" // Brighter yellow
-          className="top-1/2 left-[100px] -translate-y-1/2"
-        />
-
-        {/* Layer 4: The Comet Head - Brightest part */}
-        <div
-          className="absolute top-1/2 w-24 h-24 -translate-x-1/2 -translate-y-1/2"
-          style={{
-            left: '400px', // Positioned at the center of the 800px container
-            background: "radial-gradient(circle, white 20%, rgba(253, 224, 71, 1) 50%, rgba(217, 119, 6, 0.3) 75%, transparent 100%)",
-            filter: 'blur(15px)'
-          }}
-        />
-      </div>
+      <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );
 };
 
 
-// Main Animated Logo Component
+// --- Main Animated Logo Component (NO CHANGES NEEDED HERE) ---
 const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
   const animationPath = useMemo(() => {
-    // CRITICAL FIX: The trail angles have been corrected to point AWAY from the origin.
     switch (logo.animation) {
-      // Moves from top-left. Tail must point back to top-left (45 degrees).
       case "from-top-left":
         return { x1: -500, y1: -350, r1: -15, x2: 0, y2: 0, r2: 0, trailAngle: 45 };
-      // Moves from bottom-left. Tail must point back to bottom-left (-45 degrees).
       case "from-bottom-left":
         return { x1: -500, y1: 350, r1: 15, x2: 0, y2: 0, r2: 0, trailAngle: -45 };
-      // Moves from top. Tail must point back up (90 degrees).
       case "from-top":
         return { x1: 0, y1: -400, r1: 0, x2: 0, y2: 0, r2: 0, trailAngle: 90 };
-      // Moves from bottom-right. Tail must point back to bottom-right (-135 degrees).
       case "from-bottom-right":
         return { x1: 500, y1: 350, r1: -15, x2: 0, y2: 0, r2: 0, trailAngle: -135 };
-      // Moves from top-right. Tail must point back to top-right (135 degrees).
       case "from-top-right":
         return { x1: 500, y1: -350, r1: 15, x2: 0, y2: 0, r2: 0, trailAngle: 135 };
       default:
@@ -180,7 +223,7 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
         className="absolute inset-0 flex items-center justify-center"
       >
         <div style={{ transform: `rotate(${currentRotation}deg)` }} className="relative z-10">
-          <div className="bg-white p-2 rounded-md shadow-lg border border-gray-200/50">
+          <div className="p-2 rounded-md shadow-lg ">
             <Image
               src={logo.src}
               alt={logo.alt}
@@ -199,13 +242,13 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
           transform: `rotate(${animationPath.r2}deg)`,
         }}
       >
-        <div className="bg-white p-2 rounded-md shadow-lg border border-gray-200/50">
+        <div className=" p- rounded-md   ">
           <Image
             src={logo.src}
             alt={logo.alt}
             width={140}
             height={70}
-            className="object-contain h-14 w-auto"
+            className="object-contain  w-full"
           />
         </div>
       </div>

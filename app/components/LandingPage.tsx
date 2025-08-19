@@ -1,4 +1,3 @@
-// LandingPage.tsx
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -171,41 +170,56 @@ export default function LandingPage() {
 
       if (layout.coursesTop === 0) return;
 
-      // Destructure new layout property
       const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop } = layout;
 
-      const trustWatermarkAnimStart = testimonialsTop - viewportHeight; 
-      // This animation now happens between the start of trust and the start of recognized by
+      // START OF CHANGE: Refined watermark transition timing
+      
+      // Define start and end points for the "Partners" to "Trust" transition
+      const trustWatermarkAnimStart = testimonialsTop - viewportHeight; // Start when testimonials section enters viewport
+      const trustWatermarkAnimEnd = testimonialsTop - viewportHeight / 2; // End when testimonials section is centered
+      const trustWatermarkAnimDuration = trustWatermarkAnimEnd - trustWatermarkAnimStart;
+
+      // Define points for the "Trust" to "Recognized By" transition
       const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
       const recognizedByWatermarkAnimDuration = viewportHeight / 2;
 
       let newWatermarkProgress = 0;
-      // New condition for the "Recognized By" watermark
+      
+      // Phase 5: "Trust" -> "Validation"
       if (currentScroll >= recognizedByWatermarkAnimStart) {
         const progress = (currentScroll - recognizedByWatermarkAnimStart) / recognizedByWatermarkAnimDuration;
         newWatermarkProgress = 4 + Math.min(1, progress);
       }
-      // Updated condition for the "Trust" watermark transition
+      // New static phase: "Trust" is fully visible while scrolling through testimonials
+      else if (currentScroll >= trustWatermarkAnimEnd) {
+        newWatermarkProgress = 4.0;
+      }
+      // Phase 4: "Partners" -> "Trust" transition (now happens over a shorter, specific duration)
       else if (currentScroll >= trustWatermarkAnimStart) {
-        const duration = recognizedByWatermarkAnimStart - trustWatermarkAnimStart;
+        const duration = trustWatermarkAnimDuration > 0 ? trustWatermarkAnimDuration : 1;
         const progress = (currentScroll - trustWatermarkAnimStart) / duration;
         newWatermarkProgress = 3 + Math.min(1, progress);
       } 
+      // Phase 3: "Our Edge" -> "Partners"
       else if (currentScroll >= partnersTop) {
         const duration = trustWatermarkAnimStart - partnersTop;
         const progress = (currentScroll - partnersTop) / duration;
         newWatermarkProgress = 2 + Math.min(1, progress);
       } 
+      // Phase 2: "Courses" -> "Our Edge"
       else if (currentScroll >= edgeTop - viewportHeight) {
         const progress = (currentScroll - (edgeTop - viewportHeight)) / viewportHeight;
         newWatermarkProgress = 1 + Math.min(1, progress);
       } 
+      // Phase 1: "Persevex" -> "Courses"
       else if (currentScroll >= coursesTop - viewportHeight) {
         const progress = (currentScroll - (coursesTop - viewportHeight)) / viewportHeight;
         newWatermarkProgress = Math.min(1, progress);
       }
       watermarkProgressRef.current = newWatermarkProgress;
       
+      // END OF CHANGE
+
       const edgeCardAnimStart = edgeTop;
       const cardAnimScrollDistance = viewportHeight * NUM_CARDS;
       const scrollInCardZone = currentScroll - edgeCardAnimStart;
@@ -235,9 +249,8 @@ export default function LandingPage() {
         setTestimonialProgress(0);
       }
 
-      // Calculate progress for the new section
       const recognizedByAnimStart = recognizedByTop;
-      const recognizedByAnimDuration = viewportHeight * 2; // Animation occurs over 200vh of scrolling
+      const recognizedByAnimDuration = viewportHeight * 2;
       const scrollInRecognizedByZone = currentScroll - recognizedByAnimStart;
       let newRecognizedByProgress = 0;
       if (scrollInRecognizedByZone > 0) {
@@ -251,7 +264,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
 
-  // The rest of your useEffects for wheel and scroll snapping remain unchanged
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       const wrapper = testimonialsSectionWrapperRef.current;
@@ -353,7 +365,7 @@ export default function LandingPage() {
         '--our-edge-opacity': 0,
         '--partners-opacity': 0,
         '--trust-opacity': 0,
-        '--recognized-by-opacity': 0 // Add new CSS variable initial state
+        '--recognized-by-opacity': 0
       } as any}
     >
       <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
@@ -361,8 +373,7 @@ export default function LandingPage() {
       <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--our-edge-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Edge</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
-      {/* New watermark text */}
-      <h2 className="absolute bottom-0 left-1/2 z-[-3] text-[16vw] md:text-[14vw] lg:text-[12rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Recognized By</h2>
+      <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
     </div>
       
       <div className="relative z-20">
@@ -386,7 +397,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Add the new section here */}
         <div ref={recognizedBySectionWrapperRef} style={{ height: '300vh' }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <RecognizedBySection progress={recognizedByProgress} />

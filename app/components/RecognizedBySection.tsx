@@ -2,26 +2,61 @@
 "use client";
 
 import Image from "next/image";
+import { useRef, useState, useLayoutEffect } from "react";
 
-// Replace these with your actual partner logo paths
+// Updated logo order to match your new image
 const logos = [
-  { src: "/r1.jpg", alt: "Partner 1" },
-  { src: "/r2.png", alt: "Partner 2" },
-  { src: "/r3.jpeg", alt: "Partner 3" },
-  { src: "/r4.png", alt: "Partner 4" },
-  { src: "/r5.jpg", alt: "Partner 5" }, // Corrected alt text from Partner 6 to 5
+  { src: "/r4.png", alt: "AICTE" },
+  { src: "/r5.jpg", alt: "MSME" },
+  { src: "/r1.jpg", alt: "Ministry of Corporate Affairs" },
+  { src: "/r2.png", alt: "ISO 9001:2015" },
+  { src: "/r3.jpeg", alt: "Startup India" },
 ];
 
+// An easing function to make the animation feel smoother (starts and ends slowly)
+const easeInOutCubic = (t: number): number => {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+};
+
+
 const RecognizedBySection = ({ progress }: { progress: number }) => {
-  // We want to translate the logo strip. The strip is 200% wide.
-  // To move it by one full screen width (the width of the first set of logos),
-  // we need to translate it by 50% of its own total width.
-  // So, progress=0 -> translateX=0%, progress=1 -> translateX=-50%
-  const translateX = progress * 50;
+  const trackRef = useRef<HTMLDivElement>(null);
+  const windowRef = useRef<HTMLDivElement>(null);
+  const [scrollDistance, setScrollDistance] = useState(0);
+
+  // We use useLayoutEffect to measure the width of the logo track and its container
+  // after they have been rendered to the DOM.
+  useLayoutEffect(() => {
+    const calculateScrollDistance = () => {
+      if (trackRef.current && windowRef.current) {
+        const trackWidth = trackRef.current.scrollWidth;
+        const windowWidth = windowRef.current.offsetWidth;
+        
+        // The total distance the track can scroll is its full width minus the visible window width.
+        // We only set a distance if the track is actually wider than the window.
+        if (trackWidth > windowWidth) {
+          setScrollDistance(trackWidth - windowWidth);
+        } else {
+          setScrollDistance(0);
+        }
+      }
+    };
+
+    calculateScrollDistance();
+    // Recalculate if the window is resized
+    window.addEventListener('resize', calculateScrollDistance);
+    return () => window.removeEventListener('resize', calculateScrollDistance);
+  }, []); // Empty dependency array means this runs once on mount.
+
+  // Apply the easing function to the raw progress value
+  const easedProgress = easeInOutCubic(progress);
+
+  // Calculate the final translation in pixels
+  const translateX = easedProgress * scrollDistance;
 
   return (
-    <div className="relative h-full w-full flex flex-col justify-center items-center overflow-hidden text-white px-4">
-      <div className="text-center mb-16 md:mb-24">
+    <div className="relative h-full w-full flex flex-col j items-center text-white px-4">
+      <div className="text-center mb-16 mt-40 md:mb-24">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
           Recognized By
         </h2>
@@ -31,22 +66,31 @@ const RecognizedBySection = ({ progress }: { progress: number }) => {
         </p>
       </div>
 
-      <div className="w-full">
-        {/* The 'track' that moves horizontally */}
+      {/* 
+        THE FIX IS HERE:
+        Changed `max-w-6xl` to `max-w-lg`. This makes the container much narrower (512px),
+        which is wide enough for about 2-3 logos. This forces the full logo track
+        to overflow and creates a scrollable distance, fixing the animation.
+      */}
+      <div ref={windowRef} className="w-full max-w-3xl mx-auto overflow-hidden">
+        {/* 
+          The 'track' that moves horizontally.
+          - `w-max` makes the container just wide enough to fit all its children in a single line.
+        */}
         <div
-          style={{ transform: `translateX(-${translateX}%)` }}
-          // THIS IS THE FIX: Set width to 200% to hold both sets of logos side-by-side.
-          className="flex items-center w-[200%] gap-x-24 will-change-transform"
+          ref={trackRef}
+          style={{ transform: `translateX(-${translateX}px)` }} // We now translate by pixels
+          className="flex items-center gap-x-16 md:gap-x-24 will-change-transform w-max"
         >
-          {/* We render the logos twice to create the seamless loop */}
-          {[...logos, ...logos].map((logo, index) => (
-            <div key={index} className="flex-shrink-0">
+          {/* We render the logos only ONCE */}
+          {logos.map((logo) => (
+            <div key={logo.alt} className="flex-shrink-0">
               <Image
                 src={logo.src}
                 alt={logo.alt}
                 width={160}
                 height={80}
-                className="object-contain h-16 md:h-20 w-auto filter grayscale hover:grayscale-0 transition-all duration-300"
+                className="object-contain h-16 md:h-20 w-auto"
               />
             </div>
           ))}

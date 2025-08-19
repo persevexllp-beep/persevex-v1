@@ -1,62 +1,25 @@
 // RecognizedBySection.tsx
 "use client";
 
-import Image from "next/image";
-import { useRef, useState, useLayoutEffect } from "react";
+import { useMemo } from "react";
+import AnimatedLogo from "./AnimatedLogo";
 
-// Updated logo order to match your new image
+// Define the logos with their final positions and animation types
 const logos = [
-  { src: "/r4.png", alt: "AICTE" },
-  { src: "/r5.jpg", alt: "MSME" },
-  { src: "/r1.jpg", alt: "Ministry of Corporate Affairs" },
-  { src: "/r2.png", alt: "ISO 9001:2015" },
-  { src: "/r3.jpeg", alt: "Startup India" },
+  { src: "/r5.jpg", alt: "MSME", animation: "from-top-left" },
+  { src: "/r2.png", alt: "Skill India", animation: "from-bottom-left" },
+  { src: "/r1.jpg", alt: "Ministry of Corporate Affairs", animation: "from-top" },
+  { src: "/r3.jpeg", alt: "Startup India", animation: "from-bottom-right" },
+  { src: "/r4.png", alt: "Mood Indigo IIT Bombay", animation: "from-top-right" },
 ];
 
-// An easing function to make the animation feel smoother (starts and ends slowly)
-const easeInOutCubic = (t: number): number => {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-};
-
-
 const RecognizedBySection = ({ progress }: { progress: number }) => {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const windowRef = useRef<HTMLDivElement>(null);
-  const [scrollDistance, setScrollDistance] = useState(0);
-
-  // We use useLayoutEffect to measure the width of the logo track and its container
-  // after they have been rendered to the DOM.
-  useLayoutEffect(() => {
-    const calculateScrollDistance = () => {
-      if (trackRef.current && windowRef.current) {
-        const trackWidth = trackRef.current.scrollWidth;
-        const windowWidth = windowRef.current.offsetWidth;
-        
-        // The total distance the track can scroll is its full width minus the visible window width.
-        // We only set a distance if the track is actually wider than the window.
-        if (trackWidth > windowWidth) {
-          setScrollDistance(trackWidth - windowWidth);
-        } else {
-          setScrollDistance(0);
-        }
-      }
-    };
-
-    calculateScrollDistance();
-    // Recalculate if the window is resized
-    window.addEventListener('resize', calculateScrollDistance);
-    return () => window.removeEventListener('resize', calculateScrollDistance);
-  }, []); // Empty dependency array means this runs once on mount.
-
-  // Apply the easing function to the raw progress value
-  const easedProgress = easeInOutCubic(progress);
-
-  // Calculate the final translation in pixels
-  const translateX = easedProgress * scrollDistance;
+  const numLogos = logos.length;
 
   return (
-    <div className="relative h-full w-full flex flex-col j items-center text-white px-4">
-      <div className="text-center mb-16 mt-40 md:mb-24">
+    <div className="relative h-full w-full flex flex-col justify-center items-center text-white px-4 overflow-hidden">
+      {/* Text Content */}
+      <div className="text-center mb-16 md:mb-24 relative z-10">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
           Recognized By
         </h2>
@@ -66,35 +29,33 @@ const RecognizedBySection = ({ progress }: { progress: number }) => {
         </p>
       </div>
 
-      {/* 
-        THE FIX IS HERE:
-        Changed `max-w-6xl` to `max-w-lg`. This makes the container much narrower (512px),
-        which is wide enough for about 2-3 logos. This forces the full logo track
-        to overflow and creates a scrollable distance, fixing the animation.
-      */}
-      <div ref={windowRef} className="w-full max-w-3xl mx-auto overflow-hidden">
-        {/* 
-          The 'track' that moves horizontally.
-          - `w-max` makes the container just wide enough to fit all its children in a single line.
-        */}
-        <div
-          ref={trackRef}
-          style={{ transform: `translateX(-${translateX}px)` }} // We now translate by pixels
-          className="flex items-center gap-x-16 md:gap-x-24 will-change-transform w-max"
-        >
-          {/* We render the logos only ONCE */}
-          {logos.map((logo) => (
-            <div key={logo.alt} className="flex-shrink-0">
-              <Image
-                src={logo.src}
-                alt={logo.alt}
-                width={160}
-                height={80}
-                className="object-contain h-16 md:h-20 w-auto"
+      {/* Static grid container that defines the final positions of the logos */}
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-x-12 md:gap-x-20 gap-y-12 w-full max-w-4xl">
+        {logos.map((logo, index) => {
+          // This logic determines the progress for each individual logo's animation.
+          // The total scroll progress (0 to 1) is divided into segments for each logo.
+          const progressPerLogo = 1 / numLogos;
+          const startProgress = index * progressPerLogo;
+          const endProgress = startProgress + progressPerLogo;
+
+          // Calculate the local progress (0 to 1) for the current logo's animation
+          const localProgress = useMemo(() => {
+            if (progress >= startProgress && progress <= endProgress) {
+              return (progress - startProgress) / progressPerLogo;
+            }
+            return progress > endProgress ? 1 : 0;
+          }, [progress, startProgress, endProgress, progressPerLogo]);
+
+          return (
+            <div key={logo.alt} className="relative aspect-video flex items-center justify-center">
+              {/* The AnimatedLogo component handles its own animation based on its local progress */}
+              <AnimatedLogo
+                logo={logo}
+                progress={localProgress}
               />
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );

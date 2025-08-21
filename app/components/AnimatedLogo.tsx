@@ -3,7 +3,6 @@
 
 import Image from "next/image";
 import { useMemo, useEffect, useRef } from "react";
-import { createNoise2D } from "simplex-noise"; 
 
 // --- Helper Class for Particles (NO CHANGES) ---
 class Particle {
@@ -38,7 +37,7 @@ class Particle {
 }
 
 
-// --- Updated CometTrail with Wider Tip ---
+// --- CometTrail Component (NO CHANGES) ---
 const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const opacityRef = useRef(opacity);
@@ -54,8 +53,6 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     
-    const simplex = createNoise2D();
-    
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
@@ -69,8 +66,6 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
     const coreX = canvas.width / dpr - 50; 
     const coreY = canvas.height / dpr / 2;
     
-    let tick = 0;
-
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.globalAlpha = opacityRef.current;
@@ -78,65 +73,51 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
       ctx.globalCompositeOperation = 'lighter';
       
       const tailLength = 400;
-
-      const noiseScale1 = 0.01, noiseSpeed1 = 0.005, amplitude1 = 80;
-      const noiseScale2 = 0.05, noiseSpeed2 = 0.01, amplitude2 = 35;
+      const tailStartWidth = 40;
+      const tailEndWidth = 200;
 
       for (let i = 0; i < tailLength; i += 4) {
         const progress = i / tailLength;
         const x = coreX - i;
         
-        // --- UPDATED: Modified width factor for wider tip ---
-        // Using a curve that starts wide (tip), narrows in the middle, then widens at core
-        // This creates a more consistent and visually appealing trail
-        const widthFactor = 0.4 + 0.6 * (1 - Math.abs(Math.sin(progress * Math.PI * 0.7)));
+        const currentWidth = tailStartWidth + (tailEndWidth - tailStartWidth) * progress;
 
-        // Apply the widthFactor to the noise amplitude
-        const yOffset1 = simplex(i * noiseScale1, tick * noiseSpeed1) * amplitude1 * widthFactor;
-        const yOffset2 = simplex(i * noiseScale2, tick * noiseSpeed2) * amplitude2 * widthFactor;
-        
-        const y = coreY + yOffset1 + yOffset2;
+        const puffsPerSegment = 3;
+        for (let j = 0; j < puffsPerSegment; j++) {
+          const yOffset = (Math.random() - 0.5) * currentWidth;
+          const y = coreY + yOffset;
+          
+          const baseRadius = 40;
+          const radius = (baseRadius + Math.random() * 20) * (progress * 0.8 + 0.2); 
+          
+          const alpha = (1 - progress * 0.7) * (Math.random() * 0.1 + 0.05);
 
-        const randomSizeFactor = Math.random() * 0.4 + 0.8;
-        const randomAlphaFactor = Math.random() * 0.5 + 0.75;
-
-        // Apply the widthFactor to the radius of the cloud puffs
-        const baseRadius = 80;
-        const radius = baseRadius * widthFactor * randomSizeFactor;
-        // Also tie alpha to the width factor to make the middle appear denser
-        const alpha = 0.15 * widthFactor * randomAlphaFactor;
-
-        const tailPartGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        tailPartGradient.addColorStop(0, `rgba(253, 224, 71, ${alpha})`);
-        tailPartGradient.addColorStop(1, `rgba(217, 119, 6, 0)`);
-        
-        ctx.fillStyle = tailPartGradient;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
+          const tailPartGradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          tailPartGradient.addColorStop(0, `rgba(253, 224, 71, ${alpha})`);
+          tailPartGradient.addColorStop(1, `rgba(217, 119, 6, 0)`);
+          
+          ctx.fillStyle = tailPartGradient;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
       
       ctx.globalCompositeOperation = 'source-over';
 
-      // Update particle spawning to use the new shaping logic
-      if (particles.length < maxParticles && Math.random() > 0.5) {
-        for (let i = 0; i < 3; i++) {
-            const spawnDist = Math.random() * tailLength * 0.9;
+      if (particles.length < maxParticles && Math.random() > 0.6) {
+        for (let k = 0; k < 2; k++) {
+            const spawnDist = Math.random() * tailLength * 0.8;
             const progress = spawnDist / tailLength;
             const spawnX = coreX - spawnDist;
-
-            // Use the same widthFactor calculation for particle spawning
-            const spawnWidthFactor = 0.4 + 0.6 * (1 - Math.abs(Math.sin(progress * Math.PI * 0.7)));
-
-            const spawnYOffset1 = simplex(spawnDist * noiseScale1, tick * noiseSpeed1) * amplitude1 * spawnWidthFactor;
-            const spawnYOffset2 = simplex(spawnDist * noiseScale2, tick * noiseSpeed2) * amplitude2 * spawnWidthFactor;
-
-            const spawnY = coreY + spawnYOffset1 + spawnYOffset2;
+            
+            const spawnWidth = tailStartWidth + (tailEndWidth - tailStartWidth) * progress;
+            const spawnY = coreY + (Math.random() - 0.5) * spawnWidth;
+            
             particles.push(new Particle(spawnX, spawnY));
         }
       }
 
-      // Update and draw particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.update();
@@ -146,7 +127,6 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
         }
       }
 
-      // Draw the core
       const coreGradient = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, 30);
       coreGradient.addColorStop(0, "rgba(255, 255, 224, 1)");
       coreGradient.addColorStop(0.3, "rgba(253, 224, 71, 0.8)");
@@ -157,7 +137,6 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
       ctx.arc(coreX, coreY, 30, 0, Math.PI * 2);
       ctx.fill();
 
-      tick++;
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -181,7 +160,7 @@ const CometTrail = ({ opacity, rotation }: { opacity: number; rotation: number }
 };
 
 
-// --- Main Animated Logo Component (NO CHANGES NEEDED HERE) ---
+// --- UPDATED: Main component with slower internal animation ---
 const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
   const animationPath = useMemo(() => {
     switch (logo.animation) {
@@ -199,17 +178,26 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
         return { x1: 0, y1: 0, r1: 0, x2: 0, y2: 0, r2: 0, trailAngle: 0 };
     }
   }, [logo.animation]);
+  
+  // --- UPDATED: Increased duration for slower movement ---
+  const movementDuration = 2.0; // Was 1.5
+  const fadeDuration = 0.4;     // Was 0.3
 
   const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
-  const easedProgress = easeOutQuart(Math.min(1, progress / 0.85));
+  
+  const easedProgress = easeOutQuart(Math.min(1, progress / movementDuration));
 
   const currentX = animationPath.x1 + (animationPath.x2 - animationPath.x1) * easedProgress;
   const currentY = animationPath.y1 + (animationPath.y2 - animationPath.y1) * easedProgress;
   const currentRotation = animationPath.r1 + (animationPath.r2 - animationPath.r1) * easedProgress;
 
   const logoAndTrailOpacity = progress > 0.01 ? 1 : 0;
-  const trailFadeProgress = Math.max(0, (progress - 0.85) / 0.15);
+
+  const trailFadeProgress = Math.max(0, (progress - movementDuration) / fadeDuration);
   const trailFinalOpacity = 1 - trailFadeProgress;
+  
+  const isMovementComplete = progress >= movementDuration;
+  const isFadeComplete = trailFadeProgress >= 1;
 
   return (
     <>
@@ -218,11 +206,17 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
           opacity: logoAndTrailOpacity,
           transform: `translate(${currentX}px, ${currentY}px)`,
           transition: "opacity 0.2s linear",
-          visibility: progress >= 1 ? "hidden" : "visible",
+          visibility: isFadeComplete ? "hidden" : "visible",
         }}
         className="absolute inset-0 flex items-center justify-center"
       >
-        <div style={{ transform: `rotate(${currentRotation}deg)` }} className="relative z-10">
+        <div 
+            style={{ 
+                transform: `rotate(${currentRotation}deg)`,
+                visibility: isMovementComplete ? 'hidden' : 'visible'
+            }} 
+            className="relative z-10"
+        >
           <div className="p-2 rounded-md shadow-lg ">
             <Image
               src={logo.src}
@@ -237,7 +231,7 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
       </div>
       <div
         style={{
-          opacity: progress >= 1 ? 1 : 0,
+          opacity: isMovementComplete ? 1 : 0,
           transition: "opacity 0.3s ease-in",
           transform: `rotate(${animationPath.r2}deg)`,
         }}

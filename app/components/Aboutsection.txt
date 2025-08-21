@@ -1,0 +1,95 @@
+ <main>
+      <div className="fixed top-0 left-0 w-full h-full z-0">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+          <Suspense fallback={null}>
+            <AnimationController 
+              watermarkProgressRef={watermarkProgressRef} 
+              textContainerRef={textContainerRef} 
+            />
+          </Suspense>
+        </Canvas>
+      </div>
+
+     <div
+      ref={textContainerRef}
+      className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
+      style={{ 
+        '--persevex-opacity': 0.4, 
+        '--courses-opacity': 0, 
+        '--our-edge-opacity': 0,
+        '--partners-opacity': 0,
+        '--trust-opacity': 0,
+        '--recognized-by-opacity': 0,
+        '--about-us-opacity': 0, // Initial state for the new watermark
+      } as any}
+    >
+      <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
+      <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Courses</h2>
+      <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--our-edge-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Edge</h2>
+      <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
+      <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
+      <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
+      {/* New static watermark for the crossfade */}
+      <h2 className="absolute bottom-6 left-1/2 z-[-4] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>About Us</h2>
+    </div>
+      
+      <div className="relative z-20">
+        <div ref={heroWrapperRef} className="sticky top-0 flex items-center justify-center h-screen pointer-events-none">
+          <div className="w-full mr-74 mb-36 pointer-events-auto"><Hero /></div>
+        </div>
+        
+        <div style={{ height: '10vh' }} />
+        <div ref={coursesSectionWrapperRef}><CoursesSection /></div>
+        <div style={{ height: '50vh' }} />
+        <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}><OurEdgeSection progress={edgeProgress} /></div>
+        <div ref={partnersSectionWrapperRef} style={{ height: '200vh', marginTop: '-50vh' }}><PartnersSection progress={partnersProgress} /></div>
+        
+        <div style={{ height: '10vh' }} />
+        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <AnimatedTestimonials testimonials={formattedTestimonials} progress={testimonialProgress} />
+          </div>
+        </div>
+
+        <div ref={recognizedBySectionWrapperRef} style={{ height: '300vh' }}>
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <RecognizedBySection progress={recognizedByProgress} />
+          </div>
+        </div>
+
+        <div ref={aboutUsSectionWrapperRef} style={{ height: '400vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
+      </div>
+
+     
+    </main>
+
+
+
+
+
+
+
+    {/* --- CORRECTED: There is no longer a static H2. This is the one and only "About Us" --- */}
+      <div 
+          className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
+          style={{ 
+              bottom: '1.5rem', // Start at the same position as "Validation"
+              opacity: 'var(--about-us-opacity)', 
+              transform: 'var(--about-us-container-transform, translateX(-50%))',
+              whiteSpace: 'nowrap' 
+          }}
+      >
+        {"ABOUT US".split('').map((letter, index) => (
+          letter === " " ? <div key={index} className="w-8 md:w-12" /> :
+          <h2
+            key={index}
+            className="text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              WebkitTextStroke: "1px white",
+              transform: `var(--about-us-letter-${index}-transform)`,
+            }}
+          >
+            {letter}
+          </h2>
+        ))}
+      </div>

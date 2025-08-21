@@ -4,7 +4,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useEffect, useState, FC, RefObject, MutableRefObject } from "react";
 import * as THREE from "three";
 
-// Assuming these are component imports from your project structure
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -19,7 +18,6 @@ import AboutUsSection from "./AboutUs";
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
 
-// --- Type Definitions ---
 interface DustMaterial extends THREE.ShaderMaterial {
   uniforms: {
     uOpacity: { value: number };
@@ -278,6 +276,7 @@ const LandingPage: FC = () => {
           <Suspense fallback={null}>
             <AnimationController 
               watermarkProgressRef={watermarkProgressRef} 
+              //@ts-ignore
               textContainerRef={textContainerRef} 
             />
           </Suspense>

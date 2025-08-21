@@ -4,6 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useEffect, useState, FC, RefObject, MutableRefObject } from "react";
 import * as THREE from "three";
 
+// Assuming these are component imports from your project structure
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -18,17 +19,22 @@ import AboutUsSection from "./AboutUs";
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
 
+// --- Type Definitions ---
+
+// Interface for the custom material on the DustPlane to type-check uniforms
 interface DustMaterial extends THREE.ShaderMaterial {
   uniforms: {
     uOpacity: { value: number };
   };
 }
 
+// Interface for the props of AnimationController
 interface AnimationControllerProps {
   watermarkProgressRef: MutableRefObject<number>;
-  textContainerRef: RefObject<HTMLDivElement | null>;
+  textContainerRef: RefObject<HTMLDivElement>;
 }
 
+// Interface for the Testimonial data structure
 interface Testimonial {
   quote: string;
   name: string;
@@ -36,6 +42,7 @@ interface Testimonial {
   src: string;
 }
 
+// Interface for the layout state
 interface LayoutState {
   coursesTop: number;
   edgeTop: number;
@@ -45,94 +52,14 @@ interface LayoutState {
   aboutUsTop: number;
 }
 
-interface AboutUsAnimationControllerProps {
-  watermarkProgressRef: MutableRefObject<number>;
-  storyWatermarkRef: RefObject<HTMLHeadingElement | null>;
-  videoTextContainerRef: RefObject<HTMLDivElement | null>;
-}
-
-const AboutUsAnimationController: FC<AboutUsAnimationControllerProps> = ({
-  watermarkProgressRef,
-  storyWatermarkRef,
-  videoTextContainerRef,
-}) => {
-  const aboutUsWordString = "ABOUT US";
-
-  useFrame(() => {
-    const currentProgress = watermarkProgressRef.current;
-
-    if (currentProgress < 5.0 || !videoTextContainerRef.current || !storyWatermarkRef.current) {
-      if (storyWatermarkRef.current) storyWatermarkRef.current.style.opacity = '0';
-      if (videoTextContainerRef.current) videoTextContainerRef.current.style.opacity = '0';
-      return;
-    }
-
-    let aboutUsOpacity = 0;
-    if (currentProgress >= 5.0 && currentProgress < 6.0) {
-      const p = currentProgress - 5.0;
-      aboutUsOpacity = p * 0.4;
-    } else if (currentProgress >= 6.0) {
-      aboutUsOpacity = 0.4;
-    }
-    storyWatermarkRef.current.style.opacity = `${clamp(aboutUsOpacity, 0, 0.4)}`;
-    videoTextContainerRef.current.style.opacity = `${clamp(aboutUsOpacity, 0, 0.4)}`;
-
-    const assemblyStart = 6.0;
-    const assemblyDuration = 2.5;
-    const assemblyEnd = assemblyStart + assemblyDuration;
-    const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
-
-    const riseStart = assemblyEnd;
-    const riseDuration = 0.5;
-    const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
-
-    const initialY = 4;
-    const centerTarget = -35;
-    const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
-    const finalRise = -riseProgress * 30;
-    const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
-    const containerScale = 1 - riseProgress * 0.7;
-    videoTextContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
-
-    const lettersWithSpaces = aboutUsWordString.split('');
-    const numLetters = aboutUsWordString.replace(/ /g, '').length;
-    const numSpaces = aboutUsWordString.split(' ').length - 1;
-
-    const spacePauseFactor = 2;
-    const totalAnimationUnits = numLetters + (numSpaces * spacePauseFactor);
-    const unitDuration = 1.0 / totalAnimationUnits;
-    const animationWindow = unitDuration * 5;
-
-    let timeCursor = 0;
-
-    lettersWithSpaces.forEach((char, globalIndex) => {
-      if (char === ' ') {
-        timeCursor += unitDuration * spacePauseFactor;
-        return;
-      }
-      const start = timeCursor;
-      const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
-      const letterOpacity = letterProgress > 0 ? 1 : 0;
-      const translateY = (1 - letterProgress) * 20;
-      const scale = 0.5 + letterProgress * 0.5;
-
-      if (currentProgress < riseStart) {
-        videoTextContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(${translateY}vh) scale(${scale})`);
-      } else {
-        videoTextContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(0vh) scale(1)`);
-      }
-      videoTextContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-opacity`, `${letterOpacity}`);
-      timeCursor += unitDuration;
-    });
-  });
-
-  return null;
-};
+// --- AnimationController Component ---
 
 const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef, textContainerRef }) => {
     const animatedProgress = useRef<number>(0);
     const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
     
+    const aboutUsWord = "ABOUT US"; 
+
     useFrame(() => {
         animatedProgress.current = THREE.MathUtils.lerp(
             animatedProgress.current,
@@ -153,26 +80,72 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
         }
 
         if (textContainerRef.current) {
-            let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0;
+            let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0;
             
             if (currentProgress < 1.0) { persevexOpacity = (1 - currentProgress) * 0.4; coursesOpacity = currentProgress * 0.4; }
             else if (currentProgress < 2.0) { const p = currentProgress - 1.0; coursesOpacity = (1 - p) * 0.4; ourEdgeOpacity = p * 0.4; }
             else if (currentProgress < 3.0) { const p = currentProgress - 2.0; ourEdgeOpacity = (1 - p) * 0.4; partnersOpacity = p * 0.4; }
             else if (currentProgress < 4.0) { const p = currentProgress - 3.0; partnersOpacity = (1 - p) * 0.4; trustOpacity = p * 0.4; }
-            else if (currentProgress < 5.0) { 
-                const p = currentProgress - 4.0; 
-                trustOpacity = (1 - p) * 0.4; 
-                recognizedByOpacity = p * 0.4; 
-            }
+            else if (currentProgress < 5.0) { const p = currentProgress - 4.0; trustOpacity = (1 - p) * 0.4; recognizedByOpacity = p * 0.4; }
             else if (currentProgress < 6.0) {
                 const p = currentProgress - 5.0;
-                trustOpacity = 0;
                 recognizedByOpacity = (1 - p) * 0.4;
+                aboutUsOpacity = p * 0.4;
             }
             else {
-                trustOpacity = 0;
                 recognizedByOpacity = 0;
+                aboutUsOpacity = 0.4;
             }
+            
+            const assemblyStart = 6.0;
+            const assemblyDuration = 2.5; 
+            const assemblyEnd = assemblyStart + assemblyDuration;
+            const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
+            
+            const riseStart = assemblyEnd;
+            const riseDuration = 0.5;
+            const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
+            
+            const initialY = 4;
+            const centerTarget = -35;
+            const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
+            const finalRise = -riseProgress * 30;
+            const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
+            const containerScale = 1 - riseProgress * 0.7;
+            textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
+
+            const lettersWithSpaces = aboutUsWord.split('');
+            const numLetters = aboutUsWord.replace(/ /g, '').length;
+            const numSpaces = aboutUsWord.split(' ').length - 1;
+            
+            const spacePauseFactor = 2;
+            const totalAnimationUnits = numLetters + (numSpaces * spacePauseFactor);
+            const unitDuration = 1.0 / totalAnimationUnits;
+            const animationWindow = unitDuration * 5;
+
+            let timeCursor = 0;
+
+            lettersWithSpaces.forEach((char, globalIndex) => {
+                if (char === ' ') {
+                timeCursor += unitDuration * spacePauseFactor;
+                return;
+                }
+
+                const start = timeCursor;
+                const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
+                const letterOpacity = letterProgress > 0 ? 1 : 0;
+                const translateY = (1 - letterProgress) * 20;
+                const scale = 0.5 + letterProgress * 0.5;
+
+                if (currentProgress < riseStart) {
+                textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(${translateY}vh) scale(${scale})`);
+                } else {
+                textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(0vh) scale(1)`);
+                }
+                textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-opacity`, `${letterOpacity}`);
+
+                timeCursor += unitDuration;
+            });
             
             textContainerRef.current.style.setProperty('--persevex-opacity', `${clamp(persevexOpacity, 0, 0.4)}`);
             textContainerRef.current.style.setProperty('--courses-opacity', `${clamp(coursesOpacity, 0, 0.4)}`);
@@ -180,6 +153,7 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
             textContainerRef.current.style.setProperty('--partners-opacity', `${clamp(partnersOpacity, 0, 0.4)}`);
             textContainerRef.current.style.setProperty('--trust-opacity', `${clamp(trustOpacity, 0, 0.4)}`);
             textContainerRef.current.style.setProperty('--recognized-by-opacity', `${clamp(recognizedByOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty('--about-us-opacity', `${clamp(aboutUsOpacity, 0, 0.4)}`);
         }
     });
 
@@ -192,6 +166,9 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
     );
 }
 
+
+// --- Main LandingPage Component ---
+
 const LandingPage: FC = () => {
   const watermarkProgressRef = useRef<number>(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
@@ -202,8 +179,6 @@ const LandingPage: FC = () => {
   const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
   const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
   const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const storyWatermarkRef = useRef<HTMLHeadingElement>(null);
-  const videoTextContainerRef = useRef<HTMLDivElement>(null);
   
   const [edgeProgress, setEdgeProgress] = useState<number>(0);
   const [partnersProgress, setPartnersProgress] = useState<number>(0);
@@ -213,6 +188,7 @@ const LandingPage: FC = () => {
   const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
   const lastScrollTime = useRef<number>(0);
   const isInitialLoad = useRef<boolean>(true);
+  const aboutUsWords = "ABOUT US".split(' '); 
 
   const [layout, setLayout] = useState<LayoutState>({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0, aboutUsTop: 0 });
   const formattedTestimonials: Testimonial[] = testimonialsData.map(t => ({ quote: t.quote, name: t.name, designation: t.title, src: t.image }));
@@ -234,6 +210,7 @@ const LandingPage: FC = () => {
       };
       calculateLayout();
       const resizeObserver = new ResizeObserver(calculateLayout);
+      // Ensure observed nodes are elements
       document.body.childNodes.forEach(node => { if (node instanceof Element) resizeObserver.observe(node); });
       window.addEventListener('resize', calculateLayout);
       return () => { resizeObserver.disconnect(); window.removeEventListener('resize', calculateLayout); };
@@ -301,7 +278,7 @@ const LandingPage: FC = () => {
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [layout, testimonialsAnimationDurationVh]);
+  }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
   
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -347,12 +324,8 @@ const LandingPage: FC = () => {
           <Suspense fallback={null}>
             <AnimationController 
               watermarkProgressRef={watermarkProgressRef} 
+              // @ts-ignore
               textContainerRef={textContainerRef} 
-            />
-             <AboutUsAnimationController
-              watermarkProgressRef={watermarkProgressRef}
-              storyWatermarkRef={storyWatermarkRef}
-              videoTextContainerRef={videoTextContainerRef}
             />
           </Suspense>
         </Canvas>
@@ -368,7 +341,8 @@ const LandingPage: FC = () => {
         '--partners-opacity': 0,
         '--trust-opacity': 0,
         '--recognized-by-opacity': 0,
-      } as React.CSSProperties}
+        '--about-us-opacity': 0,
+      } as React.CSSProperties} // Cast style object for CSS custom properties
     >
       <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Courses</h2>
@@ -376,6 +350,53 @@ const LandingPage: FC = () => {
       <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
       <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
+      <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
+      
+      <div 
+        className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
+        style={{ 
+            bottom: '1.5rem',
+            opacity: 'var(--about-us-opacity)', 
+            transform: 'var(--about-us-container-transform, translateX(-50%))',
+            whiteSpace: 'nowrap' 
+        } as React.CSSProperties}
+      >
+        {aboutUsWords.map((word, wordIndex) => (
+          <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
+            {word.split('').map((letter, letterIndex) => {
+              const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
+              
+              return (
+                <h2
+                  key={letterIndex}
+                  className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
+                  style={{
+                    fontFamily: 'serif',
+                    transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
+                    opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
+                    WebkitMaskImage: 'linear-gradient(white, white)',
+                    maskImage: 'linear-gradient(white, white)',
+                    WebkitMaskClip: 'text',
+                    maskClip: 'text',
+                    color: 'transparent',
+                  } as React.CSSProperties}
+                >
+                  <video 
+                    src={"/videos/U.mp4"}
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+                  />
+                  {letter}
+                </h2>
+              )
+            })}
+            {wordIndex < aboutUsWords.length - 1 && <div className="w-8 md:w-12" />}
+          </div>
+        ))}
+      </div>
     </div>
       
       <div className="relative z-20">
@@ -402,13 +423,7 @@ const LandingPage: FC = () => {
           </div>
         </div>
 
-        <div ref={aboutUsSectionWrapperRef} style={{ height: '400vh' }}>
-          <AboutUsSection 
-            contentProgress={aboutUsProgress} 
-            storyWatermarkRef={storyWatermarkRef}
-            videoTextContainerRef={videoTextContainerRef}
-          />
-        </div>
+        <div ref={aboutUsSectionWrapperRef} style={{ height: '400vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
       </div>
     </main>
   );

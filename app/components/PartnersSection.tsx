@@ -29,35 +29,22 @@ interface PartnersSectionProps {
   progress: number;
 }
 
-// new section
-
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
-  // Define keyframes for the text's movement. These remain unchanged.
   const movementStartProgress = 0.45;
   const movementEndProgress = 0.75; 
+  const opacityPeakProgress = 0.55; 
 
-  // --- MODIFIED OPACITY LOGIC ---
-  // THE ONLY CHANGE IS ON THE NEXT LINE:
-  // Set the text to be fully opaque (1.0) slightly before the visual midpoint of its journey.
-  const opacityPeakProgress = 0.55; // Changed from (start + end) / 2
-
-  // Calculate the duration of the fade-in and fade-out phases based on the new peak.
   const fadeInDuration = opacityPeakProgress - movementStartProgress;
   const fadeOutDuration = movementEndProgress - opacityPeakProgress;
 
   let textOpacity = 0;
   if (progress >= movementStartProgress && progress < opacityPeakProgress) {
-    // Phase 1: Fading IN.
     textOpacity = (progress - movementStartProgress) / fadeInDuration;
   } else if (progress >= opacityPeakProgress && progress <= movementEndProgress) {
-    // Phase 2: Fading OUT.
     textOpacity = 1 - ((progress - opacityPeakProgress) / fadeOutDuration);
   }
-  // Ensure opacity doesn't go below 0.
   textOpacity = Math.max(0, textOpacity);
-  // --- END OF MODIFICATION ---
 
-  // Movement logic remains the same.
   const movementAnimationDuration = movementEndProgress - movementStartProgress; 
   const movementProgress = Math.max(0, Math.min(1, (progress - movementStartProgress) / movementAnimationDuration));
   
@@ -109,8 +96,8 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
                  <Image
                     src={partner.src}
                     alt={`${partner.name} logo`}
-                    layout="fill"
-                    objectFit="contain"
+                    fill // <-- FIX #1
+                    className="object-contain" // <-- FIX #2
                  />
               </div>
             </div>

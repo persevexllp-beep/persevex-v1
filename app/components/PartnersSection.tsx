@@ -121,4 +121,4 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   );
 };
 
-export default PartnersSection;
+export default React.memo(PartnersSection);

@@ -1,7 +1,7 @@
 // RecognizedBySection.tsx
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import AnimatedLogo from "./AnimatedLogo";
 
 const logos = [
@@ -71,4 +71,4 @@ const RecognizedBySection = ({ progress }: { progress: number }) => {
   );
 };
 
-export default RecognizedBySection;
+export default React.memo(RecognizedBySection);

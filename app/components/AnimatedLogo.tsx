@@ -1,6 +1,6 @@
 // AnimatedLogo.tsx
 "use client";
-
+import React from "react";
 import Image from "next/image";
 import { useMemo, useEffect, useRef } from "react";
 
@@ -250,4 +250,4 @@ const AnimatedLogo = ({ logo, progress }: { logo: any; progress: number }) => {
   );
 };
 
-export default AnimatedLogo;
+export default React.memo(AnimatedLogo);

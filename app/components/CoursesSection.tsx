@@ -257,4 +257,4 @@ const CoursesSection: React.FC = () => {
   );
 }
 
-export default CoursesSection;
+export default React.memo(CoursesSection);

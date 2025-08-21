@@ -1,5 +1,5 @@
 "use client";
-
+import React from 'react';
 import { BrainCircuit, Zap, Users, Code, ShieldCheck, Rocket } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -119,4 +119,5 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
   );
 };
 
-export default OurEdgeSection;
+
+export default React.memo(OurEdgeSection);

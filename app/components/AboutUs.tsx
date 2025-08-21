@@ -1,5 +1,6 @@
 // AboutUs.tsx (UPDATED - Simplified)
 "use client";
+import React from "react";
 
 const AboutUsSection = ({ progress }: { progress: number }) => {
   // The animation now happens entirely in the parent.
@@ -21,4 +22,4 @@ const AboutUsSection = ({ progress }: { progress: number }) => {
   );
 };
 
-export default AboutUsSection;
+export default React.memo(AboutUsSection);

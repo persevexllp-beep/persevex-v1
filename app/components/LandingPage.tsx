@@ -62,7 +62,7 @@ function AnimationController({ watermarkProgressRef, textContainerRef }: any) {
       }
       
       const assemblyStart = 6.0;
-      const assemblyDuration = 1.5;
+      const assemblyDuration = 2.5; 
       const assemblyEnd = assemblyStart + assemblyDuration;
       const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
       
@@ -151,6 +151,18 @@ export default function LandingPage() {
   const lastScrollTime = useRef(0);
   const isInitialLoad = useRef(true);
   const aboutUsWords = "ABOUT US".split(' '); 
+
+  // --- 1. PREPARE VIDEO ASSETS ---
+  // Replace these with the actual paths to your videos
+  const letterVideos = [
+    '/videos/A.mp4', // for 'A'
+    '/videos/B.mp4', // for 'B'
+    '/videos/O.mp4', // for 'O'
+    '/videos/U.mp4', // for 'U'
+    '/videos/T.mp4', // for 'T'
+    '/videos/U2.mp4',// for 'U'
+    '/videos/S.mp4', // for 'S'
+  ];
   
   const [layout, setLayout] = useState({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0, aboutUsTop: 0 });
 
@@ -201,13 +213,13 @@ export default function LandingPage() {
       const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
       
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
-      const aboutUsWatermarkAnimDuration = viewportHeight * 3;
+      const aboutUsWatermarkAnimDuration = viewportHeight * 4; 
 
       let newWatermarkProgress = 0;
       
       if (currentScroll >= aboutUsWatermarkAnimStart) {
         const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
-        newWatermarkProgress = 5 + progress * 3;
+        newWatermarkProgress = 5 + progress * 4;
       }
       else if (currentScroll >= recognizedByWatermarkAnimStart) {
         newWatermarkProgress = 4 + Math.min(1, (currentScroll - recognizedByWatermarkAnimStart) / viewportHeight);
@@ -225,7 +237,7 @@ export default function LandingPage() {
       setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
       setRecognizedByProgress(Math.min(1, Math.max(0, currentScroll - recognizedByTop) / (viewportHeight * 2)));
       
-      const aboutUsContentStart = aboutUsTop + viewportHeight * 2;
+      const aboutUsContentStart = aboutUsTop + viewportHeight * 3;
       setAboutUsProgress(Math.min(1, Math.max(0, currentScroll - aboutUsContentStart) / (viewportHeight)));
     };
 
@@ -303,7 +315,10 @@ export default function LandingPage() {
       <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
       <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
-      <h2 className="absolute bottom-6 left-1/2 z-[-4] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
+      {/* This "Our Story" is now just a fallback and hidden by the video text */}
+      <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
+      
+      {/* --- 2. RESTRUCTURED JSX FOR VIDEO TEXT --- */}
       <div 
         className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
         style={{ 
@@ -313,27 +328,52 @@ export default function LandingPage() {
             whiteSpace: 'nowrap' 
         }}
     >
-        {aboutUsWords.map((word, wordIndex) => (
+        {(() => {
+          let videoIndex = 0;
+          return aboutUsWords.map((word, wordIndex) => (
             <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
             {word.split('').map((letter, letterIndex) => {
                 const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
+                const currentVideoSrc = letterVideos[videoIndex++];
+                
                 return (
-                    <h2
-                        key={letterIndex}
-                        className="text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-                        style={{
-                            WebkitTextStroke: "1px white",
-                            transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
-                            opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
-                        }}
-                    >
-                        {letter}
-                    </h2>
+                  // This h2 is the container, the mask, and the animated element.
+                  <h2
+                    key={letterIndex}
+                    className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
+                    style={{
+                      // Use a serif font like in the example image
+                      fontFamily: 'serif',
+                      // Apply animation transformations
+                      transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
+                      opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
+                      
+                      // Use CSS masking to clip the video to the text shape, removing the rectangle
+                      WebkitMaskImage: 'linear-gradient(white, white)',
+                      maskImage: 'linear-gradient(white, white)',
+                      WebkitMaskClip: 'text',
+                      maskClip: 'text',
+                      color: 'transparent',
+                    }}
+                  >
+                    <video 
+                      src={currentVideoSrc}
+                      autoPlay 
+                      loop 
+                      muted 
+                      playsInline
+                      // Video is positioned absolutely behind the text mask
+                      className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+                    />
+                    {/* The letter provides the shape for the mask */}
+                    {letter}
+                  </h2>
                 )
             })}
             {wordIndex < aboutUsWords.length - 1 && <div className="w-8 md:w-12" />}
             </div>
-        ))}
+          ))
+        })()}
         </div>
     </div>
       

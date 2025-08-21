@@ -27,9 +27,6 @@ body {
   font-family: var(--font-poppins), sans-serif;
 }
 
-
-
-
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -44,23 +41,22 @@ body {
   animation-duration: 1s;
 }
 
-
-
-/* Base state for the logo wrapper before it becomes visible */
 .logo-wrapper {
   opacity: 0;
   transition: opacity 0.5s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Set initial positions based on the data-animation attribute */
 .logo-wrapper[data-animation="from-top-left"] { transform: translate(-80px, -60px); }
 .logo-wrapper[data-animation="from-bottom-left"] { transform: translate(-80px, 60px); }
 .logo-wrapper[data-animation="from-top"] { transform: translateY(-80px); }
 .logo-wrapper[data-animation="from-bottom-right"] { transform: translate(80px, 60px); }
 .logo-wrapper[data-animation="from-top-right"] { transform: translate(80px, -60px); }
 
-/* The state when the logo is visible: reset transform and fade in */
 .logo-wrapper.is-visible {
   opacity: 1;
   transform: translate(0, 0);
+}
+
+.will-change-transform {
+  will-change: transform;
 }

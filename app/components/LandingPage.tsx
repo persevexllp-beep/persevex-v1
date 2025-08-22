@@ -195,8 +195,7 @@ const LandingPage: FC = () => {
             
             const initialY = 4;
             const centerTarget = -35;
-           // REPLACE IT WITH THIS LINE
-const move_to_center_Y = (initialY * 16) * (1 - assemblyProgress) + (centerTarget * window.innerHeight / 100) * assemblyProgress;
+            const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
             const finalRise = -riseProgress * 30;
             const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
             const containerScale = 1 - riseProgress * 0.7;
@@ -337,56 +336,61 @@ const move_to_center_Y = (initialY * 16) * (1 - assemblyProgress) + (centerTarge
       <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
       <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
       
-
-
 <div 
-    className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
-    style={{ 
-        bottom: '1.5rem',
-        opacity: 'var(--about-us-opacity)', 
-        transform: 'var(--about-us-container-transform, translateX(-50%))',
-        whiteSpace: 'nowrap' 
-    } as React.CSSProperties}
+  className="absolute left-1/2 z-[-4]"
+  style={{
+    bottom: '1.5rem',
+    opacity: 'var(--about-us-opacity)', 
+    transform: 'var(--about-us-container-transform, translateX(-50%))',
+    whiteSpace: 'nowrap',
+    // This creates a new stacking context for blend modes to work correctly.
+    isolation: 'isolate', 
+  } as React.CSSProperties}
 >
+  {/* The ONE AND ONLY video element. It sits in the background. */}
+  <video 
+    autoPlay 
+    loop 
+    muted 
+    playsInline
+    className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+  >
+    <source src="/O_optimized.webm" type="video/webm" />
+  </video>
+
+  {/* This wrapper creates a black screen and uses the text to punch a hole in it. */}
+  <div 
+    className="flex items-center justify-center space-x-1 md:space-x-2"
+    style={{ background: 'black', mixBlendMode: 'screen' }}
+  >
     {aboutUsWords.map((word, wordIndex) => (
-        <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
+      <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
         {word.split('').map((letter, letterIndex) => {
-            const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
-            
-            return (
+          const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
+          
+          return (
             <h2
-                key={letterIndex}
-                className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
-                style={{
+              key={letterIndex}
+              // The text is now solid white.
+              className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none text-white"
+              style={{
                 fontFamily: 'serif',
                 transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
                 opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
-                WebkitMaskImage: 'linear-gradient(white, white)',
-                maskImage: 'linear-gradient(white, white)',
-                WebkitMaskClip: 'text',
-                maskClip: 'text',
-                color: 'transparent',
-                } as React.CSSProperties}
+                // This makes the white text punch out the black background,
+                // revealing the starfield from the very back.
+                mixBlendMode: 'difference',
+              } as React.CSSProperties}
             >
-                <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="absolute top-0 left-0 w-full h-full object-cover -z-10"
-                >
-                <source src="/O_optimized.webm" type="video/webm" />
-                </video>
-                {letter}
+              {letter}
             </h2>
-            )
+          )
         })}
         {wordIndex < aboutUsWords.length - 1 && <div className="w-8 md:w-12" />}
-        </div>
+      </div>
     ))}
+  </div>
 </div>
-
-
     </div>
       
       <div className="relative z-20">

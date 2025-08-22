@@ -78,13 +78,42 @@ body {
   transition: opacity 0.3s ease-out;
 }
 
+/* Replace your existing About Us CSS transitions with these improved versions */
+
+/* Remove transitions from container during active animation to prevent conflicts */
 div[style*="--about-us-container-transform"] {
-  /* This smoothly transitions the container's transform, replacing the JS lerp */
-  transition: transform 0.3s ease-out;
+  /* Remove the transition property to prevent conflicts with rapid JS updates */
+  will-change: transform, opacity;
+  /* Add smooth rendering optimizations */
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
-/* Targets the individual h2 letters containing the videos */
+/* Optimize individual letter animations */
 div[style*="--about-us-container-transform"] h2 {
-  /* The CRITICAL performance hint. This tells the browser to optimize for transform animations. */
-  will-change: transform;
+  /* Reduce transition duration and use hardware acceleration */
+  transition: opacity 0.2s ease-out;
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  /* Force hardware acceleration */
+  transform: translateZ(0);
+}
+
+/* Add a utility class for smooth scrolling sections */
+.smooth-scroll-section {
+  will-change: scroll-position;
+}
+
+/* Optimize the main watermark transitions */
+.fixed h2[style*="opacity"] {
+  transition: opacity 0.2s ease-out; /* Reduced from 0.3s */
+  will-change: opacity;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Add specific styles for the About Us video mask */
+div[style*="--about-us-container-transform"] h2 video {
+  will-change: auto; /* Don't animate videos unnecessarily */
+  transform: translateZ(0);
 }

@@ -336,52 +336,56 @@ const LandingPage: FC = () => {
       <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
       <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
       
-      <div 
-        className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
-        style={{ 
-            bottom: '1.5rem',
-            opacity: 'var(--about-us-opacity)', 
-            transform: 'var(--about-us-container-transform, translateX(-50%))',
-            whiteSpace: 'nowrap' 
-        } as React.CSSProperties}
-      >
-        {aboutUsWords.map((word, wordIndex) => (
-          <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
-            {word.split('').map((letter, letterIndex) => {
-              const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
-              
-              return (
-                <h2
-                  key={letterIndex}
-                  className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
-                  style={{
-                    fontFamily: 'serif',
-                    transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
-                    opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
-                    WebkitMaskImage: 'linear-gradient(white, white)',
-                    maskImage: 'linear-gradient(white, white)',
-                    WebkitMaskClip: 'text',
-                    maskClip: 'text',
-                    color: 'transparent',
-                  } as React.CSSProperties}
+
+
+<div 
+    className="absolute left-1/2 z-[-4] flex items-center justify-center space-x-1 md:space-x-2"
+    style={{ 
+        bottom: '1.5rem',
+        opacity: 'var(--about-us-opacity)', 
+        transform: 'var(--about-us-container-transform, translateX(-50%))',
+        whiteSpace: 'nowrap' 
+    } as React.CSSProperties}
+>
+    {aboutUsWords.map((word, wordIndex) => (
+        <div key={wordIndex} className="flex items-center justify-center space-x-1 md:space-x-2">
+        {word.split('').map((letter, letterIndex) => {
+            const globalLetterIndex = aboutUsWords.slice(0, wordIndex).join(' ').length + (wordIndex > 0 ? 1 : 0) + letterIndex;
+            
+            return (
+            <h2
+                key={letterIndex}
+                className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
+                style={{
+                fontFamily: 'serif',
+                transform: `var(--about-us-letter-${globalLetterIndex}-transform)`,
+                opacity: `var(--about-us-letter-${globalLetterIndex}-opacity, 1)`,
+                WebkitMaskImage: 'linear-gradient(white, white)',
+                maskImage: 'linear-gradient(white, white)',
+                WebkitMaskClip: 'text',
+                maskClip: 'text',
+                color: 'transparent',
+                } as React.CSSProperties}
+            >
+                <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="absolute top-0 left-0 w-full h-full object-cover -z-10"
                 >
-                  <video 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                    className="absolute top-0 left-0 w-full h-full object-cover -z-10"
-                  >
-                    <source src="/O_optimized.webm" type="video/webm" />
-                  </video>
-                  {letter}
-                </h2>
-              )
-            })}
-            {wordIndex < aboutUsWords.length - 1 && <div className="w-8 md:w-12" />}
-          </div>
-        ))}
-      </div>
+                <source src="/O_optimized.webm" type="video/webm" />
+                </video>
+                {letter}
+            </h2>
+            )
+        })}
+        {wordIndex < aboutUsWords.length - 1 && <div className="w-8 md:w-12" />}
+        </div>
+    ))}
+</div>
+
+
     </div>
       
       <div className="relative z-20">

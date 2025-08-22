@@ -137,13 +137,13 @@ const performUpdate = () => {
     const trustWatermarkAnimEnd = testimonialsTop - viewportHeight / 2;
     const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
     const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
-    const aboutUsWatermarkAnimDuration = viewportHeight * 4; 
+    const aboutUsWatermarkAnimDuration = viewportHeight * 5; // Increased duration to accommodate the new phase
 
     let newWatermarkProgress = 0;
     
     if (currentScroll >= aboutUsWatermarkAnimStart) {
         const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
-        newWatermarkProgress = 5 + progress * 4;
+        newWatermarkProgress = 5 + progress * 5; // Match new duration
     } else if (currentScroll >= recognizedByWatermarkAnimStart) {
         newWatermarkProgress = 4 + Math.min(1, (currentScroll - recognizedByWatermarkAnimStart) / viewportHeight);
     } else if (currentScroll >= trustWatermarkAnimEnd) { newWatermarkProgress = 4.0; }
@@ -173,31 +173,59 @@ const performUpdate = () => {
             aboutUsOpacity = 0.4;
         }
         
+        // --- NEW SEQUENTIAL ANIMATION TIMELINE ---
         const assemblyStart = 6.0;
         const assemblyDuration = 2.5; 
-        const assemblyEnd = assemblyStart + assemblyDuration;
-        
-        const isAssembled = currentProgress >= assemblyEnd;
-        textContainerRef.current.style.setProperty('--about-us-fill-color', isAssembled ? 'white' : 'transparent');
-        textContainerRef.current.style.setProperty('--about-us-stroke', isAssembled ? '2px black' : '1px white');
-        // --- CHANGE #1: Conditionally set a box-shadow to hide the edge artifact ---
-        textContainerRef.current.style.setProperty('--about-us-edge-fix', isAssembled ? '0 0 20px 20px black' : 'none');
+        const assemblyEnd = assemblyStart + assemblyDuration; // Ends at 8.5
+
+        const videoFadeStart = assemblyEnd; // Starts at 8.5
+        const videoFadeDuration = 1.0; // Lasts for 1.0 unit of scroll
+        const videoFadeEnd = videoFadeStart + videoFadeDuration; // Ends at 9.5
+
+        const riseStart = videoFadeEnd; // Starts at 9.5
+        const riseDuration = 0.5;
+        // --- END OF NEW TIMELINE ---
 
         const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
-        
-        if (videoRef.current) {
-            videoRef.current.style.opacity = currentProgress >= assemblyEnd ? '1' : '0';
-        }
-
-        const riseStart = assemblyEnd;
-        const riseDuration = 0.5;
+        const videoFadeProgress = clamp((currentProgress - videoFadeStart) / videoFadeDuration, 0, 1);
         const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
         
+        // --- Fading Logic for Text ---
+        let fillColor;
+        let stroke;
+        const isPastFade = currentProgress >= videoFadeStart;
+
+        if (isPastFade) {
+            fillColor = 'white';
+            stroke = 'none';
+        } else {
+            const startFade = 0.7; 
+            const endFade = 0.95; 
+            const fadeProgress = clamp((assemblyProgress - startFade) / (endFade - startFade), 0, 1);
+            const fillOpacity = 1 - fadeProgress;
+            
+            fillColor = `rgba(255, 255, 255, ${fillOpacity})`;
+            stroke = '1px white';
+        }
+
+        textContainerRef.current.style.setProperty('--about-us-fill-color', fillColor);
+        textContainerRef.current.style.setProperty('--about-us-stroke', stroke);
+        textContainerRef.current.style.setProperty('--about-us-edge-fix', isPastFade ? '0 0 20px 20px black' : 'none');
+        
+        // Video opacity is now controlled by its own progress
+        if (videoRef.current) {
+            videoRef.current.style.opacity = `${videoFadeProgress}`;
+        }
+
+        // --- Transformation Logic ---
         const initialY = 4;
         const centerTarget = -35;
+        // Lerp to the center during assembly
         const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
+        // Only start rising *after* the video has faded in
         const finalRise = -riseProgress * 30;
         const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
+        // Only start scaling down *after* the video has faded in
         const containerScale = 1 - riseProgress * 0.7;
         textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
 
@@ -224,7 +252,8 @@ const performUpdate = () => {
             const translateY = (1 - letterProgress) * 20;
             const scale = 0.5 + letterProgress * 0.5;
 
-            if (currentProgress < riseStart) {
+            // Stop individual letter animation after assembly is done
+            if (currentProgress < assemblyEnd) {
                 textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(${translateY}vh) scale(${scale})`);
             } else {
                 textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(0vh) scale(1)`);
@@ -247,7 +276,7 @@ const performUpdate = () => {
     setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)));
     setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
     
-    const aboutUsContentStart = aboutUsTop + viewportHeight * 3;
+    const aboutUsContentStart = aboutUsTop + viewportHeight * 4; // Adjusted start point
     setAboutUsProgress(Math.min(1, Math.max(0, currentScroll - aboutUsContentStart) / (viewportHeight)));
 
     ticking = false;
@@ -324,8 +353,8 @@ watermarkProgressRef={watermarkProgressRef}
     '--trust-opacity': 0,
     '--recognized-by-opacity': 0,
     '--about-us-opacity': 0,
-    '--about-us-fill-color': 'transparent',
-    '--about-us-stroke': '1px white',
+    '--about-us-fill-color': 'white',
+    '--about-us-stroke': 'none',
     '--about-us-edge-fix': 'none',
   } as React.CSSProperties}
 >
@@ -354,13 +383,12 @@ loop
 muted
 playsInline
 className="absolute top-0 left-0 w-full h-full object-cover"
-style={{ opacity: 0, transition: 'opacity 0.5s ease' }}
+style={{ opacity: 0 }} // Removed transition for direct scroll control
 >
 <source src="/O_optimized.webm" type="video/webm" />
 </video>
 <div
 className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-// --- CHANGE #2: Apply the box-shadow variable here ---
 style={{ background: 'black', mixBlendMode: 'darken', boxShadow: 'var(--about-us-edge-fix)' }}
 >
 {aboutUsWords.map((word, wordIndex) => (
@@ -417,7 +445,7 @@ return (
       </div>
     </div>
 
-    <div ref={aboutUsSectionWrapperRef} style={{ height: '400vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
+    <div ref={aboutUsSectionWrapperRef} style={{ height: '500vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
   </div>
 </main>
 );

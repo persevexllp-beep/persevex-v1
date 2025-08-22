@@ -195,7 +195,8 @@ const LandingPage: FC = () => {
             
             const initialY = 4;
             const centerTarget = -35;
-            const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
+           // REPLACE IT WITH THIS LINE
+const move_to_center_Y = (initialY * 16) * (1 - assemblyProgress) + (centerTarget * window.innerHeight / 100) * assemblyProgress;
             const finalRise = -riseProgress * 30;
             const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
             const containerScale = 1 - riseProgress * 0.7;

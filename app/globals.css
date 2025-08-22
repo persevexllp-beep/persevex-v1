@@ -60,3 +60,32 @@ body {
 .will-change-transform {
   will-change: transform;
 }
+
+
+/*
+  Add these styles to your global CSS file to enable smooth transitions,
+  which replaces the expensive JavaScript-based smoothing.
+*/
+
+/* Smoothly transition the opacity of the main watermark h2 elements */
+.fixed h2[style*="--persevex-opacity"],
+.fixed h2[style*="--courses-opacity"],
+.fixed h2[style*="--our-edge-opacity"],
+.fixed h2[style*="--partners-opacity"],
+.fixed h2[style*="--trust-opacity"],
+.fixed h2[style*="--recognized-by-opacity"],
+.fixed h2[style*="--about-us-opacity"] {
+  transition: opacity 0.3s ease-out;
+}
+
+/* Smoothly transition the "ABOUT US" container transform and opacity */
+div[style*="--about-us-container-transform"] {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  will-change: transform, opacity;
+}
+
+/* Smoothly transition the individual "ABOUT US" letters */
+div[style*="--about-us-container-transform"] h2 {
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease-out;
+  will-change: transform, opacity;
+}

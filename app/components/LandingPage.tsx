@@ -4,7 +4,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useRef, useEffect, useState, FC, RefObject, MutableRefObject } from "react";
 import * as THREE from "three";
 
-// Assuming these are component imports from your project structure
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -19,22 +18,16 @@ import AboutUsSection from "./AboutUs";
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
 
-// --- Type Definitions ---
-
-// Interface for the custom material on the DustPlane to type-check uniforms
 interface DustMaterial extends THREE.ShaderMaterial {
   uniforms: {
     uOpacity: { value: number };
   };
 }
 
-// Interface for the props of AnimationController
 interface AnimationControllerProps {
   watermarkProgressRef: MutableRefObject<number>;
-  textContainerRef: RefObject<HTMLDivElement>;
 }
 
-// Interface for the Testimonial data structure
 interface Testimonial {
   quote: string;
   name: string;
@@ -42,7 +35,6 @@ interface Testimonial {
   src: string;
 }
 
-// Interface for the layout state
 interface LayoutState {
   coursesTop: number;
   edgeTop: number;
@@ -52,14 +44,10 @@ interface LayoutState {
   aboutUsTop: number;
 }
 
-// --- AnimationController Component ---
-
-const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef, textContainerRef }) => {
+const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef }) => {
     const animatedProgress = useRef<number>(0);
     const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
     
-    const aboutUsWord = "ABOUT US"; 
-
     useFrame(() => {
         animatedProgress.current = THREE.MathUtils.lerp(
             animatedProgress.current,
@@ -78,8 +66,107 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
                 material.uniforms.uOpacity.value = dustOpacity;
             }
         }
+    });
 
+    return (
+        <>
+            <color attach="background" args={['black']} />
+            <StarField hover={false} />
+            <DustPlane ref={dustPlaneRef} renderOrder={-2} />
+        </>
+    );
+}
+
+const LandingPage: FC = () => {
+  const watermarkProgressRef = useRef<number>(0);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
+  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  
+  const [edgeProgress, setEdgeProgress] = useState<number>(0);
+  const [partnersProgress, setPartnersProgress] = useState<number>(0);
+  const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
+  const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
+  
+  const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
+  const lastScrollTime = useRef<number>(0);
+  const isInitialLoad = useRef<boolean>(true);
+  const aboutUsWords = "ABOUT US".split(' '); 
+  const aboutUsWord = "ABOUT US";
+
+  const [layout, setLayout] = useState<LayoutState>({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0, aboutUsTop: 0 });
+  const formattedTestimonials: Testimonial[] = testimonialsData.map(t => ({ quote: t.quote, name: t.name, designation: t.title, src: t.image }));
+  const testimonialsAnimationDurationVh = 150 * (formattedTestimonials.length - 1);
+  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+
+  useEffect(() => {
+    const calculateLayout = () => {
+        if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current && testimonialsSectionWrapperRef.current && recognizedBySectionWrapperRef.current && aboutUsSectionWrapperRef.current) {
+          setLayout({
+            coursesTop: coursesSectionWrapperRef.current.offsetTop,
+            edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
+            partnersTop: partnersSectionWrapperRef.current.offsetTop,
+            testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
+            recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
+            aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
+          });
+        }
+      };
+      calculateLayout();
+      const resizeObserver = new ResizeObserver(calculateLayout);
+      document.body.childNodes.forEach(node => { if (node instanceof Element) resizeObserver.observe(node); });
+      window.addEventListener('resize', calculateLayout);
+      return () => { resizeObserver.disconnect(); window.removeEventListener('resize', calculateLayout); };
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const performUpdate = () => {
+        const currentScroll = window.scrollY;
+        const viewportHeight = window.innerHeight;
+
+        if (heroWrapperRef.current) {
+            const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
+            heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
+            heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
+        }
+
+        if (layout.coursesTop === 0) {
+            ticking = false;
+            return;
+        }
+
+        const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop } = layout;
+
+        const trustWatermarkAnimStart = testimonialsTop - viewportHeight;
+        const trustWatermarkAnimEnd = testimonialsTop - viewportHeight / 2;
+        const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
+        const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
+        const aboutUsWatermarkAnimDuration = viewportHeight * 4; 
+
+        let newWatermarkProgress = 0;
+        
+        if (currentScroll >= aboutUsWatermarkAnimStart) {
+            const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
+            newWatermarkProgress = 5 + progress * 4;
+        } else if (currentScroll >= recognizedByWatermarkAnimStart) {
+            newWatermarkProgress = 4 + Math.min(1, (currentScroll - recognizedByWatermarkAnimStart) / viewportHeight);
+        } else if (currentScroll >= trustWatermarkAnimEnd) { newWatermarkProgress = 4.0; }
+        else if (currentScroll >= trustWatermarkAnimStart) { newWatermarkProgress = 3 + Math.min(1, (currentScroll - trustWatermarkAnimStart) / (trustWatermarkAnimEnd - trustWatermarkAnimStart)); }
+        else if (currentScroll >= partnersTop) { newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (trustWatermarkAnimStart - partnersTop)); }
+        else if (currentScroll >= edgeTop - viewportHeight) { newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight); }
+        else if (currentScroll >= coursesTop - viewportHeight) { newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight); }
+        
+        watermarkProgressRef.current = newWatermarkProgress;
+        
         if (textContainerRef.current) {
+            const currentProgress = newWatermarkProgress;
             let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0;
             
             if (currentProgress < 1.0) { persevexOpacity = (1 - currentProgress) * 0.4; coursesOpacity = currentProgress * 0.4; }
@@ -127,8 +214,8 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
 
             lettersWithSpaces.forEach((char, globalIndex) => {
                 if (char === ' ') {
-                timeCursor += unitDuration * spacePauseFactor;
-                return;
+                    timeCursor += unitDuration * spacePauseFactor;
+                    return;
                 }
 
                 const start = timeCursor;
@@ -138,9 +225,9 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
                 const scale = 0.5 + letterProgress * 0.5;
 
                 if (currentProgress < riseStart) {
-                textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(${translateY}vh) scale(${scale})`);
+                    textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(${translateY}vh) scale(${scale})`);
                 } else {
-                textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(0vh) scale(1)`);
+                    textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-transform`, `translateY(0vh) scale(1)`);
                 }
                 textContainerRef.current!.style.setProperty(`--about-us-letter-${globalIndex}-opacity`, `${letterOpacity}`);
 
@@ -155,108 +242,7 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
             textContainerRef.current.style.setProperty('--recognized-by-opacity', `${clamp(recognizedByOpacity, 0, 0.4)}`);
             textContainerRef.current.style.setProperty('--about-us-opacity', `${clamp(aboutUsOpacity, 0, 0.4)}`);
         }
-    });
 
-    return (
-        <>
-            <color attach="background" args={['black']} />
-            <StarField hover={false} />
-            <DustPlane ref={dustPlaneRef} renderOrder={-2} />
-        </>
-    );
-}
-
-
-// --- Main LandingPage Component ---
-
-const LandingPage: FC = () => {
-  const watermarkProgressRef = useRef<number>(0);
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const heroWrapperRef = useRef<HTMLDivElement>(null);
-  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
-  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
-  
-  const [edgeProgress, setEdgeProgress] = useState<number>(0);
-  const [partnersProgress, setPartnersProgress] = useState<number>(0);
-  const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
-  const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
-  
-  const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
-  const lastScrollTime = useRef<number>(0);
-  const isInitialLoad = useRef<boolean>(true);
-  const aboutUsWords = "ABOUT US".split(' '); 
-
-  const [layout, setLayout] = useState<LayoutState>({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0, aboutUsTop: 0 });
-  const formattedTestimonials: Testimonial[] = testimonialsData.map(t => ({ quote: t.quote, name: t.name, designation: t.title, src: t.image }));
-  const testimonialsAnimationDurationVh = 150 * (formattedTestimonials.length - 1);
-  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
-
-  useEffect(() => {
-    const calculateLayout = () => {
-        if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current && testimonialsSectionWrapperRef.current && recognizedBySectionWrapperRef.current && aboutUsSectionWrapperRef.current) {
-          setLayout({
-            coursesTop: coursesSectionWrapperRef.current.offsetTop,
-            edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
-            partnersTop: partnersSectionWrapperRef.current.offsetTop,
-            testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
-            recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
-            aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
-          });
-        }
-      };
-      calculateLayout();
-      const resizeObserver = new ResizeObserver(calculateLayout);
-      // Ensure observed nodes are elements
-      document.body.childNodes.forEach(node => { if (node instanceof Element) resizeObserver.observe(node); });
-      window.addEventListener('resize', calculateLayout);
-      return () => { resizeObserver.disconnect(); window.removeEventListener('resize', calculateLayout); };
-  }, []);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const performUpdate = () => {
-        const currentScroll = window.scrollY;
-        const viewportHeight = window.innerHeight;
-
-        if (heroWrapperRef.current) {
-            const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
-            heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
-            heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
-        }
-
-        if (layout.coursesTop === 0) {
-            ticking = false;
-            return;
-        }
-
-        const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop } = layout;
-
-        const trustWatermarkAnimStart = testimonialsTop - viewportHeight;
-        const trustWatermarkAnimEnd = testimonialsTop - viewportHeight / 2;
-        const recognizedByWatermarkAnimStart = recognizedByTop - viewportHeight; 
-        const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
-        const aboutUsWatermarkAnimDuration = viewportHeight * 4; 
-
-        let newWatermarkProgress = 0;
-        
-        if (currentScroll >= aboutUsWatermarkAnimStart) {
-            const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
-            newWatermarkProgress = 5 + progress * 4;
-        } else if (currentScroll >= recognizedByWatermarkAnimStart) {
-            newWatermarkProgress = 4 + Math.min(1, (currentScroll - recognizedByWatermarkAnimStart) / viewportHeight);
-        } else if (currentScroll >= trustWatermarkAnimEnd) { newWatermarkProgress = 4.0; }
-        else if (currentScroll >= trustWatermarkAnimStart) { newWatermarkProgress = 3 + Math.min(1, (currentScroll - trustWatermarkAnimStart) / (trustWatermarkAnimEnd - trustWatermarkAnimStart)); }
-        else if (currentScroll >= partnersTop) { newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (trustWatermarkAnimStart - partnersTop)); }
-        else if (currentScroll >= edgeTop - viewportHeight) { newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight); }
-        else if (currentScroll >= coursesTop - viewportHeight) { newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight); }
-        
-        watermarkProgressRef.current = newWatermarkProgress;
-        
         setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
         setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)));
         setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
@@ -324,8 +310,6 @@ const LandingPage: FC = () => {
           <Suspense fallback={null}>
             <AnimationController 
               watermarkProgressRef={watermarkProgressRef} 
-              // @ts-ignore
-              textContainerRef={textContainerRef} 
             />
           </Suspense>
         </Canvas>
@@ -342,7 +326,7 @@ const LandingPage: FC = () => {
         '--trust-opacity': 0,
         '--recognized-by-opacity': 0,
         '--about-us-opacity': 0,
-      } as React.CSSProperties} // Cast style object for CSS custom properties
+      } as React.CSSProperties}
     >
       <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
       <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Courses</h2>

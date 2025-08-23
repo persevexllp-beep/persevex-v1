@@ -171,12 +171,20 @@ const LandingPage: FC = () => {
                 let fillColor;
                 let stroke;
                 const isPastFade = currentProgress >= videoFadeStart;
+                
+                // New logic for video fade during rise
+                const videoRiseOpacity = Math.max(0, 1 - riseProgress);
 
                 const maskBackground = videoFadeProgress > 0 ? 'black' : 'transparent';
                 textContainerRef.current.style.setProperty('--about-us-mask-bg', maskBackground);
 
-
-                if (isPastFade) {
+                // Modify fill color logic to include rise progress
+                if (riseProgress > 0) {
+                    // During rise, gradually transition to white
+                    const whiteTransition = riseProgress;
+                    fillColor = `rgba(255, 255, 255, ${whiteTransition})`;
+                    stroke = riseProgress < 1 ? '1px white' : 'none';
+                } else if (isPastFade) {
                     fillColor = 'white';
                     stroke = 'none';
                 } else {
@@ -193,7 +201,9 @@ const LandingPage: FC = () => {
                 textContainerRef.current.style.setProperty('--about-us-edge-fix', isPastFade ? '0 0 20px 20px black' : 'none');
 
                 if (videoRef.current) {
-                    videoRef.current.style.opacity = `${videoFadeProgress}`;
+                    // Combine both fade effects
+                    const combinedVideoOpacity = videoFadeProgress * videoRiseOpacity;
+                    videoRef.current.style.opacity = `${combinedVideoOpacity}`;
                 }
 
                 const initialY = 4;
@@ -402,7 +412,7 @@ const LandingPage: FC = () => {
                             className="absolute top-0 left-0 w-full h-full object-cover"
                             style={{ opacity: 0 }}
                         >
-                            <source src="/videos/A.mp4" type="video/mp4" />
+                            <source src="/videos/T.mp4" type="video/mp4" />
                         </video>
                         <div
                             className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"

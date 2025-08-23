@@ -1,6 +1,6 @@
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useRef, useEffect, useState, FC, RefObject, MutableRefObject } from "react";
+import { Suspense, useRef, useEffect, useState, FC, MutableRefObject } from "react";
 import * as THREE from "three";
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
@@ -89,6 +89,8 @@ const LandingPage: FC = () => {
     const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const starfieldOverlayRef = useRef<HTMLDivElement>(null);
+    const whiteOverlayRef = useRef<HTMLDivElement>(null);
+    const textMaskContainerRef = useRef<HTMLDivElement>(null);
     const [edgeProgress, setEdgeProgress] = useState<number>(0);
     const [partnersProgress, setPartnersProgress] = useState<number>(0);
     const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -156,69 +158,84 @@ const LandingPage: FC = () => {
                 }
 
                 const assemblyStart = 6.0;
-                const assemblyDuration = 2.5;
+                const assemblyDuration = 2.0;
                 const assemblyEnd = assemblyStart + assemblyDuration;
                 const videoFadeStart = assemblyEnd;
-                const videoFadeDuration = 1.0;
+                const videoFadeDuration = 2.0;
                 const videoFadeEnd = videoFadeStart + videoFadeDuration;
                 const riseStart = videoFadeEnd;
-                const riseDuration = 0.5;
+                const riseDuration = 1.0;
 
                 const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
                 const videoFadeProgress = clamp((currentProgress - videoFadeStart) / videoFadeDuration, 0, 1);
                 const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
 
-                let fillColor;
-                let stroke;
-                const isPastFade = currentProgress >= videoFadeStart;
-                
-                // New logic for video fade during rise
-                const videoRiseOpacity = Math.max(0, 1 - riseProgress);
+                let fillColor = 'transparent';
+                let stroke = '1px white';
+                let textContainerMixBlendMode = 'normal';
+                let textContainerBackground = 'transparent';
+                let textContainerBoxShadow = 'none';
+                let videoOpacity = 0;
+                let starfieldOpacity = 0;
+                let whiteOverlayOpacity = 0;
 
-                const maskBackground = videoFadeProgress > 0 ? 'black' : 'transparent';
-                textContainerRef.current.style.setProperty('--about-us-mask-bg', maskBackground);
-
-                // Modify fill color logic to include rise progress
-                if (riseProgress > 0) {
-                    // During rise, gradually transition to white
-                    const whiteTransition = riseProgress;
-                    fillColor = `rgba(255, 255, 255, ${whiteTransition})`;
-                    stroke = riseProgress < 1 ? '1px white' : 'none';
-                } else if (isPastFade) {
-                    fillColor = 'white';
-                    stroke = 'none';
-                } else {
+                if (assemblyProgress < 1) {
                     const startFade = 0.7;
                     const endFade = 0.95;
                     const fadeProgress = clamp((assemblyProgress - startFade) / (endFade - startFade), 0, 1);
                     const fillOpacity = 1 - fadeProgress;
                     fillColor = `rgba(255, 255, 255, ${fillOpacity})`;
                     stroke = '1px white';
+                } else if (videoFadeProgress < 1) {
+                    fillColor = 'white';
+                    stroke = 'none';
+                    textContainerMixBlendMode = 'multiply';
+                    textContainerBackground = 'black';
+                    textContainerBoxShadow = '0 0 20px 20px black';
+                    videoOpacity = 1;
+                    starfieldOpacity = 1;
+                    whiteOverlayOpacity = videoFadeProgress;
+                } else {
+                    fillColor = 'white';
+                    stroke = 'none';
+                    textContainerMixBlendMode = 'normal';
+                    textContainerBackground = 'transparent';
+                    textContainerBoxShadow = 'none';
+                    videoOpacity = 0;
+                    whiteOverlayOpacity = 0;
+                    starfieldOpacity = 1 - riseProgress;
+                }
+
+                const isBeforeRise = currentProgress < riseStart;
+                const centerProgress = isBeforeRise ? assemblyProgress : 1;
+                const initialY = 4;
+                const centerTargetVh = -35;
+                const topTargetVh = -90;
+                const centerTargetPx = centerTargetVh * window.innerHeight / 100;
+                const topTargetPx = topTargetVh * window.innerHeight / 100;
+
+                const y_pos_before_rise = THREE.MathUtils.lerp(initialY * 16, centerTargetPx, centerProgress);
+                const y_pos_after_rise_starts = THREE.MathUtils.lerp(centerTargetPx, topTargetPx, riseProgress);
+                const containerTranslateY = isBeforeRise ? y_pos_before_rise : y_pos_after_rise_starts;
+
+                const initial_scale = 1.0;
+                const final_scale = 0.15;
+                const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
+
+                textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
+
+                if (textMaskContainerRef.current) {
+                    (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
+                    textMaskContainerRef.current.style.background = textContainerBackground;
+                    textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
                 }
 
                 textContainerRef.current.style.setProperty('--about-us-fill-color', fillColor);
                 textContainerRef.current.style.setProperty('--about-us-stroke', stroke);
-                textContainerRef.current.style.setProperty('--about-us-edge-fix', isPastFade ? '0 0 20px 20px black' : 'none');
 
-                if (videoRef.current) {
-                    // Combine both fade effects
-                    const combinedVideoOpacity = videoFadeProgress * videoRiseOpacity;
-                    videoRef.current.style.opacity = `${combinedVideoOpacity}`;
-                }
-
-                const initialY = 4;
-                const centerTarget = -35;
-                const move_to_center_Y = THREE.MathUtils.lerp(initialY * 16, centerTarget * window.innerHeight / 100, assemblyProgress);
-                const finalRise = -riseProgress * 30;
-                const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
-                const containerScale = 1 - riseProgress * 0.7;
-                textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
-                
-
-                const starfieldOpacity = videoFadeProgress > 0 ? 1 : 0;
-                if (starfieldOverlayRef.current) {
-                    starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
-                }
+                if (videoRef.current) videoRef.current.style.opacity = `${videoOpacity}`;
+                if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+                if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
 
                 const numLetters = aboutUsWord.replace(/ /g, '').length;
                 const numSpaces = aboutUsWord.split(' ').length - 1;
@@ -226,10 +243,8 @@ const LandingPage: FC = () => {
                 const totalAnimationUnits = numLetters + (numSpaces * spacePauseFactor);
                 const unitDuration = 1.0 / totalAnimationUnits;
                 const animationWindow = unitDuration * 5;
-
                 const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
                 const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
-                
                 let timeCursor = 0;
 
                 lettersWithSpaces.forEach((char, index) => {
@@ -237,18 +252,15 @@ const LandingPage: FC = () => {
                         timeCursor += unitDuration * spacePauseFactor;
                         return;
                     }
-
                     const start = timeCursor * compressionFactor;
                     const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
                     const letterOpacity = letterProgress > 0 ? 1 : 0;
                     const translateY = (1 - letterProgress) * 20;
                     const scale = 0.5 + letterProgress * 0.5;
-
                     if (textContainerRef.current) {
                         textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
+                        textContainerRef.current.style.setProperty(`--about-us-letter-${index}-opacity`, `${letterOpacity}`);
                     }
-                    
-                    textContainerRef.current!.style.setProperty(`--about-us-letter-${index}-opacity`, `${letterOpacity}`);
                     timeCursor += unitDuration;
                 });
 
@@ -276,11 +288,11 @@ const LandingPage: FC = () => {
             const viewportHeight = window.innerHeight;
             const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop } = layout;
             const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
-            const aboutUsWatermarkAnimDuration = viewportHeight * 5;
+            const aboutUsWatermarkAnimDuration = viewportHeight * 6;
             let newWatermarkProgress = 0;
             if (currentScroll >= aboutUsWatermarkAnimStart) {
                 const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
-                newWatermarkProgress = 5 + progress * 5;
+                newWatermarkProgress = 6 + progress * 5;
             } else if (currentScroll >= recognizedByTop - viewportHeight) {
                 newWatermarkProgress = 4 + Math.min(1, (currentScroll - (recognizedByTop - viewportHeight)) / viewportHeight);
             } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
@@ -349,7 +361,7 @@ const LandingPage: FC = () => {
         const targetScrollY = layout.testimonialsTop + (targetProgress * testimonialsAnimDurationPx);
         if (Math.abs(window.scrollY - targetScrollY) > 5) { window.scrollTo({ top: targetScrollY, behavior: "smooth" }); }
     }, [targetTestimonialIndex, layout.testimonialsTop, formattedTestimonials.length, testimonialsAnimationDurationVh]);
-    
+
     return (
         <main>
             <div className="fixed top-0 left-0 w-full h-full z-0">
@@ -362,7 +374,6 @@ const LandingPage: FC = () => {
                 </Canvas>
             </div>
 
-
             <div
                 ref={textContainerRef}
                 className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
@@ -374,10 +385,8 @@ const LandingPage: FC = () => {
                     '--trust-opacity': 0,
                     '--recognized-by-opacity': 0,
                     '--about-us-opacity': 0,
-                    '--about-us-fill-color': 'white',
-                    '--about-us-stroke': 'none',
-                    '--about-us-edge-fix': 'none',
-                    '--about-us-mask-bg': 'transparent',
+                    '--about-us-fill-color': 'transparent',
+                    '--about-us-stroke': '1px white',
                 } as React.CSSProperties}
             >
                 <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
@@ -387,7 +396,7 @@ const LandingPage: FC = () => {
                 <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
                 <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
                 <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
-                
+
                 <div
                     className="absolute left-1/2 z-[-4]"
                     style={{
@@ -403,24 +412,31 @@ const LandingPage: FC = () => {
                             isolation: 'isolate',
                         }}
                     >
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            style={{ opacity: 0 }}
-                        >
-                            <source src="/videos/T.mp4" type="video/mp4" />
-                        </video>
+                        <div className="absolute inset-0 w-full h-full">
+                            <video
+                                ref={videoRef}
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="absolute top-0 left-0 w-full h-full object-cover"
+                                style={{ opacity: 0 }}
+                            >
+                                <source src="/videos/U.mp4" type="video/mp4" />
+                            </video>
+                            <div
+                                ref={starfieldOverlayRef}
+                                className="absolute inset-0 pointer-events-none"
+                                style={{ opacity: 0, overflow: 'hidden' }}
+                            >
+                                <SimpleStars />
+                            </div>
+                            <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }} />
+                        </div>
+
                         <div
+                            ref={textMaskContainerRef}
                             className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-                            style={{
-                                background: 'var(--about-us-mask-bg)',
-                                boxShadow: 'var(--about-us-edge-fix)',
-                                mixBlendMode: 'multiply'
-                            }}
                         >
                             {lettersWithSpaces.map((letter, index) => {
                                 if (letter === ' ') {
@@ -442,17 +458,6 @@ const LandingPage: FC = () => {
                                     </h2>
                                 );
                             })}
-                        </div>
-                        <div
-                            ref={starfieldOverlayRef}
-                            className="absolute inset-0 pointer-events-none"
-                            style={{
-                                opacity: 0,
-                                mixBlendMode: 'screen', 
-                                overflow: 'hidden',
-                            }}
-                        >
-                           <SimpleStars />
                         </div>
                     </div>
                 </div>
@@ -482,7 +487,7 @@ const LandingPage: FC = () => {
                     </div>
                 </div>
 
-                <div ref={aboutUsSectionWrapperRef} style={{ height: '500vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
+                <div ref={aboutUsSectionWrapperRef} style={{ height: '530vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
             </div>
         </main>
     );

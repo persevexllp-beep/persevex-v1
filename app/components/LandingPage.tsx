@@ -1,6 +1,13 @@
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useRef, useEffect, useState, FC, MutableRefObject } from "react";
+import {
+  Suspense,
+  useRef,
+  useEffect,
+  useState,
+  FC,
+  MutableRefObject,
+} from "react";
 import * as THREE from "three";
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
@@ -12,493 +19,809 @@ import { AnimatedTestimonials } from "./Testimonials";
 import { testimonialsData } from "../constants/TestimonialsData";
 import RecognizedBySection from "./RecognizedBySection";
 import AboutUsSection from "./AboutUs";
-import SimpleStars from './SimpleStars';
+import SimpleStars from "./SimpleStars";
 
 const NUM_CARDS = 6;
-const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
+const clamp = (num: number, min: number, max: number): number =>
+  Math.min(Math.max(num, min), max);
 
 interface DustMaterial extends THREE.ShaderMaterial {
-    uniforms: {
-        uOpacity: { value: number };
-    };
+  uniforms: {
+    uOpacity: { value: number };
+  };
 }
 
 interface AnimationControllerProps {
-    watermarkProgressRef: MutableRefObject<number>;
+  watermarkProgressRef: MutableRefObject<number>;
 }
 
 interface Testimonial {
-    quote: string;
-    name: string;
-    designation: string;
-    src: string;
+  quote: string;
+  name: string;
+  designation: string;
+  src: string;
 }
 
 interface LayoutState {
-    coursesTop: number;
-    edgeTop: number;
-    partnersTop: number;
-    testimonialsTop: number;
-    recognizedByTop: number;
-    aboutUsTop: number;
+  coursesTop: number;
+  edgeTop: number;
+  partnersTop: number;
+  testimonialsTop: number;
+  recognizedByTop: number;
+  aboutUsTop: number;
 }
 
-const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef }) => {
-    const animatedProgress = useRef<number>(0);
-    const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
+const AnimationController: FC<AnimationControllerProps> = ({
+  watermarkProgressRef,
+}) => {
+  const animatedProgress = useRef<number>(0);
+  const dustPlaneRef =
+    useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
 
-
-    useFrame(() => {
-        animatedProgress.current = THREE.MathUtils.lerp(
-            animatedProgress.current,
-            watermarkProgressRef.current,
-            0.05
-        );
-        const currentProgress = animatedProgress.current;
-
-        if (dustPlaneRef.current) {
-            let dustOpacity = 1.0;
-            if (currentProgress > 1.0) {
-                dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
-            }
-            const material = dustPlaneRef.current.material;
-            if (material.uniforms.uOpacity) {
-                material.uniforms.uOpacity.value = dustOpacity;
-            }
-        }
-    });
-
-    return (
-        <>
-            <color attach="background" args={['black']} />
-            <StarField hover={false} />
-            <DustPlane ref={dustPlaneRef} renderOrder={-2} />
-        </>
+  useFrame(() => {
+    animatedProgress.current = THREE.MathUtils.lerp(
+      animatedProgress.current,
+      watermarkProgressRef.current,
+      0.05
     );
-}
+    const currentProgress = animatedProgress.current;
+
+    if (dustPlaneRef.current) {
+      let dustOpacity = 1.0;
+      if (currentProgress > 1.0) {
+        dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
+      }
+      const material = dustPlaneRef.current.material;
+      if (material.uniforms.uOpacity) {
+        material.uniforms.uOpacity.value = dustOpacity;
+      }
+    }
+  });
+
+  return (
+    <>
+      <color attach="background" args={["black"]} />
+      <StarField hover={false} />
+      <DustPlane ref={dustPlaneRef} renderOrder={-2} />
+    </>
+  );
+};
 
 const LandingPage: FC = () => {
-    const watermarkProgressRef = useRef<number>(0);
-    const textContainerRef = useRef<HTMLDivElement>(null);
-    const heroWrapperRef = useRef<HTMLDivElement>(null);
-    const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
-    const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
-    const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
-    const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
-    const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
-    const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const starfieldOverlayRef = useRef<HTMLDivElement>(null);
-    const whiteOverlayRef = useRef<HTMLDivElement>(null);
-    const textMaskContainerRef = useRef<HTMLDivElement>(null);
-    const [edgeProgress, setEdgeProgress] = useState<number>(0);
-    const [partnersProgress, setPartnersProgress] = useState<number>(0);
-    const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
-    const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
-    const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
-    const lastScrollTime = useRef<number>(0);
-    const isInitialLoad = useRef<boolean>(true);
-    const aboutUsWord = "ABOUT US";
-    const lettersWithSpaces = aboutUsWord.split('');
-    const [layout, setLayout] = useState<LayoutState>({ coursesTop: 0, edgeTop: 0, partnersTop: 0, testimonialsTop: 0, recognizedByTop: 0, aboutUsTop: 0 });
-    const formattedTestimonials: Testimonial[] = testimonialsData.map(t => ({ quote: t.quote, name: t.name, designation: t.title, src: t.image }));
-    const testimonialsAnimationDurationVh = 150 * (formattedTestimonials.length - 1);
-    const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+  const watermarkProgressRef = useRef<number>(0);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
+  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const starfieldOverlayRef = useRef<HTMLDivElement>(null);
+  const whiteOverlayRef = useRef<HTMLDivElement>(null);
+  const textMaskContainerRef = useRef<HTMLDivElement>(null);
+  const [edgeProgress, setEdgeProgress] = useState<number>(0);
+  const [partnersProgress, setPartnersProgress] = useState<number>(0);
+  const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
+  const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
+  const [targetTestimonialIndex, setTargetTestimonialIndex] =
+    useState<number>(0);
+  const lastScrollTime = useRef<number>(0);
+  const isInitialLoad = useRef<boolean>(true);
+  const aboutUsWord = "ABOUT US";
+  const lettersWithSpaces = aboutUsWord.split("");
+  const [layout, setLayout] = useState<LayoutState>({
+    coursesTop: 0,
+    edgeTop: 0,
+    partnersTop: 0,
+    testimonialsTop: 0,
+    recognizedByTop: 0,
+    aboutUsTop: 0,
+  });
+  const formattedTestimonials: Testimonial[] = testimonialsData.map((t) => ({
+    quote: t.quote,
+    name: t.name,
+    designation: t.title,
+    src: t.image,
+  }));
+  const testimonialsAnimationDurationVh =
+    150 * (formattedTestimonials.length - 1);
+  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
-    useEffect(() => {
-        const calculateLayout = () => {
-            if (coursesSectionWrapperRef.current && ourEdgeSectionWrapperRef.current && partnersSectionWrapperRef.current && testimonialsSectionWrapperRef.current && recognizedBySectionWrapperRef.current && aboutUsSectionWrapperRef.current) {
-                setLayout({
-                    coursesTop: coursesSectionWrapperRef.current.offsetTop,
-                    edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
-                    partnersTop: partnersSectionWrapperRef.current.offsetTop,
-                    testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
-                    recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
-                    aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
-                });
-            }
-        };
-        calculateLayout();
-        const resizeObserver = new ResizeObserver(calculateLayout);
-        document.body.childNodes.forEach(node => { if (node instanceof Element) resizeObserver.observe(node); });
-        window.addEventListener('resize', calculateLayout);
-        return () => { resizeObserver.disconnect(); window.removeEventListener('resize', calculateLayout); };
-    }, []);
+  useEffect(() => {
+    const calculateLayout = () => {
+      if (
+        coursesSectionWrapperRef.current &&
+        ourEdgeSectionWrapperRef.current &&
+        partnersSectionWrapperRef.current &&
+        testimonialsSectionWrapperRef.current &&
+        recognizedBySectionWrapperRef.current &&
+        aboutUsSectionWrapperRef.current
+      ) {
+        setLayout({
+          coursesTop: coursesSectionWrapperRef.current.offsetTop,
+          edgeTop: ourEdgeSectionWrapperRef.current.offsetTop,
+          partnersTop: partnersSectionWrapperRef.current.offsetTop,
+          testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
+          recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
+          aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
+        });
+      }
+    };
+    calculateLayout();
+    const resizeObserver = new ResizeObserver(calculateLayout);
+    document.body.childNodes.forEach((node) => {
+      if (node instanceof Element) resizeObserver.observe(node);
+    });
+    window.addEventListener("resize", calculateLayout);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", calculateLayout);
+    };
+  }, []);
 
-    const targetProgressRef = useRef(0);
-    const smoothedProgressRef = useRef(0);
+  const targetProgressRef = useRef(0);
+  const smoothedProgressRef = useRef(0);
 
-    useEffect(() => {
-        let animationFrameId: number;
-        const animationLoop = () => {
-            smoothedProgressRef.current = THREE.MathUtils.lerp(
-                smoothedProgressRef.current,
-                targetProgressRef.current,
-                0.075
+  useEffect(() => {
+    let animationFrameId: number;
+    const animationLoop = () => {
+      smoothedProgressRef.current = THREE.MathUtils.lerp(
+        smoothedProgressRef.current,
+        targetProgressRef.current,
+        0.075
+      );
+      watermarkProgressRef.current = targetProgressRef.current;
+      const currentProgress = smoothedProgressRef.current;
+
+      if (textContainerRef.current && window.innerHeight) {
+        let persevexOpacity = 0,
+          coursesOpacity = 0,
+          ourEdgeOpacity = 0,
+          partnersOpacity = 0,
+          trustOpacity = 0,
+          recognizedByOpacity = 0,
+          aboutUsOpacity = 0;
+
+        if (currentProgress < 1.0) {
+          persevexOpacity = (1 - currentProgress) * 0.4;
+          coursesOpacity = currentProgress * 0.4;
+        } else if (currentProgress < 2.0) {
+          const p = currentProgress - 1.0;
+          coursesOpacity = (1 - p) * 0.4;
+          ourEdgeOpacity = p * 0.4;
+        } else if (currentProgress < 3.0) {
+          const p = currentProgress - 2.0;
+          ourEdgeOpacity = (1 - p) * 0.4;
+          partnersOpacity = p * 0.4;
+        } else if (currentProgress < 4.0) {
+          const p = currentProgress - 3.0;
+          partnersOpacity = (1 - p) * 0.4;
+          trustOpacity = p * 0.4;
+        } else if (currentProgress < 5.0) {
+          const p = currentProgress - 4.0;
+          trustOpacity = (1 - p) * 0.4;
+          recognizedByOpacity = p * 0.4;
+        } else if (currentProgress < 6.0) {
+          const p = currentProgress - 5.0;
+          recognizedByOpacity = (1 - p) * 0.4;
+          aboutUsOpacity = p * 0.4;
+        } else {
+          recognizedByOpacity = 0;
+          aboutUsOpacity = 0.4;
+        }
+
+        const assemblyStart = 6.0;
+        const assemblyDuration = 2.0;
+        const assemblyEnd = assemblyStart + assemblyDuration;
+        const videoFadeStart = assemblyEnd;
+        const videoFadeDuration = 2.0;
+        const videoFadeEnd = videoFadeStart + videoFadeDuration;
+        const riseStart = videoFadeEnd;
+        const riseDuration = 1.0;
+
+        const assemblyProgress = clamp(
+          (currentProgress - assemblyStart) / assemblyDuration,
+          0,
+          1
+        );
+        const videoFadeProgress = clamp(
+          (currentProgress - videoFadeStart) / videoFadeDuration,
+          0,
+          1
+        );
+        const riseProgress = clamp(
+          (currentProgress - riseStart) / riseDuration,
+          0,
+          1
+        );
+
+        let fillColor = "transparent";
+        let stroke = "1px white";
+        let textContainerMixBlendMode = "normal";
+        let textContainerBackground = "transparent";
+        let textContainerBoxShadow = "none";
+        let videoOpacity = 0;
+        let starfieldOpacity = 0;
+        let whiteOverlayOpacity = 0;
+
+        if (assemblyProgress < 1) {
+          const startFade = 0.7;
+          const endFade = 0.95;
+          const fadeProgress = clamp(
+            (assemblyProgress - startFade) / (endFade - startFade),
+            0,
+            1
+          );
+          const fillOpacity = 1 - fadeProgress;
+          fillColor = `rgba(255, 255, 255, ${fillOpacity})`;
+          stroke = "1px white";
+        } else if (videoFadeProgress < 1) {
+          fillColor = "white";
+          stroke = "none";
+          textContainerMixBlendMode = "multiply";
+          textContainerBackground = "black";
+          textContainerBoxShadow = "0 0 20px 20px black";
+          videoOpacity = 1;
+
+          // CHANGED: Added delay to star fade-out
+          const starFadeStartPoint = 0.9; // Stars start fading when white overlay is 60% visible. You can tweak this value (0.0 to 1.0).
+          const starFadeProgress = clamp(
+            (videoFadeProgress - starFadeStartPoint) /
+              (1.0 - starFadeStartPoint),
+            0,
+            1
+          );
+          starfieldOpacity = 1 - starFadeProgress;
+
+          whiteOverlayOpacity = videoFadeProgress;
+        } else {
+          fillColor = "white";
+          stroke = "none";
+          textContainerMixBlendMode = "normal";
+          textContainerBackground = "transparent";
+          textContainerBoxShadow = "none";
+          videoOpacity = 0;
+          whiteOverlayOpacity = 0;
+          starfieldOpacity = 0;
+        }
+
+        const isBeforeRise = currentProgress < riseStart;
+        const centerProgress = isBeforeRise ? assemblyProgress : 1;
+        const initialY = 4;
+        const centerTargetVh = -35;
+        const topTargetVh = -90;
+        const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
+        const topTargetPx = (topTargetVh * window.innerHeight) / 100;
+
+        const y_pos_before_rise = THREE.MathUtils.lerp(
+          initialY * 16,
+          centerTargetPx,
+          centerProgress
+        );
+        const y_pos_after_rise_starts = THREE.MathUtils.lerp(
+          centerTargetPx,
+          topTargetPx,
+          riseProgress
+        );
+        const containerTranslateY = isBeforeRise
+          ? y_pos_before_rise
+          : y_pos_after_rise_starts;
+
+        const initial_scale = 1.0;
+        const final_scale = 0.15;
+        const containerScale = isBeforeRise
+          ? initial_scale
+          : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
+
+        textContainerRef.current.style.setProperty(
+          "--about-us-container-transform",
+          `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`
+        );
+
+        if (textMaskContainerRef.current) {
+          (textMaskContainerRef.current.style as any).mixBlendMode =
+            textContainerMixBlendMode;
+          textMaskContainerRef.current.style.background =
+            textContainerBackground;
+          textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
+        }
+
+        textContainerRef.current.style.setProperty(
+          "--about-us-fill-color",
+          fillColor
+        );
+        textContainerRef.current.style.setProperty("--about-us-stroke", stroke);
+
+        if (videoRef.current)
+          videoRef.current.style.opacity = `${videoOpacity}`;
+        if (starfieldOverlayRef.current)
+          starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+        if (whiteOverlayRef.current)
+          whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
+
+        const numLetters = aboutUsWord.replace(/ /g, "").length;
+        const numSpaces = aboutUsWord.split(" ").length - 1;
+        const spacePauseFactor = 2;
+        const totalAnimationUnits = numLetters + numSpaces * spacePauseFactor;
+        const unitDuration = 1.0 / totalAnimationUnits;
+        const animationWindow = unitDuration * 5;
+        const totalStaggerDuration =
+          (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
+        const compressionFactor =
+          totalStaggerDuration > 0
+            ? (1.0 - animationWindow) / totalStaggerDuration
+            : 1;
+        let timeCursor = 0;
+
+        lettersWithSpaces.forEach((char, index) => {
+          if (char === " ") {
+            timeCursor += unitDuration * spacePauseFactor;
+            return;
+          }
+          const start = timeCursor * compressionFactor;
+          const letterProgress = clamp(
+            (assemblyProgress - start) / animationWindow,
+            0,
+            1
+          );
+          const letterOpacity = letterProgress > 0 ? 1 : 0;
+          const translateY = (1 - letterProgress) * 20;
+          const scale = 0.5 + letterProgress * 0.5;
+          if (textContainerRef.current) {
+            textContainerRef.current.style.setProperty(
+              `--about-us-letter-${index}-transform`,
+              `translateY(${translateY}vh) scale(${scale})`
             );
-            watermarkProgressRef.current = targetProgressRef.current;
-            const currentProgress = smoothedProgressRef.current;
+            textContainerRef.current.style.setProperty(
+              `--about-us-letter-${index}-opacity`,
+              `${letterOpacity}`
+            );
+          }
+          timeCursor += unitDuration;
+        });
 
-            if (textContainerRef.current && window.innerHeight) {
-                let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0;
+        textContainerRef.current.style.setProperty(
+          "--persevex-opacity",
+          `${clamp(persevexOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--courses-opacity",
+          `${clamp(coursesOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--our-edge-opacity",
+          `${clamp(ourEdgeOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--partners-opacity",
+          `${clamp(partnersOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--trust-opacity",
+          `${clamp(trustOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--recognized-by-opacity",
+          `${clamp(recognizedByOpacity, 0, 0.4)}`
+        );
+        textContainerRef.current.style.setProperty(
+          "--about-us-opacity",
+          `${clamp(aboutUsOpacity, 0, 0.4)}`
+        );
+      }
 
-                if (currentProgress < 1.0) { persevexOpacity = (1 - currentProgress) * 0.4; coursesOpacity = currentProgress * 0.4; }
-                else if (currentProgress < 2.0) { const p = currentProgress - 1.0; coursesOpacity = (1 - p) * 0.4; ourEdgeOpacity = p * 0.4; }
-                else if (currentProgress < 3.0) { const p = currentProgress - 2.0; ourEdgeOpacity = (1 - p) * 0.4; partnersOpacity = p * 0.4; }
-                else if (currentProgress < 4.0) { const p = currentProgress - 3.0; partnersOpacity = (1 - p) * 0.4; trustOpacity = p * 0.4; }
-                else if (currentProgress < 5.0) { const p = currentProgress - 4.0; trustOpacity = (1 - p) * 0.4; recognizedByOpacity = p * 0.4; }
-                else if (currentProgress < 6.0) {
-                    const p = currentProgress - 5.0;
-                    recognizedByOpacity = (1 - p) * 0.4;
-                    aboutUsOpacity = p * 0.4;
-                }
-                else {
-                    recognizedByOpacity = 0;
-                    aboutUsOpacity = 0.4;
-                }
+      animationFrameId = requestAnimationFrame(animationLoop);
+    };
+    animationLoop();
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [layout, lettersWithSpaces]);
 
-                const assemblyStart = 6.0;
-                const assemblyDuration = 2.0;
-                const assemblyEnd = assemblyStart + assemblyDuration;
-                const videoFadeStart = assemblyEnd;
-                const videoFadeDuration = 2.0;
-                const videoFadeEnd = videoFadeStart + videoFadeDuration;
-                const riseStart = videoFadeEnd;
-                const riseDuration = 1.0;
+  useEffect(() => {
+    const handleScroll = () => {
+      if (layout.coursesTop === 0) return;
+      const currentScroll = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const {
+        coursesTop,
+        edgeTop,
+        partnersTop,
+        testimonialsTop,
+        recognizedByTop,
+        aboutUsTop,
+      } = layout;
+      const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
+      const aboutUsWatermarkAnimDuration = viewportHeight * 6;
+      let newWatermarkProgress = 0;
+      if (currentScroll >= aboutUsWatermarkAnimStart) {
+        const progress =
+          (currentScroll - aboutUsWatermarkAnimStart) /
+          aboutUsWatermarkAnimDuration;
+        newWatermarkProgress = 6 + progress * 5;
+      } else if (currentScroll >= recognizedByTop - viewportHeight) {
+        newWatermarkProgress =
+          4 +
+          Math.min(
+            1,
+            (currentScroll - (recognizedByTop - viewportHeight)) /
+              viewportHeight
+          );
+      } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
+        newWatermarkProgress = 4.0;
+      } else if (currentScroll >= testimonialsTop - viewportHeight) {
+        newWatermarkProgress =
+          3 +
+          Math.min(
+            1,
+            (currentScroll - (testimonialsTop - viewportHeight)) /
+              (viewportHeight / 2)
+          );
+      } else if (currentScroll >= partnersTop) {
+        newWatermarkProgress =
+          2 +
+          Math.min(
+            1,
+            (currentScroll - partnersTop) /
+              (testimonialsTop - viewportHeight - partnersTop)
+          );
+      } else if (currentScroll >= edgeTop - viewportHeight) {
+        newWatermarkProgress =
+          1 +
+          Math.min(
+            1,
+            (currentScroll - (edgeTop - viewportHeight)) / viewportHeight
+          );
+      } else if (currentScroll >= coursesTop - viewportHeight) {
+        newWatermarkProgress = Math.min(
+          1,
+          (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
+        );
+      }
 
-                const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
-                const videoFadeProgress = clamp((currentProgress - videoFadeStart) / videoFadeDuration, 0, 1);
-                const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
+      targetProgressRef.current = newWatermarkProgress;
 
-                let fillColor = 'transparent';
-                let stroke = '1px white';
-                let textContainerMixBlendMode = 'normal';
-                let textContainerBackground = 'transparent';
-                let textContainerBoxShadow = 'none';
-                let videoOpacity = 0;
-                let starfieldOpacity = 0;
-                let whiteOverlayOpacity = 0;
+      if (heroWrapperRef.current) {
+        const heroProgress = Math.min(
+          1,
+          currentScroll / (viewportHeight * 0.8)
+        );
+        heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
+        heroWrapperRef.current.style.transform = `translateY(${
+          heroProgress * -250
+        }px)`;
+      }
+      setEdgeProgress(
+        Math.min(
+          1,
+          Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)
+        )
+      );
+      setPartnersProgress(
+        Math.min(
+          1,
+          Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)
+        )
+      );
+      setTestimonialProgress(
+        Math.min(
+          1,
+          Math.max(0, currentScroll - testimonialsTop) /
+            ((testimonialsAnimationDurationVh / 100) * viewportHeight)
+        )
+      );
+      setAboutUsProgress(
+        Math.min(
+          1,
+          Math.max(0, currentScroll - (aboutUsTop + viewportHeight * 4)) /
+            viewportHeight
+        )
+      );
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
 
-                if (assemblyProgress < 1) {
-                    const startFade = 0.7;
-                    const endFade = 0.95;
-                    const fadeProgress = clamp((assemblyProgress - startFade) / (endFade - startFade), 0, 1);
-                    const fillOpacity = 1 - fadeProgress;
-                    fillColor = `rgba(255, 255, 255, ${fillOpacity})`;
-                    stroke = '1px white';
-                } else if (videoFadeProgress < 1) {
-                    fillColor = 'white';
-                    stroke = 'none';
-                    textContainerMixBlendMode = 'multiply';
-                    textContainerBackground = 'black';
-                    textContainerBoxShadow = '0 0 20px 20px black';
-                    videoOpacity = 1;
-                    
-                    // CHANGED: Added delay to star fade-out
-                    const starFadeStartPoint = 0.6; // Stars start fading when white overlay is 60% visible. You can tweak this value (0.0 to 1.0).
-                    const starFadeProgress = clamp((videoFadeProgress - starFadeStartPoint) / (1.0 - starFadeStartPoint), 0, 1);
-                    starfieldOpacity = 1 - starFadeProgress;
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      const wrapper = testimonialsSectionWrapperRef.current;
+      if (!wrapper || layout.testimonialsTop === 0) return;
+      const top = layout.testimonialsTop;
+      const bottom = top + wrapper.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const isTestimonialSectionActive =
+        window.scrollY >= top && window.scrollY < bottom - viewportHeight;
+      if (!isTestimonialSectionActive) return;
+      const now = Date.now();
+      if (now - lastScrollTime.current < 1000) {
+        event.preventDefault();
+        return;
+      }
+      if (Math.abs(event.deltaY) < 20) {
+        event.preventDefault();
+        return;
+      }
+      const maxIndex = formattedTestimonials.length - 1;
+      const scrollDirection = event.deltaY;
+      if (scrollDirection < 0 && targetTestimonialIndex === 0) return;
+      if (scrollDirection > 0 && targetTestimonialIndex === maxIndex) return;
+      event.preventDefault();
+      let newIndex = targetTestimonialIndex;
+      if (scrollDirection > 0 && targetTestimonialIndex < maxIndex)
+        newIndex = targetTestimonialIndex + 1;
+      else if (scrollDirection < 0 && targetTestimonialIndex > 0)
+        newIndex = targetTestimonialIndex - 1;
+      if (newIndex !== targetTestimonialIndex) {
+        lastScrollTime.current = now;
+        setTargetTestimonialIndex(newIndex);
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [
+    layout.testimonialsTop,
+    targetTestimonialIndex,
+    formattedTestimonials.length,
+  ]);
 
-                    whiteOverlayOpacity = videoFadeProgress;
-                } else {
-                    fillColor = 'white';
-                    stroke = 'none';
-                    textContainerMixBlendMode = 'normal';
-                    textContainerBackground = 'transparent';
-                    textContainerBoxShadow = 'none';
-                    videoOpacity = 0;
-                    whiteOverlayOpacity = 0;
-                    starfieldOpacity = 0;
-                }
+  useEffect(() => {
+    if (isInitialLoad.current && layout.testimonialsTop > 0) {
+      isInitialLoad.current = false;
+      return;
+    }
+    if (layout.testimonialsTop === 0) return;
+    const maxIndex = formattedTestimonials.length - 1;
+    if (maxIndex <= 0) return;
+    const testimonialsAnimDurationPx =
+      (testimonialsAnimationDurationVh / 100) * window.innerHeight;
+    const targetProgress = targetTestimonialIndex / maxIndex;
+    const targetScrollY =
+      layout.testimonialsTop + targetProgress * testimonialsAnimDurationPx;
+    if (Math.abs(window.scrollY - targetScrollY) > 5) {
+      window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+    }
+  }, [
+    targetTestimonialIndex,
+    layout.testimonialsTop,
+    formattedTestimonials.length,
+    testimonialsAnimationDurationVh,
+  ]);
 
-                const isBeforeRise = currentProgress < riseStart;
-                const centerProgress = isBeforeRise ? assemblyProgress : 1;
-                const initialY = 4;
-                const centerTargetVh = -35;
-                const topTargetVh = -90;
-                const centerTargetPx = centerTargetVh * window.innerHeight / 100;
-                const topTargetPx = topTargetVh * window.innerHeight / 100;
+  return (
+    <main>
+      <div className="fixed top-0 left-0 w-full h-full z-0">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+          <Suspense fallback={null}>
+            <AnimationController watermarkProgressRef={watermarkProgressRef} />
+          </Suspense>
+        </Canvas>
+      </div>
 
-                const y_pos_before_rise = THREE.MathUtils.lerp(initialY * 16, centerTargetPx, centerProgress);
-                const y_pos_after_rise_starts = THREE.MathUtils.lerp(centerTargetPx, topTargetPx, riseProgress);
-                const containerTranslateY = isBeforeRise ? y_pos_before_rise : y_pos_after_rise_starts;
+      <div
+        ref={textContainerRef}
+        className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
+        style={
+          {
+            "--persevex-opacity": 0.4,
+            "--courses-opacity": 0,
+            "--our-edge-opacity": 0,
+            "--partners-opacity": 0,
+            "--trust-opacity": 0,
+            "--recognized-by-opacity": 0,
+            "--about-us-opacity": 0,
+            "--about-us-fill-color": "transparent",
+            "--about-us-stroke": "1px white",
+          } as React.CSSProperties
+        }
+      >
+        <h2
+          className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--persevex-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+          }}
+        >
+          Persevex
+        </h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--courses-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+          }}
+        >
+          Courses
+        </h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--our-edge-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Our Edge
+        </h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--partners-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+          }}
+        >
+          Partners
+        </h2>
+        <h2
+          className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--trust-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+          }}
+        >
+          Trust
+        </h2>
+        <h2
+          className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--recognized-by-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Validation
+        </h2>
+        <h2
+          className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+          style={{
+            opacity: "var(--about-us-opacity)",
+            WebkitTextStroke: "1px white",
+            transform: "translateX(-50%) translateY(4rem)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Our Story
+        </h2>
 
-                const initial_scale = 1.0;
-                const final_scale = 0.15;
-                const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
-
-                textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
-
-                if (textMaskContainerRef.current) {
-                    (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
-                    textMaskContainerRef.current.style.background = textContainerBackground;
-                    textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
-                }
-
-                textContainerRef.current.style.setProperty('--about-us-fill-color', fillColor);
-                textContainerRef.current.style.setProperty('--about-us-stroke', stroke);
-
-                if (videoRef.current) videoRef.current.style.opacity = `${videoOpacity}`;
-                if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
-                if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
-
-                const numLetters = aboutUsWord.replace(/ /g, '').length;
-                const numSpaces = aboutUsWord.split(' ').length - 1;
-                const spacePauseFactor = 2;
-                const totalAnimationUnits = numLetters + (numSpaces * spacePauseFactor);
-                const unitDuration = 1.0 / totalAnimationUnits;
-                const animationWindow = unitDuration * 5;
-                const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
-                const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
-                let timeCursor = 0;
-
-                lettersWithSpaces.forEach((char, index) => {
-                    if (char === ' ') {
-                        timeCursor += unitDuration * spacePauseFactor;
-                        return;
-                    }
-                    const start = timeCursor * compressionFactor;
-                    const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
-                    const letterOpacity = letterProgress > 0 ? 1 : 0;
-                    const translateY = (1 - letterProgress) * 20;
-                    const scale = 0.5 + letterProgress * 0.5;
-                    if (textContainerRef.current) {
-                        textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
-                        textContainerRef.current.style.setProperty(`--about-us-letter-${index}-opacity`, `${letterOpacity}`);
-                    }
-                    timeCursor += unitDuration;
-                });
-
-                textContainerRef.current.style.setProperty('--persevex-opacity', `${clamp(persevexOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--courses-opacity', `${clamp(coursesOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--our-edge-opacity', `${clamp(ourEdgeOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--partners-opacity', `${clamp(partnersOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--trust-opacity', `${clamp(trustOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--recognized-by-opacity', `${clamp(recognizedByOpacity, 0, 0.4)}`);
-                textContainerRef.current.style.setProperty('--about-us-opacity', `${clamp(aboutUsOpacity, 0, 0.4)}`);
-            }
-
-            animationFrameId = requestAnimationFrame(animationLoop);
-        };
-        animationLoop();
-        return () => {
-            cancelAnimationFrame(animationFrameId);
-        };
-    }, [layout, lettersWithSpaces]);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (layout.coursesTop === 0) return;
-            const currentScroll = window.scrollY;
-            const viewportHeight = window.innerHeight;
-            const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop } = layout;
-            const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
-            const aboutUsWatermarkAnimDuration = viewportHeight * 6;
-            let newWatermarkProgress = 0;
-            if (currentScroll >= aboutUsWatermarkAnimStart) {
-                const progress = (currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration;
-                newWatermarkProgress = 6 + progress * 5;
-            } else if (currentScroll >= recognizedByTop - viewportHeight) {
-                newWatermarkProgress = 4 + Math.min(1, (currentScroll - (recognizedByTop - viewportHeight)) / viewportHeight);
-            } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
-                newWatermarkProgress = 4.0;
-            } else if (currentScroll >= testimonialsTop - viewportHeight) {
-                newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / (viewportHeight / 2));
-            } else if (currentScroll >= partnersTop) {
-                newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / ((testimonialsTop - viewportHeight) - partnersTop));
-            } else if (currentScroll >= edgeTop - viewportHeight) {
-                newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
-            } else if (currentScroll >= coursesTop - viewportHeight) {
-                newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
-            }
-
-            targetProgressRef.current = newWatermarkProgress;
-
-            if (heroWrapperRef.current) {
-                const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
-                heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
-                heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
-            }
-            setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
-            setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)));
-            setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
-            setAboutUsProgress(Math.min(1, Math.max(0, currentScroll - (aboutUsTop + viewportHeight * 4)) / viewportHeight));
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
-
-
-    useEffect(() => {
-        const handleWheel = (event: WheelEvent) => {
-            const wrapper = testimonialsSectionWrapperRef.current;
-            if (!wrapper || layout.testimonialsTop === 0) return;
-            const top = layout.testimonialsTop;
-            const bottom = top + wrapper.offsetHeight;
-            const viewportHeight = window.innerHeight;
-            const isTestimonialSectionActive = window.scrollY >= top && window.scrollY < bottom - viewportHeight;
-            if (!isTestimonialSectionActive) return;
-            const now = Date.now();
-            if (now - lastScrollTime.current < 1000) { event.preventDefault(); return; }
-            if (Math.abs(event.deltaY) < 20) { event.preventDefault(); return; }
-            const maxIndex = formattedTestimonials.length - 1;
-            const scrollDirection = event.deltaY;
-            if (scrollDirection < 0 && targetTestimonialIndex === 0) return;
-            if (scrollDirection > 0 && targetTestimonialIndex === maxIndex) return;
-            event.preventDefault();
-            let newIndex = targetTestimonialIndex;
-            if (scrollDirection > 0 && targetTestimonialIndex < maxIndex) newIndex = targetTestimonialIndex + 1;
-            else if (scrollDirection < 0 && targetTestimonialIndex > 0) newIndex = targetTestimonialIndex - 1;
-            if (newIndex !== targetTestimonialIndex) { lastScrollTime.current = now; setTargetTestimonialIndex(newIndex); }
-        };
-        window.addEventListener("wheel", handleWheel, { passive: false });
-        return () => window.removeEventListener("wheel", handleWheel);
-    }, [layout.testimonialsTop, targetTestimonialIndex, formattedTestimonials.length]);
-
-    useEffect(() => {
-        if (isInitialLoad.current && layout.testimonialsTop > 0) { isInitialLoad.current = false; return; }
-        if (layout.testimonialsTop === 0) return;
-        const maxIndex = formattedTestimonials.length - 1;
-        if (maxIndex <= 0) return;
-        const testimonialsAnimDurationPx = (testimonialsAnimationDurationVh / 100) * window.innerHeight;
-        const targetProgress = targetTestimonialIndex / maxIndex;
-        const targetScrollY = layout.testimonialsTop + (targetProgress * testimonialsAnimDurationPx);
-        if (Math.abs(window.scrollY - targetScrollY) > 5) { window.scrollTo({ top: targetScrollY, behavior: "smooth" }); }
-    }, [targetTestimonialIndex, layout.testimonialsTop, formattedTestimonials.length, testimonialsAnimationDurationVh]);
-
-    return (
-        <main>
-            <div className="fixed top-0 left-0 w-full h-full z-0">
-                <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                    <Suspense fallback={null}>
-                        <AnimationController
-                            watermarkProgressRef={watermarkProgressRef}
-                        />
-                    </Suspense>
-                </Canvas>
+        <div
+          className="absolute left-1/2 z-[-4]"
+          style={
+            {
+              bottom: "1.5rem",
+              transform:
+                "var(--about-us-container-transform, translateX(-50%))",
+              whiteSpace: "nowrap",
+            } as React.CSSProperties
+          }
+        >
+          <div
+            className="relative"
+            style={{
+              opacity: "calc(var(--about-us-opacity) * 2.5)",
+              isolation: "isolate",
+            }}
+          >
+            {/* Layer 1: Video Background and White Overlay */}
+            <div className="absolute inset-0 w-full h-full">
+              <video
+                ref={videoRef}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute top-0 left-0 w-full h-full object-cover"
+                style={{ opacity: 0 }}
+              >
+                <source src="/videos/U.mp4" type="video/mp4" />
+              </video>
+              <div
+                ref={whiteOverlayRef}
+                className="absolute inset-0 bg-white"
+                style={{ opacity: 0 }}
+              />
             </div>
 
+            {/* Layer 2: "ABOUT US" Text */}
             <div
-                ref={textContainerRef}
-                className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-                style={{
-                    '--persevex-opacity': 0.4,
-                    '--courses-opacity': 0,
-                    '--our-edge-opacity': 0,
-                    '--partners-opacity': 0,
-                    '--trust-opacity': 0,
-                    '--recognized-by-opacity': 0,
-                    '--about-us-opacity': 0,
-                    '--about-us-fill-color': 'transparent',
-                    '--about-us-stroke': '1px white',
-                } as React.CSSProperties}
+              ref={textMaskContainerRef}
+              className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
             >
-                <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--persevex-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Persevex</h2>
-                <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--courses-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Courses</h2>
-                <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--our-edge-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Edge</h2>
-                <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--partners-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Partners</h2>
-                <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
-                <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
-                <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
-
-                <div
-                    className="absolute left-1/2 z-[-4]"
-                    style={{
-                        bottom: '1.5rem',
-                        transform: 'var(--about-us-container-transform, translateX(-50%))',
-                        whiteSpace: 'nowrap',
-                    } as React.CSSProperties}
-                >
-                    <div
-                        className="relative"
-                        style={{
-                            opacity: 'calc(var(--about-us-opacity) * 2.5)',
-                            isolation: 'isolate',
-                        }}
-                    >
-                        {/* Layer 1: Video Background and White Overlay */}
-                        <div className="absolute inset-0 w-full h-full">
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                className="absolute top-0 left-0 w-full h-full object-cover"
-                                style={{ opacity: 0 }}
-                            >
-                                <source src="/videos/U.mp4" type="video/mp4" />
-                            </video>
-                            <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }} />
-                        </div>
-
-                        {/* Layer 2: "ABOUT US" Text */}
-                        <div
-                            ref={textMaskContainerRef}
-                            className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-                        >
-                            {lettersWithSpaces.map((letter, index) => {
-                                if (letter === ' ') {
-                                    return <div key={index} className="w-8 md:w-12" />;
-                                }
-                                return (
-                                    <h2
-                                        key={index}
-                                        className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
-                                        style={{
-                                            fontFamily: 'serif',
-                                            transform: `var(--about-us-letter-${index}-transform)`,
-                                            opacity: `var(--about-us-letter-${index}-opacity, 1)`,
-                                            color: 'var(--about-us-fill-color)',
-                                            WebkitTextStroke: 'var(--about-us-stroke)',
-                                        } as React.CSSProperties}
-                                    >
-                                        {letter}
-                                    </h2>
-                                );
-                            })}
-                        </div>
-                        
-                        {/* Layer 3: SimpleStars Overlay */}
-                        <div
-                            ref={starfieldOverlayRef}
-                            className="absolute inset-0 pointer-events-none"
-                            style={{ opacity: 0, overflow: 'hidden' }}
-                        >
-                            <SimpleStars />
-                        </div>
-                    </div>
-                </div>
+              {lettersWithSpaces.map((letter, index) => {
+                if (letter === " ") {
+                  return <div key={index} className="w-8 md:w-12" />;
+                }
+                return (
+                  <h2
+                    key={index}
+                    className="relative text-[20vw] md:text-[16vw] lg:text-[200px] font-black leading-none"
+                    style={
+                      {
+                        fontFamily: "serif",
+                        transform: `var(--about-us-letter-${index}-transform)`,
+                        opacity: `var(--about-us-letter-${index}-opacity, 1)`,
+                        color: "var(--about-us-fill-color)",
+                        WebkitTextStroke: "var(--about-us-stroke)",
+                      } as React.CSSProperties
+                    }
+                  >
+                    {letter}
+                  </h2>
+                );
+              })}
             </div>
 
-            <div className="relative z-20">
-                <div ref={heroWrapperRef} className="sticky top-0 flex items-center justify-center h-screen pointer-events-none">
-                    <div className="w-full mr-74 mb-36 pointer-events-auto"><Hero /></div>
-                </div>
-
-                <div style={{ height: '10vh' }} />
-                <div ref={coursesSectionWrapperRef}><CoursesSection /></div>
-                <div style={{ height: '50vh' }} />
-                <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}><OurEdgeSection progress={edgeProgress} /></div>
-                <div ref={partnersSectionWrapperRef} style={{ height: '200vh', marginTop: '-50vh' }}><PartnersSection progress={partnersProgress} /></div>
-
-                <div style={{ height: '10vh' }} />
-                <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
-                    <div className="sticky top-0 flex h-screen items-center justify-center">
-                        <AnimatedTestimonials testimonials={formattedTestimonials} progress={testimonialProgress} />
-                    </div>
-                </div>
-
-                <div ref={recognizedBySectionWrapperRef} style={{ height: '300vh' }}>
-                    <div className="sticky top-0 flex h-screen items-center justify-center">
-                        <RecognizedBySection />
-                    </div>
-                </div>
-
-                <div ref={aboutUsSectionWrapperRef} style={{ height: '530vh' }}><AboutUsSection progress={aboutUsProgress} /></div>
+            {/* Layer 3: SimpleStars Overlay */}
+            <div
+              ref={starfieldOverlayRef}
+              className="absolute inset-0 pointer-events-none"
+              style={{ opacity: 0, overflow: "hidden" }}
+            >
+              <SimpleStars />
             </div>
-        </main>
-    );
-}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative z-20">
+        <div
+          ref={heroWrapperRef}
+          className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
+        >
+          <div className="w-full mr-74 mb-36 pointer-events-auto">
+            <Hero />
+          </div>
+        </div>
+
+        <div style={{ height: "10vh" }} />
+        <div ref={coursesSectionWrapperRef}>
+          <CoursesSection />
+        </div>
+        <div style={{ height: "50vh" }} />
+        <div
+          ref={ourEdgeSectionWrapperRef}
+          style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}
+        >
+          <OurEdgeSection progress={edgeProgress} />
+        </div>
+        <div
+          ref={partnersSectionWrapperRef}
+          style={{ height: "200vh", marginTop: "-50vh" }}
+        >
+          <PartnersSection progress={partnersProgress} />
+        </div>
+
+        <div style={{ height: "10vh" }} />
+        <div
+          ref={testimonialsSectionWrapperRef}
+          style={{ height: `${testimonialsSectionHeightVh}vh` }}
+        >
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <AnimatedTestimonials
+              testimonials={formattedTestimonials}
+              progress={testimonialProgress}
+            />
+          </div>
+        </div>
+
+        <div ref={recognizedBySectionWrapperRef} style={{ height: "300vh" }}>
+          <div className="sticky top-0 flex h-screen items-center justify-center">
+            <RecognizedBySection />
+          </div>
+        </div>
+
+        <div ref={aboutUsSectionWrapperRef} style={{ height: "540vh" }}>
+          <AboutUsSection progress={aboutUsProgress} />
+        </div>
+      </div>
+    </main>
+  );
+};
 export default LandingPage;

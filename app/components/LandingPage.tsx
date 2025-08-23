@@ -193,7 +193,12 @@ const LandingPage: FC = () => {
                     textContainerBackground = 'black';
                     textContainerBoxShadow = '0 0 20px 20px black';
                     videoOpacity = 1;
-                    starfieldOpacity = 1;
+                    
+                    // CHANGED: Added delay to star fade-out
+                    const starFadeStartPoint = 0.6; // Stars start fading when white overlay is 60% visible. You can tweak this value (0.0 to 1.0).
+                    const starFadeProgress = clamp((videoFadeProgress - starFadeStartPoint) / (1.0 - starFadeStartPoint), 0, 1);
+                    starfieldOpacity = 1 - starFadeProgress;
+
                     whiteOverlayOpacity = videoFadeProgress;
                 } else {
                     fillColor = 'white';
@@ -203,7 +208,7 @@ const LandingPage: FC = () => {
                     textContainerBoxShadow = 'none';
                     videoOpacity = 0;
                     whiteOverlayOpacity = 0;
-                    starfieldOpacity = 1 - riseProgress;
+                    starfieldOpacity = 0;
                 }
 
                 const isBeforeRise = currentProgress < riseStart;
@@ -412,6 +417,7 @@ const LandingPage: FC = () => {
                             isolation: 'isolate',
                         }}
                     >
+                        {/* Layer 1: Video Background and White Overlay */}
                         <div className="absolute inset-0 w-full h-full">
                             <video
                                 ref={videoRef}
@@ -424,16 +430,10 @@ const LandingPage: FC = () => {
                             >
                                 <source src="/videos/U.mp4" type="video/mp4" />
                             </video>
-                            <div
-                                ref={starfieldOverlayRef}
-                                className="absolute inset-0 pointer-events-none"
-                                style={{ opacity: 0, overflow: 'hidden' }}
-                            >
-                                <SimpleStars />
-                            </div>
                             <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }} />
                         </div>
 
+                        {/* Layer 2: "ABOUT US" Text */}
                         <div
                             ref={textMaskContainerRef}
                             className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
@@ -458,6 +458,15 @@ const LandingPage: FC = () => {
                                     </h2>
                                 );
                             })}
+                        </div>
+                        
+                        {/* Layer 3: SimpleStars Overlay */}
+                        <div
+                            ref={starfieldOverlayRef}
+                            className="absolute inset-0 pointer-events-none"
+                            style={{ opacity: 0, overflow: 'hidden' }}
+                        >
+                            <SimpleStars />
                         </div>
                     </div>
                 </div>

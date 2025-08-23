@@ -87,6 +87,7 @@ const LandingPage: FC = () => {
     const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
     const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const starfieldOverlayRef = useRef<HTMLDivElement>(null); // Ref for the new starfield overlay
     const [edgeProgress, setEdgeProgress] = useState<number>(0);
     const [partnersProgress, setPartnersProgress] = useState<number>(0);
     const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -193,6 +194,10 @@ const LandingPage: FC = () => {
                 if (videoRef.current) {
                     videoRef.current.style.opacity = `${videoFadeProgress}`;
                 }
+                // Fade in the new starfield overlay at the same time as the video
+                if (starfieldOverlayRef.current) {
+                    starfieldOverlayRef.current.style.opacity = `${videoFadeProgress}`;
+                }
 
                 const initialY = 4;
                 const centerTarget = -35;
@@ -209,7 +214,6 @@ const LandingPage: FC = () => {
                 const unitDuration = 1.0 / totalAnimationUnits;
                 const animationWindow = unitDuration * 5;
 
-                // --- CHANGE #1: Calculate a compression factor to ensure the animation finishes smoothly. ---
                 const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
                 const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
                 
@@ -221,15 +225,12 @@ const LandingPage: FC = () => {
                         return;
                     }
 
-                    // --- CHANGE #2: Apply the compression factor to each letter's animation start time. ---
                     const start = timeCursor * compressionFactor;
                     const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
                     const letterOpacity = letterProgress > 0 ? 1 : 0;
                     const translateY = (1 - letterProgress) * 20;
                     const scale = 0.5 + letterProgress * 0.5;
 
-                    // --- CHANGE #3: Remove the conditional logic that caused the jump. ---
-                    // With the corrected timing, the animation will naturally and smoothly resolve to its final state.
                     if (textContainerRef.current) {
                         textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
                     }
@@ -373,59 +374,84 @@ const LandingPage: FC = () => {
                 <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--trust-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)' }}>Trust</h2>
                 <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
                 <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
+                
+                {/* A new wrapper to contain both the original effect and the new starfield overlay */}
                 <div
                     className="absolute left-1/2 z-[-4]"
                     style={{
                         bottom: '1.5rem',
-                        opacity: 'calc(var(--about-us-opacity) * 2.5)',
                         transform: 'var(--about-us-container-transform, translateX(-50%))',
                         whiteSpace: 'nowrap',
-                        isolation: 'isolate',
                     } as React.CSSProperties}
                 >
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="absolute top-0 left-0 w-full h-full object-cover"
-                        style={{ opacity: 0 }}
-                    >
-                        <source src="/videos/A.mp4" type="video/mp4" />
-                    </video>
+                    {/* This div contains the original video-in-text effect */}
                     <div
-                        className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
+                        className="relative"
                         style={{
-                            background: 'var(--about-us-mask-bg)',
-                            boxShadow: 'var(--about-us-edge-fix)',
-                            mixBlendMode: 'multiply'
+                            opacity: 'calc(var(--about-us-opacity) * 2.5)',
+                            isolation: 'isolate',
                         }}
                     >
-                        {lettersWithSpaces.map((letter, index) => {
-                            if (letter === ' ') {
-                                return <div key={index} className="w-8 md:w-12" />;
-                            }
-                            return (
-                                <h2
-                                    key={index}
-                                    className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
-                                    style={{
-                                        fontFamily: 'serif',
-                                        transform: `var(--about-us-letter-${index}-transform)`,
-                                        opacity: `var(--about-us-letter-${index}-opacity, 1)`,
-                                        color: 'var(--about-us-fill-color)',
-                                        WebkitTextStroke: 'var(--about-us-stroke)',
-                                    } as React.CSSProperties}
-                                >
-                                    {letter}
-                                </h2>
-                            );
-                        })}
+                        <video
+                            ref={videoRef}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute top-0 left-0 w-full h-full object-cover"
+                            style={{ opacity: 0 }}
+                        >
+                            <source src="/videos/A.mp4" type="video/mp4" />
+                        </video>
+                        <div
+                            className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
+                            style={{
+                                background: 'var(--about-us-mask-bg)',
+                                boxShadow: 'var(--about-us-edge-fix)',
+                                mixBlendMode: 'multiply'
+                            }}
+                        >
+                            {lettersWithSpaces.map((letter, index) => {
+                                if (letter === ' ') {
+                                    return <div key={index} className="w-8 md:w-12" />;
+                                }
+                                return (
+                                    <h2
+                                        key={index}
+                                        className="relative text-[20vw] md:text-[16vw] lg:text-[240px] font-black leading-none"
+                                        style={{
+                                            fontFamily: 'serif',
+                                            transform: `var(--about-us-letter-${index}-transform)`,
+                                            opacity: `var(--about-us-letter-${index}-opacity, 1)`,
+                                            color: 'var(--about-us-fill-color)',
+                                            WebkitTextStroke: 'var(--about-us-stroke)',
+                                        } as React.CSSProperties}
+                                    >
+                                        {letter}
+                                    </h2>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* The new starfield overlay, placed on top of the original effect */}
+                    <div
+                        ref={starfieldOverlayRef}
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            opacity: 0,
+                            mixBlendMode: 'screen', // This blend mode turns black transparent and adds stars to the video
+                        }}
+                    >
+                        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+                            <Suspense fallback={null}>
+                                <color attach="background" args={['black']} />
+                                <StarField hover={false} />
+                            </Suspense>
+                        </Canvas>
                     </div>
                 </div>
             </div>
-
 
             <div className="relative z-20">
                 <div ref={heroWrapperRef} className="sticky top-0 flex items-center justify-center h-screen pointer-events-none">

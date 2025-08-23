@@ -208,6 +208,11 @@ const LandingPage: FC = () => {
                 const totalAnimationUnits = numLetters + (numSpaces * spacePauseFactor);
                 const unitDuration = 1.0 / totalAnimationUnits;
                 const animationWindow = unitDuration * 5;
+
+                // --- CHANGE #1: Calculate a compression factor to ensure the animation finishes smoothly. ---
+                const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
+                const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
+                
                 let timeCursor = 0;
 
                 lettersWithSpaces.forEach((char, index) => {
@@ -215,16 +220,20 @@ const LandingPage: FC = () => {
                         timeCursor += unitDuration * spacePauseFactor;
                         return;
                     }
-                    const start = timeCursor;
+
+                    // --- CHANGE #2: Apply the compression factor to each letter's animation start time. ---
+                    const start = timeCursor * compressionFactor;
                     const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
                     const letterOpacity = letterProgress > 0 ? 1 : 0;
                     const translateY = (1 - letterProgress) * 20;
                     const scale = 0.5 + letterProgress * 0.5;
-                    if (currentProgress < assemblyEnd) {
-                        textContainerRef.current!.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
-                    } else {
-                        textContainerRef.current!.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(0vh) scale(1)`);
+
+                    // --- CHANGE #3: Remove the conditional logic that caused the jump. ---
+                    // With the corrected timing, the animation will naturally and smoothly resolve to its final state.
+                    if (textContainerRef.current) {
+                        textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
                     }
+                    
                     textContainerRef.current!.style.setProperty(`--about-us-letter-${index}-opacity`, `${letterOpacity}`);
                     timeCursor += unitDuration;
                 });
@@ -381,14 +390,12 @@ const LandingPage: FC = () => {
                         muted
                         playsInline
                         className="absolute top-0 left-0 w-full h-full object-cover"
-                        // --- CHANGE #1: Remove the incorrect blend mode from the video ---
                         style={{ opacity: 0 }}
                     >
                         <source src="/videos/A.mp4" type="video/mp4" />
                     </video>
                     <div
                         className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-                        // --- CHANGE #2: Apply the correct blend mode to the text mask container ---
                         style={{
                             background: 'var(--about-us-mask-bg)',
                             boxShadow: 'var(--about-us-edge-fix)',
@@ -409,7 +416,6 @@ const LandingPage: FC = () => {
                                         opacity: `var(--about-us-letter-${index}-opacity, 1)`,
                                         color: 'var(--about-us-fill-color)',
                                         WebkitTextStroke: 'var(--about-us-stroke)',
-                                        // --- CHANGE #3: Remove the incorrect blend mode from the text itself ---
                                     } as React.CSSProperties}
                                 >
                                     {letter}

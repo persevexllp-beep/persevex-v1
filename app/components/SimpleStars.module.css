@@ -1,0 +1,45 @@
+/* src/components/SimpleStars.module.css */
+
+.starsContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the container */
+  width: 2000px; /* Use a fixed large size */
+  height: 2000px;
+  overflow: hidden;
+  background: transparent; /* Ensure background is transparent */
+}
+
+.stars1, .stars2, .stars3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px; /* The div itself is a tiny dot */
+  height: 1px;
+  background: transparent;
+  border-radius: 50%;
+}
+
+/* Three layers for a parallax effect with slower speeds */
+.stars1 {
+  animation: animStar 150s linear infinite; /* Was 50s */
+}
+
+.stars2 {
+  animation: animStar 300s linear infinite; /* Was 100s */
+}
+
+.stars3 {
+  animation: animStar 450s linear infinite; /* Was 150s */
+}
+
+/* Changed animation from translateY to translateX */
+@keyframes animStar {
+  from {
+    transform: translateX(0px); /* Start at the right edge */
+  }
+  to {
+    transform: translateX(-2000px); /* End at the left edge */
+  }
+}

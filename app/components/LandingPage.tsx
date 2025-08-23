@@ -12,6 +12,7 @@ import { AnimatedTestimonials } from "./Testimonials";
 import { testimonialsData } from "../constants/TestimonialsData";
 import RecognizedBySection from "./RecognizedBySection";
 import AboutUsSection from "./AboutUs";
+import SimpleStars from './SimpleStars';
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number => Math.min(Math.max(num, min), max);
@@ -87,7 +88,7 @@ const LandingPage: FC = () => {
     const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
     const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const starfieldOverlayRef = useRef<HTMLDivElement>(null); // Ref for the new starfield overlay
+    const starfieldOverlayRef = useRef<HTMLDivElement>(null);
     const [edgeProgress, setEdgeProgress] = useState<number>(0);
     const [partnersProgress, setPartnersProgress] = useState<number>(0);
     const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -194,10 +195,6 @@ const LandingPage: FC = () => {
                 if (videoRef.current) {
                     videoRef.current.style.opacity = `${videoFadeProgress}`;
                 }
-                // Fade in the new starfield overlay at the same time as the video
-                if (starfieldOverlayRef.current) {
-                    starfieldOverlayRef.current.style.opacity = `${videoFadeProgress}`;
-                }
 
                 const initialY = 4;
                 const centerTarget = -35;
@@ -206,6 +203,12 @@ const LandingPage: FC = () => {
                 const containerTranslateY = move_to_center_Y + (finalRise * window.innerHeight / 100);
                 const containerScale = 1 - riseProgress * 0.7;
                 textContainerRef.current.style.setProperty('--about-us-container-transform', `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
+                
+
+                const starfieldOpacity = videoFadeProgress > 0 ? 1 : 0;
+                if (starfieldOverlayRef.current) {
+                    starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+                }
 
                 const numLetters = aboutUsWord.replace(/ /g, '').length;
                 const numSpaces = aboutUsWord.split(' ').length - 1;
@@ -375,7 +378,6 @@ const LandingPage: FC = () => {
                 <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--recognized-by-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Validation</h2>
                 <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: 'var(--about-us-opacity)', WebkitTextStroke: "1px white", transform: 'translateX(-50%) translateY(4rem)', whiteSpace: 'nowrap' }}>Our Story</h2>
                 
-                {/* A new wrapper to contain both the original effect and the new starfield overlay */}
                 <div
                     className="absolute left-1/2 z-[-4]"
                     style={{
@@ -384,7 +386,6 @@ const LandingPage: FC = () => {
                         whiteSpace: 'nowrap',
                     } as React.CSSProperties}
                 >
-                    {/* This div contains the original video-in-text effect */}
                     <div
                         className="relative"
                         style={{
@@ -432,23 +433,17 @@ const LandingPage: FC = () => {
                                 );
                             })}
                         </div>
-                    </div>
-
-                    {/* The new starfield overlay, placed on top of the original effect */}
-                    <div
-                        ref={starfieldOverlayRef}
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            opacity: 0,
-                            mixBlendMode: 'screen', // This blend mode turns black transparent and adds stars to the video
-                        }}
-                    >
-                        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                            <Suspense fallback={null}>
-                                <color attach="background" args={['black']} />
-                                <StarField hover={false} />
-                            </Suspense>
-                        </Canvas>
+                        <div
+                            ref={starfieldOverlayRef}
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                                opacity: 0,
+                                mixBlendMode: 'screen', 
+                                overflow: 'hidden',
+                            }}
+                        >
+                           <SimpleStars />
+                        </div>
                     </div>
                 </div>
             </div>

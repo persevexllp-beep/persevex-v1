@@ -237,8 +237,8 @@ const LandingPage: FC = () => {
           1
         );
 
-        let fillColor = "transparent";
-        let stroke = "1px white";
+        let fillColor = "white"; // CHANGED: Always keep letters white
+        let stroke = "none"; // CHANGED: Never add stroke outline
         let textContainerMixBlendMode = "normal";
         let textContainerBackground = "transparent";
         let textContainerBoxShadow = "none";
@@ -247,16 +247,9 @@ const LandingPage: FC = () => {
         let whiteOverlayOpacity = 0;
 
         if (assemblyProgress < 1) {
-          const startFade = 0.7;
-          const endFade = 0.95;
-          const fadeProgress = clamp(
-            (assemblyProgress - startFade) / (endFade - startFade),
-            0,
-            1
-          );
-          const fillOpacity = 1 - fadeProgress;
-          fillColor = `rgba(255, 255, 255, ${fillOpacity})`;
-          stroke = "1px white";
+          // CHANGED: Keep letters solid white throughout assembly
+          fillColor = "white";
+          stroke = "none";
         } else if (videoFadeProgress < 1) {
           fillColor = "white";
           stroke = "none";
@@ -265,8 +258,7 @@ const LandingPage: FC = () => {
           textContainerBoxShadow = "0 0 20px 20px black";
           videoOpacity = 1;
 
-          // CHANGED: Added delay to star fade-out
-          const starFadeStartPoint = 0.9; // Stars start fading when white overlay is 60% visible. You can tweak this value (0.0 to 1.0).
+          const starFadeStartPoint = 0.9;
           const starFadeProgress = clamp(
             (videoFadeProgress - starFadeStartPoint) /
               (1.0 - starFadeStartPoint),
@@ -366,18 +358,19 @@ const LandingPage: FC = () => {
             0,
             1
           );
-          const letterOpacity = letterProgress > 0 ? 1 : 0;
+          
+          // CHANGED: Remove opacity animation - letters stay fully visible
           const translateY = (1 - letterProgress) * 20;
           const scale = 0.5 + letterProgress * 0.5;
+          
           if (textContainerRef.current) {
             textContainerRef.current.style.setProperty(
               `--about-us-letter-${index}-transform`,
               `translateY(${translateY}vh) scale(${scale})`
             );
-            textContainerRef.current.style.setProperty(
-              `--about-us-letter-${index}-opacity`,
-              `${letterOpacity}`
-            );
+            
+            // CHANGED: Remove opacity control entirely
+            // No longer setting --about-us-letter-${index}-opacity
           }
           timeCursor += unitDuration;
         });
@@ -612,8 +605,8 @@ const LandingPage: FC = () => {
             "--trust-opacity": 0,
             "--recognized-by-opacity": 0,
             "--about-us-opacity": 0,
-            "--about-us-fill-color": "transparent",
-            "--about-us-stroke": "1px white",
+            "--about-us-fill-color": "white",
+            "--about-us-stroke": "none",
           } as React.CSSProperties
         }
       >
@@ -746,7 +739,6 @@ const LandingPage: FC = () => {
                       {
                         fontFamily: "serif",
                         transform: `var(--about-us-letter-${index}-transform)`,
-                        opacity: `var(--about-us-letter-${index}-opacity, 1)`,
                         color: "var(--about-us-fill-color)",
                         WebkitTextStroke: "var(--about-us-stroke)",
                       } as React.CSSProperties

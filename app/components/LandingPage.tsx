@@ -51,7 +51,6 @@ interface LayoutState {
   aboutUsTop: number;
 }
 
-// NOTE: I've kept your AboutUsLetters component as it's a good refactor.
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   <>
     {letters.map((letter, index) => {
@@ -128,7 +127,6 @@ const LandingPage: FC = () => {
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
   const textMaskContainerRef = useRef<HTMLDivElement>(null);
-  // NOTE: Removed solidTextContainerRef, it's no longer needed.
   const [edgeProgress, setEdgeProgress] = useState<number>(0);
   const [partnersProgress, setPartnersProgress] = useState<number>(0);
   const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -275,27 +273,17 @@ const LandingPage: FC = () => {
         let whiteOverlayOpacity = 0;
 
         if (assemblyProgress < 1) {
-          // Phase 1: Text is assembling, solid white, no video effects yet.
           fillColor = "white";
           stroke = "none";
         } else if (videoFadeProgress < 1) {
-          // Phase 2: The video reveal.
           fillColor = "white";
           stroke = "none";
           textContainerMixBlendMode = "multiply";
           textContainerBackground = "black";
           textContainerBoxShadow = "0 0 20px 20px black";
           videoOpacity = 1;
-
-          // --- START: MODIFIED LOGIC ---
-          // This creates the 1 -> 0 -> 1 curve for the white overlay.
-          // At progress=0, it's 1 (fully white).
-          // At progress=0.5, it's 0 (full video color).
-          // At progress=1, it's 1 (fully white again).
           whiteOverlayOpacity = 2 * Math.abs(videoFadeProgress - 0.5);
-          // --- END: MODIFIED LOGIC ---
-
-          const starFadeStartPoint = 0.9; // Stars can still fade out at the end.
+          const starFadeStartPoint = 0.9;
           const starFadeProgress = clamp(
             (videoFadeProgress - starFadeStartPoint) /
               (1.0 - starFadeStartPoint),
@@ -304,7 +292,6 @@ const LandingPage: FC = () => {
           );
           starfieldOpacity = 1 - starFadeProgress;
         } else {
-          // Phase 3: Text is solid white and rising.
           fillColor = "white";
           stroke = "none";
           textContainerMixBlendMode = "normal";
@@ -338,7 +325,7 @@ const LandingPage: FC = () => {
           : y_pos_after_rise_starts;
 
         const initial_scale = 1.0;
-        const final_scale = 0.15;
+        const final_scale = 0.02;
         const containerScale = isBeforeRise
           ? initial_scale
           : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
@@ -746,7 +733,7 @@ const LandingPage: FC = () => {
                 className="absolute top-0 left-0 w-full h-full object-cover"
                 style={{ opacity: 0 }}
               >
-                <source src="/videos/U.mp4" type="video/mp4" />
+                <source src="/videos/N2.mp4" type="video/mp4" />
               </video>
               <div
                 ref={whiteOverlayRef}
@@ -761,8 +748,6 @@ const LandingPage: FC = () => {
             >
               <AboutUsLetters letters={lettersWithSpaces} />
             </div>
-
-            {/* NOTE: solidTextContainerRef is removed. It's no longer needed with the new overlay logic. */}
 
             <div
               ref={starfieldOverlayRef}
@@ -822,7 +807,7 @@ const LandingPage: FC = () => {
           </div>
         </div>
 
-        <div ref={aboutUsSectionWrapperRef} style={{ height: "540vh" }}>
+        <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
           <AboutUsSection progress={aboutUsProgress} />
         </div>
       </div>

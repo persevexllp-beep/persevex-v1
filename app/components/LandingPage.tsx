@@ -51,6 +51,33 @@ interface LayoutState {
   aboutUsTop: number;
 }
 
+// NOTE: I've kept your AboutUsLetters component as it's a good refactor.
+const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
+  <>
+    {letters.map((letter, index) => {
+      if (letter === " ") {
+        return <div key={index} className="w-8 md:w-12" />;
+      }
+      return (
+        <h2
+          key={index}
+          className="relative text-[20vw] md:text-[16vw] lg:text-[200px] font-black leading-none"
+          style={
+            {
+              fontFamily: "serif",
+              transform: `var(--about-us-letter-${index}-transform)`,
+              color: "var(--about-us-fill-color)",
+              WebkitTextStroke: "var(--about-us-stroke)",
+            } as React.CSSProperties
+          }
+        >
+          {letter}
+        </h2>
+      );
+    })}
+  </>
+);
+
 const AnimationController: FC<AnimationControllerProps> = ({
   watermarkProgressRef,
 }) => {
@@ -101,6 +128,7 @@ const LandingPage: FC = () => {
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
   const textMaskContainerRef = useRef<HTMLDivElement>(null);
+  // NOTE: Removed solidTextContainerRef, it's no longer needed.
   const [edgeProgress, setEdgeProgress] = useState<number>(0);
   const [partnersProgress, setPartnersProgress] = useState<number>(0);
   const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -237,8 +265,8 @@ const LandingPage: FC = () => {
           1
         );
 
-        let fillColor = "white"; // CHANGED: Always keep letters white
-        let stroke = "none"; // CHANGED: Never add stroke outline
+        let fillColor = "white";
+        let stroke = "none";
         let textContainerMixBlendMode = "normal";
         let textContainerBackground = "transparent";
         let textContainerBoxShadow = "none";
@@ -247,10 +275,11 @@ const LandingPage: FC = () => {
         let whiteOverlayOpacity = 0;
 
         if (assemblyProgress < 1) {
-          // CHANGED: Keep letters solid white throughout assembly
+          // Phase 1: Text is assembling, solid white, no video effects yet.
           fillColor = "white";
           stroke = "none";
         } else if (videoFadeProgress < 1) {
+          // Phase 2: The video reveal.
           fillColor = "white";
           stroke = "none";
           textContainerMixBlendMode = "multiply";
@@ -258,7 +287,15 @@ const LandingPage: FC = () => {
           textContainerBoxShadow = "0 0 20px 20px black";
           videoOpacity = 1;
 
-          const starFadeStartPoint = 0.9;
+          // --- START: MODIFIED LOGIC ---
+          // This creates the 1 -> 0 -> 1 curve for the white overlay.
+          // At progress=0, it's 1 (fully white).
+          // At progress=0.5, it's 0 (full video color).
+          // At progress=1, it's 1 (fully white again).
+          whiteOverlayOpacity = 2 * Math.abs(videoFadeProgress - 0.5);
+          // --- END: MODIFIED LOGIC ---
+
+          const starFadeStartPoint = 0.9; // Stars can still fade out at the end.
           const starFadeProgress = clamp(
             (videoFadeProgress - starFadeStartPoint) /
               (1.0 - starFadeStartPoint),
@@ -266,9 +303,8 @@ const LandingPage: FC = () => {
             1
           );
           starfieldOpacity = 1 - starFadeProgress;
-
-          whiteOverlayOpacity = videoFadeProgress;
         } else {
+          // Phase 3: Text is solid white and rising.
           fillColor = "white";
           stroke = "none";
           textContainerMixBlendMode = "normal";
@@ -358,19 +394,15 @@ const LandingPage: FC = () => {
             0,
             1
           );
-          
-          // CHANGED: Remove opacity animation - letters stay fully visible
+
           const translateY = (1 - letterProgress) * 20;
           const scale = 0.5 + letterProgress * 0.5;
-          
+
           if (textContainerRef.current) {
             textContainerRef.current.style.setProperty(
               `--about-us-letter-${index}-transform`,
               `translateY(${translateY}vh) scale(${scale})`
             );
-            
-            // CHANGED: Remove opacity control entirely
-            // No longer setting --about-us-letter-${index}-opacity
           }
           timeCursor += unitDuration;
         });
@@ -412,6 +444,8 @@ const LandingPage: FC = () => {
       cancelAnimationFrame(animationFrameId);
     };
   }, [layout, lettersWithSpaces]);
+
+  // ... (the rest of your useEffect hooks remain unchanged)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -702,7 +736,6 @@ const LandingPage: FC = () => {
               isolation: "isolate",
             }}
           >
-            {/* Layer 1: Video Background and White Overlay */}
             <div className="absolute inset-0 w-full h-full">
               <video
                 ref={videoRef}
@@ -722,35 +755,15 @@ const LandingPage: FC = () => {
               />
             </div>
 
-            {/* Layer 2: "ABOUT US" Text */}
             <div
               ref={textMaskContainerRef}
               className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
             >
-              {lettersWithSpaces.map((letter, index) => {
-                if (letter === " ") {
-                  return <div key={index} className="w-8 md:w-12" />;
-                }
-                return (
-                  <h2
-                    key={index}
-                    className="relative text-[20vw] md:text-[16vw] lg:text-[200px] font-black leading-none"
-                    style={
-                      {
-                        fontFamily: "serif",
-                        transform: `var(--about-us-letter-${index}-transform)`,
-                        color: "var(--about-us-fill-color)",
-                        WebkitTextStroke: "var(--about-us-stroke)",
-                      } as React.CSSProperties
-                    }
-                  >
-                    {letter}
-                  </h2>
-                );
-              })}
+              <AboutUsLetters letters={lettersWithSpaces} />
             </div>
 
-            {/* Layer 3: SimpleStars Overlay */}
+            {/* NOTE: solidTextContainerRef is removed. It's no longer needed with the new overlay logic. */}
+
             <div
               ref={starfieldOverlayRef}
               className="absolute inset-0 pointer-events-none"

@@ -432,8 +432,6 @@ const LandingPage: FC = () => {
     };
   }, [layout, lettersWithSpaces]);
 
-  // ... (the rest of your useEffect hooks remain unchanged)
-
   useEffect(() => {
     const handleScroll = () => {
       if (layout.coursesTop === 0) return;
@@ -450,10 +448,15 @@ const LandingPage: FC = () => {
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
+      
+      // --- CORRECTED LOGIC ---
       if (currentScroll >= aboutUsWatermarkAnimStart) {
-        const progress =
+        const progress = clamp(
           (currentScroll - aboutUsWatermarkAnimStart) /
-          aboutUsWatermarkAnimDuration;
+            aboutUsWatermarkAnimDuration,
+          0,
+          1
+        );
         newWatermarkProgress = 6 + progress * 5;
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
         newWatermarkProgress =
@@ -494,6 +497,7 @@ const LandingPage: FC = () => {
           (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
         );
       }
+      // --- END CORRECTED LOGIC ---
 
       targetProgressRef.current = newWatermarkProgress;
 
@@ -526,11 +530,15 @@ const LandingPage: FC = () => {
             ((testimonialsAnimationDurationVh / 100) * viewportHeight)
         )
       );
+
+      const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
+      const aboutUsContentAnimDuration = viewportHeight * 4;
+
       setAboutUsProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - (aboutUsTop + viewportHeight * 4)) /
-            viewportHeight
+        clamp(
+          (currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration,
+          0,
+          1
         )
       );
     };

@@ -101,7 +101,6 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
   );
 };
 
-// --- THIS IS THE NEW, SIMPLE STICKY HEADER COMPONENT ---
 const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
   <div
     className="fixed top-0 left-0 w-full px-4 md:px-8 lg:px-16 py-6 flex items-center justify-between z-50 pointer-events-none"
@@ -111,7 +110,6 @@ const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
     }}
   >
     <div className="pointer-events-auto">
-      {/* This mimics the final state of the animated "ABOUT US" text */}
       <h2
         className="text-white text-xl md:text-2xl font-black"
         style={{ fontFamily: "serif" }}
@@ -145,6 +143,8 @@ const LandingPage: FC = () => {
   const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
   const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
   const [stackingProgress, setStackingProgress] = useState<number>(0);
+  // --- 1. ADD NEW STATE FOR THE CASCADING ANIMATION ---
+  const [cascadingProgress, setCascadingProgress] = useState<number>(0);
   const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
   const lastScrollTime = useRef<number>(0);
   const isInitialLoad = useRef<boolean>(true);
@@ -304,11 +304,11 @@ const LandingPage: FC = () => {
         const initial_scale = 1.0;
         const final_scale = 0.45;
         const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
-const animatedTextOpacity = riseProgress >= 1 ? 0 : 1;
+        const animatedTextOpacity = riseProgress >= 1 ? 0 : 1;
 
 
         textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
-textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
+        textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
 
 
         if (textMaskContainerRef.current) {
@@ -406,13 +406,33 @@ textContainerRef.current.style.setProperty("--animated-text-opacity", `${animate
       const aboutUsContentAnimDuration = viewportHeight * 4;
       setAboutUsProgress(clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1));
       
-      let newStackingProgress = 0;
-      if (cardStackingWrapperRef.current && cardStackingTop > 0) {
+      // --- 2. MODIFIED LOGIC FOR TWO-PHASE ANIMATION ---
+       let newStackingProgress = 0;
+      let newCascadingProgress = 0;
+
+       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
-        const duration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
-        newStackingProgress = clamp((currentScroll - start) / duration, 0, 1);
+        const totalDuration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
+        
+        // Stacking happens faster, over the first 30% of the scroll area.
+        const stackingDuration = totalDuration * 0.3; 
+        
+        const cascadeStart = start + stackingDuration;
+        
+        // Stacking progress is clamped between 0 and 1.
+        newStackingProgress = clamp((currentScroll - start) / stackingDuration, 0, 1);
+
+        // Cascading progress starts after stacking is complete.
+        // It is NOT clamped, allowing it to go beyond 1.
+        // We divide by viewportHeight to control the intensity:
+        // for every viewport-height scrolled, progress increases by 1.0.
+        if (currentScroll > cascadeStart) {
+          newCascadingProgress = (currentScroll - cascadeStart) / viewportHeight;
+        }
       }
       setStackingProgress(newStackingProgress);
+      setCascadingProgress(newCascadingProgress);
+      // --- END OF UPDATED LOGIC ---
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -487,40 +507,38 @@ textContainerRef.current.style.setProperty("--animated-text-opacity", `${animate
         <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--recognized-by-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Validation</h2>
         <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--about-us-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Our Story</h2>
         
-
-<div
-  className="absolute left-1/2 z-[-4]"
-  style={
-    {
-      bottom: "1.5rem",
-      transform: "var(--about-us-container-transform, translateX(-50%))",
-      whiteSpace: "nowrap",
-    } as React.CSSProperties
-  }
->
-  <div
-    className="relative"
-    style={{
-      // Changed: Use the new opacity variable instead of showStickyHeader
-      opacity: "calc(var(--about-us-opacity) * 2.5 * var(--animated-text-opacity, 1))",
-      transition: 'opacity 0.3s ease-out',
-      isolation: "isolate",
-    }}
-  >
-    <div className="absolute inset-0 w-full h-full">
-      <video ref={videoRef} autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover" style={{ opacity: 0 }} >
-        <source src="/videos/N2.mp4" type="video/mp4" />
-      </video>
-      <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }}/>
-    </div>
-    <div ref={textMaskContainerRef} className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full">
-      <AboutUsLetters letters={lettersWithSpaces} />
-    </div>
-    <div ref={starfieldOverlayRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0, overflow: "hidden" }} >
-      <SimpleStars />
-    </div>
-  </div>
-</div>
+        <div
+          className="absolute left-1/2 z-[-4]"
+          style={
+            {
+              bottom: "1.5rem",
+              transform: "var(--about-us-container-transform, translateX(-50%))",
+              whiteSpace: "nowrap",
+            } as React.CSSProperties
+          }
+        >
+          <div
+            className="relative"
+            style={{
+              opacity: "calc(var(--about-us-opacity) * 2.5 * var(--animated-text-opacity, 1))",
+              transition: 'opacity 0.3s ease-out',
+              isolation: "isolate",
+            }}
+          >
+            <div className="absolute inset-0 w-full h-full">
+              <video ref={videoRef} autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover" style={{ opacity: 0 }} >
+                <source src="/videos/N2.mp4" type="video/mp4" />
+              </video>
+              <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }}/>
+            </div>
+            <div ref={textMaskContainerRef} className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full">
+              <AboutUsLetters letters={lettersWithSpaces} />
+            </div>
+            <div ref={starfieldOverlayRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0, overflow: "hidden" }} >
+              <SimpleStars />
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="relative z-20">
@@ -559,7 +577,11 @@ textContainerRef.current.style.setProperty("--animated-text-opacity", `${animate
         <div ref={cardStackingWrapperRef} style={{ height: "150vh" }}>
           <div className="sticky top-0 h-screen flex items-center justify-center">
             <div className="w-full text-white text-sm" style={{ opacity: extendedCompProgress }}>
-              <AboutUsExtendedComp stackingProgress={stackingProgress} />
+              {/* --- 3. PASS BOTH PROPS TO THE COMPONENT --- */}
+              <AboutUsExtendedComp
+                stackingProgress={stackingProgress}
+                cascadingProgress={cascadingProgress}
+              />
             </div>
           </div>
         </div>

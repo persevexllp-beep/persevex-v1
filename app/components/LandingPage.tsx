@@ -7,6 +7,7 @@ import {
   useState,
   FC,
   MutableRefObject,
+  useMemo,
 } from "react";
 import * as THREE from "three";
 import StarField from "./StarField";
@@ -20,6 +21,7 @@ import { testimonialsData } from "../constants/TestimonialsData";
 import RecognizedBySection from "./RecognizedBySection";
 import AboutUsSection from "./AboutUs";
 import SimpleStars from "./SimpleStars";
+import AboutUsExtendedComp from "./AboutUsExtendedComp";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
@@ -114,6 +116,7 @@ const AnimationController: FC<AnimationControllerProps> = ({
 };
 
 const LandingPage: FC = () => {
+  const [headerProgress, setHeaderProgress] = useState<number>(0);
   const watermarkProgressRef = useRef<number>(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
@@ -136,7 +139,7 @@ const LandingPage: FC = () => {
   const lastScrollTime = useRef<number>(0);
   const isInitialLoad = useRef<boolean>(true);
   const aboutUsWord = "ABOUT US";
-  const lettersWithSpaces = aboutUsWord.split("");
+  const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
   const [layout, setLayout] = useState<LayoutState>({
     coursesTop: 0,
     edgeTop: 0,
@@ -145,12 +148,18 @@ const LandingPage: FC = () => {
     recognizedByTop: 0,
     aboutUsTop: 0,
   });
-  const formattedTestimonials: Testimonial[] = testimonialsData.map((t) => ({
-    quote: t.quote,
-    name: t.name,
-    designation: t.title,
-    src: t.image,
-  }));
+
+  const formattedTestimonials: Testimonial[] = useMemo(
+    () =>
+      testimonialsData.map((t) => ({
+        quote: t.quote,
+        name: t.name,
+        designation: t.title,
+        src: t.image,
+      })),
+    []
+  );
+
   const testimonialsAnimationDurationVh =
     150 * (formattedTestimonials.length - 1);
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
@@ -200,7 +209,7 @@ const LandingPage: FC = () => {
       );
       watermarkProgressRef.current = targetProgressRef.current;
       const currentProgress = smoothedProgressRef.current;
-
+      setHeaderProgress(currentProgress);
       if (textContainerRef.current && window.innerHeight) {
         let persevexOpacity = 0,
           coursesOpacity = 0,
@@ -448,8 +457,7 @@ const LandingPage: FC = () => {
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
-      
-      // --- CORRECTED LOGIC ---
+
       if (currentScroll >= aboutUsWatermarkAnimStart) {
         const progress = clamp(
           (currentScroll - aboutUsWatermarkAnimStart) /
@@ -497,7 +505,6 @@ const LandingPage: FC = () => {
           (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
         );
       }
-      // --- END CORRECTED LOGIC ---
 
       targetProgressRef.current = newWatermarkProgress;
 
@@ -536,7 +543,8 @@ const LandingPage: FC = () => {
 
       setAboutUsProgress(
         clamp(
-          (currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration,
+          (currentScroll - aboutUsContentAnimStart) /
+            aboutUsContentAnimDuration,
           0,
           1
         )
@@ -611,6 +619,8 @@ const LandingPage: FC = () => {
     formattedTestimonials.length,
     testimonialsAnimationDurationVh,
   ]);
+
+  const extendedCompProgress = clamp((aboutUsProgress - 0.5) / 0.5, 0, 1);
 
   return (
     <main>
@@ -816,7 +826,18 @@ const LandingPage: FC = () => {
         </div>
 
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
-          <AboutUsSection progress={aboutUsProgress} />
+          <AboutUsSection />
+        </div>
+
+        <div
+          className="absolute bottom-80 flex items-center justify-center ml-24 h- text-white text-sm"
+          style={{
+            opacity: extendedCompProgress,
+            transform: `translateY(${(1 - extendedCompProgress) * 120}px)`,
+            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
+          }}
+        >
+          <AboutUsExtendedComp />
         </div>
       </div>
     </main>

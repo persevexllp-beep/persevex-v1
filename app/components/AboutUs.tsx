@@ -1,3 +1,4 @@
+
 "use client";
 import React from "react";
 
@@ -7,7 +8,7 @@ const AboutUsSection = () => {
  
 
   return (
-    <div>
+    <div className="bg-green-700">
       
     </div>
   );

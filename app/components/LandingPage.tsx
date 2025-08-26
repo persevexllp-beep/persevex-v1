@@ -28,22 +28,17 @@ const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
 
 interface DustMaterial extends THREE.ShaderMaterial {
-  uniforms: {
-    uOpacity: { value: number };
-  };
+  uniforms: { uOpacity: { value: number } };
 }
-
 interface AnimationControllerProps {
   watermarkProgressRef: MutableRefObject<number>;
 }
-
 interface Testimonial {
   quote: string;
   name: string;
   designation: string;
   src: string;
 }
-
 interface LayoutState {
   coursesTop: number;
   edgeTop: number;
@@ -51,14 +46,12 @@ interface LayoutState {
   testimonialsTop: number;
   recognizedByTop: number;
   aboutUsTop: number;
+  cardStackingTop: number;
 }
-
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   <>
     {letters.map((letter, index) => {
-      if (letter === " ") {
-        return <div key={index} className="w-8 md:w-12" />;
-      }
+      if (letter === " ") return <div key={index} className="w-8 md:w-12" />;
       return (
         <h2
           key={index}
@@ -78,14 +71,9 @@ const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
     })}
   </>
 );
-
-const AnimationController: FC<AnimationControllerProps> = ({
-  watermarkProgressRef,
-}) => {
+const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef }) => {
   const animatedProgress = useRef<number>(0);
-  const dustPlaneRef =
-    useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
-
+  const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
   useFrame(() => {
     animatedProgress.current = THREE.MathUtils.lerp(
       animatedProgress.current,
@@ -93,7 +81,6 @@ const AnimationController: FC<AnimationControllerProps> = ({
       0.05
     );
     const currentProgress = animatedProgress.current;
-
     if (dustPlaneRef.current) {
       let dustOpacity = 1.0;
       if (currentProgress > 1.0) {
@@ -105,7 +92,6 @@ const AnimationController: FC<AnimationControllerProps> = ({
       }
     }
   });
-
   return (
     <>
       <color attach="background" args={["black"]} />
@@ -115,8 +101,31 @@ const AnimationController: FC<AnimationControllerProps> = ({
   );
 };
 
+// --- THIS IS THE NEW, SIMPLE STICKY HEADER COMPONENT ---
+const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
+  <div
+    className="fixed top-0 left-0 w-full px-4 md:px-8 lg:px-16 py-6 flex items-center justify-between z-50 pointer-events-none"
+    style={{
+      opacity: show ? 1 : 0,
+      transition: "opacity 0.5s ease-in-out",
+    }}
+  >
+    <div className="pointer-events-auto">
+      {/* This mimics the final state of the animated "ABOUT US" text */}
+      <h2
+        className="text-white text-xl md:text-2xl font-black"
+        style={{ fontFamily: "serif" }}
+      >
+        ABOUT US
+      </h2>
+    </div>
+  </div>
+);
+
+
 const LandingPage: FC = () => {
   const [headerProgress, setHeaderProgress] = useState<number>(0);
+  const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
   const watermarkProgressRef = useRef<number>(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
@@ -126,6 +135,7 @@ const LandingPage: FC = () => {
   const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
   const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
   const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
+  const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
@@ -134,8 +144,8 @@ const LandingPage: FC = () => {
   const [partnersProgress, setPartnersProgress] = useState<number>(0);
   const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
   const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
-  const [targetTestimonialIndex, setTargetTestimonialIndex] =
-    useState<number>(0);
+  const [stackingProgress, setStackingProgress] = useState<number>(0);
+  const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
   const lastScrollTime = useRef<number>(0);
   const isInitialLoad = useRef<boolean>(true);
   const aboutUsWord = "ABOUT US";
@@ -147,21 +157,20 @@ const LandingPage: FC = () => {
     testimonialsTop: 0,
     recognizedByTop: 0,
     aboutUsTop: 0,
+    cardStackingTop: 0,
   });
 
   const formattedTestimonials: Testimonial[] = useMemo(
-    () =>
-      testimonialsData.map((t) => ({
-        quote: t.quote,
-        name: t.name,
-        designation: t.title,
-        src: t.image,
-      })),
+    () => testimonialsData.map((t) => ({
+      quote: t.quote,
+      name: t.name,
+      designation: t.title,
+      src: t.image,
+    })),
     []
   );
 
-  const testimonialsAnimationDurationVh =
-    150 * (formattedTestimonials.length - 1);
+  const testimonialsAnimationDurationVh = 150 * (formattedTestimonials.length - 1);
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
   useEffect(() => {
@@ -172,7 +181,8 @@ const LandingPage: FC = () => {
         partnersSectionWrapperRef.current &&
         testimonialsSectionWrapperRef.current &&
         recognizedBySectionWrapperRef.current &&
-        aboutUsSectionWrapperRef.current
+        aboutUsSectionWrapperRef.current &&
+        cardStackingWrapperRef.current
       ) {
         setLayout({
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
@@ -181,6 +191,7 @@ const LandingPage: FC = () => {
           testimonialsTop: testimonialsSectionWrapperRef.current.offsetTop,
           recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
           aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
+          cardStackingTop: cardStackingWrapperRef.current.offsetTop,
         });
       }
     };
@@ -211,13 +222,7 @@ const LandingPage: FC = () => {
       const currentProgress = smoothedProgressRef.current;
       setHeaderProgress(currentProgress);
       if (textContainerRef.current && window.innerHeight) {
-        let persevexOpacity = 0,
-          coursesOpacity = 0,
-          ourEdgeOpacity = 0,
-          partnersOpacity = 0,
-          trustOpacity = 0,
-          recognizedByOpacity = 0,
-          aboutUsOpacity = 0;
+        let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0;
 
         if (currentProgress < 1.0) {
           persevexOpacity = (1 - currentProgress) * 0.4;
@@ -256,114 +261,68 @@ const LandingPage: FC = () => {
         const riseStart = videoFadeEnd;
         const riseDuration = 1.0;
 
-        const assemblyProgress = clamp(
-          (currentProgress - assemblyStart) / assemblyDuration,
-          0,
-          1
-        );
-        const videoFadeProgress = clamp(
-          (currentProgress - videoFadeStart) / videoFadeDuration,
-          0,
-          1
-        );
-        const riseProgress = clamp(
-          (currentProgress - riseStart) / riseDuration,
-          0,
-          1
-        );
+        const assemblyProgress = clamp((currentProgress - assemblyStart) / assemblyDuration, 0, 1);
+        const videoFadeProgress = clamp((currentProgress - videoFadeStart) / videoFadeDuration, 0, 1);
+        const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
+        
+        setShowStickyHeader(riseProgress >= 1);
 
-        let fillColor = "white";
-        let stroke = "none";
-        let textContainerMixBlendMode = "normal";
-        let textContainerBackground = "transparent";
-        let textContainerBoxShadow = "none";
-        let videoOpacity = 0;
-        let starfieldOpacity = 0;
-        let whiteOverlayOpacity = 0;
+        let fillColor = "white", stroke = "none", textContainerMixBlendMode = "normal", textContainerBackground = "transparent", textContainerBoxShadow = "none", videoOpacity = 0, starfieldOpacity = 0, whiteOverlayOpacity = 0;
 
         if (assemblyProgress < 1) {
-          fillColor = "white";
-          stroke = "none";
+          fillColor = "white"; stroke = "none";
         } else if (videoFadeProgress < 1) {
-          fillColor = "white";
-          stroke = "none";
+          fillColor = "white"; stroke = "none";
           textContainerMixBlendMode = "multiply";
           textContainerBackground = "black";
           textContainerBoxShadow = "0 0 20px 20px black";
           videoOpacity = 1;
           whiteOverlayOpacity = 2 * Math.abs(videoFadeProgress - 0.5);
           const starFadeStartPoint = 0.9;
-          const starFadeProgress = clamp(
-            (videoFadeProgress - starFadeStartPoint) /
-              (1.0 - starFadeStartPoint),
-            0,
-            1
-          );
+          const starFadeProgress = clamp((videoFadeProgress - starFadeStartPoint) / (1.0 - starFadeStartPoint), 0, 1);
           starfieldOpacity = 1 - starFadeProgress;
         } else {
-          fillColor = "white";
-          stroke = "none";
+          fillColor = "white"; stroke = "none";
           textContainerMixBlendMode = "normal";
           textContainerBackground = "transparent";
           textContainerBoxShadow = "none";
-          videoOpacity = 0;
-          whiteOverlayOpacity = 0;
-          starfieldOpacity = 0;
+          videoOpacity = 0; whiteOverlayOpacity = 0; starfieldOpacity = 0;
         }
 
         const isBeforeRise = currentProgress < riseStart;
         const centerProgress = isBeforeRise ? assemblyProgress : 1;
         const initialY = 4;
         const centerTargetVh = -35;
-        const topTargetVh = -90;
+        const topTargetVh = -68;
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
-        const y_pos_before_rise = THREE.MathUtils.lerp(
-          initialY * 16,
-          centerTargetPx,
-          centerProgress
-        );
-        const y_pos_after_rise_starts = THREE.MathUtils.lerp(
-          centerTargetPx,
-          topTargetPx,
-          riseProgress
-        );
-        const containerTranslateY = isBeforeRise
-          ? y_pos_before_rise
-          : y_pos_after_rise_starts;
+        const y_pos_before_rise = THREE.MathUtils.lerp(initialY * 16, centerTargetPx, centerProgress);
+        const y_pos_after_rise_starts = THREE.MathUtils.lerp(centerTargetPx, topTargetPx, riseProgress);
+        const containerTranslateY = isBeforeRise ? y_pos_before_rise : y_pos_after_rise_starts;
 
         const initial_scale = 1.0;
-        const final_scale = 0.02;
-        const containerScale = isBeforeRise
-          ? initial_scale
-          : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
+        const final_scale = 0.45;
+        const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
+const animatedTextOpacity = riseProgress >= 1 ? 0 : 1;
 
-        textContainerRef.current.style.setProperty(
-          "--about-us-container-transform",
-          `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`
-        );
+
+        textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
+textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
+
 
         if (textMaskContainerRef.current) {
-          (textMaskContainerRef.current.style as any).mixBlendMode =
-            textContainerMixBlendMode;
-          textMaskContainerRef.current.style.background =
-            textContainerBackground;
+          (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
+          textMaskContainerRef.current.style.background = textContainerBackground;
           textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
         }
 
-        textContainerRef.current.style.setProperty(
-          "--about-us-fill-color",
-          fillColor
-        );
+        textContainerRef.current.style.setProperty("--about-us-fill-color", fillColor);
         textContainerRef.current.style.setProperty("--about-us-stroke", stroke);
-
-        if (videoRef.current)
-          videoRef.current.style.opacity = `${videoOpacity}`;
-        if (starfieldOverlayRef.current)
-          starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
-        if (whiteOverlayRef.current)
-          whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
+        
+        if (videoRef.current) videoRef.current.style.opacity = `${videoOpacity}`;
+        if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+        if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
 
         const numLetters = aboutUsWord.replace(/ /g, "").length;
         const numSpaces = aboutUsWord.split(" ").length - 1;
@@ -371,68 +330,30 @@ const LandingPage: FC = () => {
         const totalAnimationUnits = numLetters + numSpaces * spacePauseFactor;
         const unitDuration = 1.0 / totalAnimationUnits;
         const animationWindow = unitDuration * 5;
-        const totalStaggerDuration =
-          (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
-        const compressionFactor =
-          totalStaggerDuration > 0
-            ? (1.0 - animationWindow) / totalStaggerDuration
-            : 1;
+        const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
+        const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
         let timeCursor = 0;
 
         lettersWithSpaces.forEach((char, index) => {
-          if (char === " ") {
-            timeCursor += unitDuration * spacePauseFactor;
-            return;
-          }
+          if (char === " ") { timeCursor += unitDuration * spacePauseFactor; return; }
           const start = timeCursor * compressionFactor;
-          const letterProgress = clamp(
-            (assemblyProgress - start) / animationWindow,
-            0,
-            1
-          );
-
+          const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
           const translateY = (1 - letterProgress) * 20;
           const scale = 0.5 + letterProgress * 0.5;
-
           if (textContainerRef.current) {
-            textContainerRef.current.style.setProperty(
-              `--about-us-letter-${index}-transform`,
-              `translateY(${translateY}vh) scale(${scale})`
-            );
+            textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
           }
           timeCursor += unitDuration;
         });
 
-        textContainerRef.current.style.setProperty(
-          "--persevex-opacity",
-          `${clamp(persevexOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--courses-opacity",
-          `${clamp(coursesOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--our-edge-opacity",
-          `${clamp(ourEdgeOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--partners-opacity",
-          `${clamp(partnersOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--trust-opacity",
-          `${clamp(trustOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--recognized-by-opacity",
-          `${clamp(recognizedByOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--about-us-opacity",
-          `${clamp(aboutUsOpacity, 0, 0.4)}`
-        );
+        textContainerRef.current.style.setProperty("--persevex-opacity", `${clamp(persevexOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--courses-opacity", `${clamp(coursesOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--our-edge-opacity", `${clamp(ourEdgeOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--partners-opacity", `${clamp(partnersOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--trust-opacity", `${clamp(trustOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--recognized-by-opacity", `${clamp(recognizedByOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--about-us-opacity", `${clamp(aboutUsOpacity, 0, 0.4)}`);
       }
-
       animationFrameId = requestAnimationFrame(animationLoop);
     };
     animationLoop();
@@ -446,109 +367,52 @@ const LandingPage: FC = () => {
       if (layout.coursesTop === 0) return;
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
-      const {
-        coursesTop,
-        edgeTop,
-        partnersTop,
-        testimonialsTop,
-        recognizedByTop,
-        aboutUsTop,
-      } = layout;
+      const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop, cardStackingTop } = layout;
+
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
-
+      
       if (currentScroll >= aboutUsWatermarkAnimStart) {
-        const progress = clamp(
-          (currentScroll - aboutUsWatermarkAnimStart) /
-            aboutUsWatermarkAnimDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration, 0, 1);
         newWatermarkProgress = 6 + progress * 5;
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
-        newWatermarkProgress =
-          4 +
-          Math.min(
-            1,
-            (currentScroll - (recognizedByTop - viewportHeight)) /
-              viewportHeight
-          );
+        newWatermarkProgress = 4 + Math.min(1, (currentScroll - (recognizedByTop - viewportHeight)) / viewportHeight);
       } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
-        newWatermarkProgress =
-          3 +
-          Math.min(
-            1,
-            (currentScroll - (testimonialsTop - viewportHeight)) /
-              (viewportHeight / 2)
-          );
+        newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / (viewportHeight / 2));
       } else if (currentScroll >= partnersTop) {
-        newWatermarkProgress =
-          2 +
-          Math.min(
-            1,
-            (currentScroll - partnersTop) /
-              (testimonialsTop - viewportHeight - partnersTop)
-          );
+        newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (testimonialsTop - viewportHeight - partnersTop));
       } else if (currentScroll >= edgeTop - viewportHeight) {
-        newWatermarkProgress =
-          1 +
-          Math.min(
-            1,
-            (currentScroll - (edgeTop - viewportHeight)) / viewportHeight
-          );
+        newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
       } else if (currentScroll >= coursesTop - viewportHeight) {
-        newWatermarkProgress = Math.min(
-          1,
-          (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
-        );
+        newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
       }
 
       targetProgressRef.current = newWatermarkProgress;
-
+      
       if (heroWrapperRef.current) {
-        const heroProgress = Math.min(
-          1,
-          currentScroll / (viewportHeight * 0.8)
-        );
+        const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
         heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
-        heroWrapperRef.current.style.transform = `translateY(${
-          heroProgress * -250
-        }px)`;
+        heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
       }
-      setEdgeProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)
-        )
-      );
-      setPartnersProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)
-        )
-      );
-      setTestimonialProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - testimonialsTop) /
-            ((testimonialsAnimationDurationVh / 100) * viewportHeight)
-        )
-      );
 
+      setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
+      setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)));
+      setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
+      
       const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
       const aboutUsContentAnimDuration = viewportHeight * 4;
-
-      setAboutUsProgress(
-        clamp(
-          (currentScroll - aboutUsContentAnimStart) /
-            aboutUsContentAnimDuration,
-          0,
-          1
-        )
-      );
+      setAboutUsProgress(clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1));
+      
+      let newStackingProgress = 0;
+      if (cardStackingWrapperRef.current && cardStackingTop > 0) {
+        const start = cardStackingTop;
+        const duration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
+        newStackingProgress = clamp((currentScroll - start) / duration, 0, 1);
+      }
+      setStackingProgress(newStackingProgress);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -562,28 +426,19 @@ const LandingPage: FC = () => {
       const top = layout.testimonialsTop;
       const bottom = top + wrapper.offsetHeight;
       const viewportHeight = window.innerHeight;
-      const isTestimonialSectionActive =
-        window.scrollY >= top && window.scrollY < bottom - viewportHeight;
+      const isTestimonialSectionActive = window.scrollY >= top && window.scrollY < bottom - viewportHeight;
       if (!isTestimonialSectionActive) return;
       const now = Date.now();
-      if (now - lastScrollTime.current < 1000) {
-        event.preventDefault();
-        return;
-      }
-      if (Math.abs(event.deltaY) < 20) {
-        event.preventDefault();
-        return;
-      }
+      if (now - lastScrollTime.current < 1000) { event.preventDefault(); return; }
+      if (Math.abs(event.deltaY) < 20) { event.preventDefault(); return; }
       const maxIndex = formattedTestimonials.length - 1;
       const scrollDirection = event.deltaY;
       if (scrollDirection < 0 && targetTestimonialIndex === 0) return;
       if (scrollDirection > 0 && targetTestimonialIndex === maxIndex) return;
       event.preventDefault();
       let newIndex = targetTestimonialIndex;
-      if (scrollDirection > 0 && targetTestimonialIndex < maxIndex)
-        newIndex = targetTestimonialIndex + 1;
-      else if (scrollDirection < 0 && targetTestimonialIndex > 0)
-        newIndex = targetTestimonialIndex - 1;
+      if (scrollDirection > 0 && targetTestimonialIndex < maxIndex) newIndex = targetTestimonialIndex + 1;
+      else if (scrollDirection < 0 && targetTestimonialIndex > 0) newIndex = targetTestimonialIndex - 1;
       if (newIndex !== targetTestimonialIndex) {
         lastScrollTime.current = now;
         setTargetTestimonialIndex(newIndex);
@@ -591,39 +446,27 @@ const LandingPage: FC = () => {
     };
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [
-    layout.testimonialsTop,
-    targetTestimonialIndex,
-    formattedTestimonials.length,
-  ]);
-
+  }, [layout.testimonialsTop, targetTestimonialIndex, formattedTestimonials.length]);
+  
   useEffect(() => {
-    if (isInitialLoad.current && layout.testimonialsTop > 0) {
-      isInitialLoad.current = false;
-      return;
-    }
+    if (isInitialLoad.current && layout.testimonialsTop > 0) { isInitialLoad.current = false; return; }
     if (layout.testimonialsTop === 0) return;
     const maxIndex = formattedTestimonials.length - 1;
     if (maxIndex <= 0) return;
-    const testimonialsAnimDurationPx =
-      (testimonialsAnimationDurationVh / 100) * window.innerHeight;
+    const testimonialsAnimDurationPx = (testimonialsAnimationDurationVh / 100) * window.innerHeight;
     const targetProgress = targetTestimonialIndex / maxIndex;
-    const targetScrollY =
-      layout.testimonialsTop + targetProgress * testimonialsAnimDurationPx;
+    const targetScrollY = layout.testimonialsTop + targetProgress * testimonialsAnimDurationPx;
     if (Math.abs(window.scrollY - targetScrollY) > 5) {
       window.scrollTo({ top: targetScrollY, behavior: "smooth" });
     }
-  }, [
-    targetTestimonialIndex,
-    layout.testimonialsTop,
-    formattedTestimonials.length,
-    testimonialsAnimationDurationVh,
-  ]);
-
-  const extendedCompProgress = clamp((aboutUsProgress - 0.5) / 0.5, 0, 1);
+  }, [targetTestimonialIndex, layout.testimonialsTop, formattedTestimonials.length, testimonialsAnimationDurationVh]);
+  
+  const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
 
   return (
     <main>
+      <StickyHeader show={showStickyHeader} />
+      
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
@@ -631,158 +474,57 @@ const LandingPage: FC = () => {
           </Suspense>
         </Canvas>
       </div>
-
+      
       <div
         ref={textContainerRef}
         className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-        style={
-          {
-            "--persevex-opacity": 0.4,
-            "--courses-opacity": 0,
-            "--our-edge-opacity": 0,
-            "--partners-opacity": 0,
-            "--trust-opacity": 0,
-            "--recognized-by-opacity": 0,
-            "--about-us-opacity": 0,
-            "--about-us-fill-color": "white",
-            "--about-us-stroke": "none",
-          } as React.CSSProperties
-        }
       >
-        <h2
-          className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--persevex-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Persevex
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--courses-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Courses
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--our-edge-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Our Edge
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--partners-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Partners
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--trust-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Trust
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--recognized-by-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Validation
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--about-us-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Our Story
-        </h2>
+        <h2 className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--persevex-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", }}>Persevex</h2>
+        <h2 className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--courses-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", }}>Courses</h2>
+        <h2 className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--our-edge-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Our Edge</h2>
+        <h2 className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--partners-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", }}>Partners</h2>
+        <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--trust-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", }}>Trust</h2>
+        <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--recognized-by-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Validation</h2>
+        <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--about-us-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Our Story</h2>
+        
 
-        <div
-          className="absolute left-1/2 z-[-4]"
-          style={
-            {
-              bottom: "1.5rem",
-              transform:
-                "var(--about-us-container-transform, translateX(-50%))",
-              whiteSpace: "nowrap",
-            } as React.CSSProperties
-          }
-        >
-          <div
-            className="relative"
-            style={{
-              opacity: "calc(var(--about-us-opacity) * 2.5)",
-              isolation: "isolate",
-            }}
-          >
-            <div className="absolute inset-0 w-full h-full">
-              <video
-                ref={videoRef}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute top-0 left-0 w-full h-full object-cover"
-                style={{ opacity: 0 }}
-              >
-                <source src="/videos/N2.mp4" type="video/mp4" />
-              </video>
-              <div
-                ref={whiteOverlayRef}
-                className="absolute inset-0 bg-white"
-                style={{ opacity: 0 }}
-              />
-            </div>
-
-            <div
-              ref={textMaskContainerRef}
-              className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-            >
-              <AboutUsLetters letters={lettersWithSpaces} />
-            </div>
-
-            <div
-              ref={starfieldOverlayRef}
-              className="absolute inset-0 pointer-events-none"
-              style={{ opacity: 0, overflow: "hidden" }}
-            >
-              <SimpleStars />
-            </div>
-          </div>
-        </div>
+<div
+  className="absolute left-1/2 z-[-4]"
+  style={
+    {
+      bottom: "1.5rem",
+      transform: "var(--about-us-container-transform, translateX(-50%))",
+      whiteSpace: "nowrap",
+    } as React.CSSProperties
+  }
+>
+  <div
+    className="relative"
+    style={{
+      // Changed: Use the new opacity variable instead of showStickyHeader
+      opacity: "calc(var(--about-us-opacity) * 2.5 * var(--animated-text-opacity, 1))",
+      transition: 'opacity 0.3s ease-out',
+      isolation: "isolate",
+    }}
+  >
+    <div className="absolute inset-0 w-full h-full">
+      <video ref={videoRef} autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover" style={{ opacity: 0 }} >
+        <source src="/videos/N2.mp4" type="video/mp4" />
+      </video>
+      <div ref={whiteOverlayRef} className="absolute inset-0 bg-white" style={{ opacity: 0 }}/>
+    </div>
+    <div ref={textMaskContainerRef} className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full">
+      <AboutUsLetters letters={lettersWithSpaces} />
+    </div>
+    <div ref={starfieldOverlayRef} className="absolute inset-0 pointer-events-none" style={{ opacity: 0, overflow: "hidden" }} >
+      <SimpleStars />
+    </div>
+  </div>
+</div>
       </div>
-
+      
       <div className="relative z-20">
-        <div
-          ref={heroWrapperRef}
-          className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
-        >
+        <div ref={heroWrapperRef} className="sticky top-0 flex items-center justify-center h-screen pointer-events-none">
           <div className="w-full mr-74 mb-36 pointer-events-auto">
             <Hero />
           </div>
@@ -793,51 +535,33 @@ const LandingPage: FC = () => {
           <CoursesSection />
         </div>
         <div style={{ height: "50vh" }} />
-        <div
-          ref={ourEdgeSectionWrapperRef}
-          style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}
-        >
+        <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }} >
           <OurEdgeSection progress={edgeProgress} />
         </div>
-        <div
-          ref={partnersSectionWrapperRef}
-          style={{ height: "200vh", marginTop: "-50vh" }}
-        >
+        <div ref={partnersSectionWrapperRef} style={{ height: "200vh", marginTop: "-50vh" }}>
           <PartnersSection progress={partnersProgress} />
         </div>
 
         <div style={{ height: "10vh" }} />
-        <div
-          ref={testimonialsSectionWrapperRef}
-          style={{ height: `${testimonialsSectionHeightVh}vh` }}
-        >
+        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
-            <AnimatedTestimonials
-              testimonials={formattedTestimonials}
-              progress={testimonialProgress}
-            />
+            <AnimatedTestimonials testimonials={formattedTestimonials} progress={testimonialProgress} />
           </div>
         </div>
-
         <div ref={recognizedBySectionWrapperRef} style={{ height: "300vh" }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <RecognizedBySection />
           </div>
         </div>
-
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
-          <AboutUsSection />
+         
         </div>
-
-        <div
-          className="absolute bottom-80 flex items-center justify-center ml-24 h- text-white text-sm"
-          style={{
-            opacity: extendedCompProgress,
-            transform: `translateY(${(1 - extendedCompProgress) * 120}px)`,
-            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-          }}
-        >
-          <AboutUsExtendedComp />
+        <div ref={cardStackingWrapperRef} style={{ height: "150vh" }}>
+          <div className="sticky top-0 h-screen flex items-center justify-center">
+            <div className="w-full text-white text-sm" style={{ opacity: extendedCompProgress }}>
+              <AboutUsExtendedComp stackingProgress={stackingProgress} />
+            </div>
+          </div>
         </div>
       </div>
     </main>

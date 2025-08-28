@@ -59,8 +59,8 @@ export default function AboutUsExtendedComp({
     const revealDistance = 400;
 
     const finalWidth = 1200;
-    const finalHeight = 400;
-    const stackPushDownOffset = 24;
+    const finalHeight = 380;
+    const stackPushDownOffset = -16;
 
     switch (index) {
       case 0: {

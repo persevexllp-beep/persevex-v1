@@ -293,7 +293,7 @@ const LandingPage: FC = () => {
         const centerProgress = isBeforeRise ? assemblyProgress : 1;
         const initialY = 4;
         const centerTargetVh = -35;
-        const topTargetVh = -68;
+        const topTargetVh = -72;
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
@@ -574,17 +574,19 @@ const LandingPage: FC = () => {
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
          
         </div>
-        <div ref={cardStackingWrapperRef} style={{ height: "150vh" }}>
-          <div className="sticky top-0 h-screen flex items-center justify-center">
-            <div className="w-full text-white text-sm" style={{ opacity: extendedCompProgress }}>
-              {/* --- 3. PASS BOTH PROPS TO THE COMPONENT --- */}
-              <AboutUsExtendedComp
-                stackingProgress={stackingProgress}
-                cascadingProgress={cascadingProgress}
-              />
-            </div>
+         <div  ref={cardStackingWrapperRef} style={{ height: "1050vh" }}>
+        <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-32 md:pt-40">
+          <div
+            className="w-full text-white text-sm"
+            style={{ opacity: extendedCompProgress }}
+          >
+            <AboutUsExtendedComp
+              stackingProgress={stackingProgress}
+              cascadingProgress={cascadingProgress}
+            />
           </div>
         </div>
+      </div>
       </div>
     </main>
   );

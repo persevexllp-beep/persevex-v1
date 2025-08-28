@@ -35,21 +35,13 @@ export default function AboutUsExtendedComp({
 
   // --- Animation Timeline Definitions ---
   const SCALE_START = 2.2;
-  const SCALE_DURATION = 1.8;
-  const STACK_DURATION = 1.5;
-  
-  const STACK_1_START = SCALE_START + SCALE_DURATION; // Starts at 4.0
-  const STACK_2_START = STACK_1_START + STACK_DURATION; // Starts at 5.5
+  const STACK_1_START = 4.0; 
+  const STACK_2_START = 5.5; 
 
-  // --- Progress Calculation ---
-  const scaleProgress = Math.max(0, Math.min((cascadingProgress - SCALE_START) / SCALE_DURATION, 1));
-  const easedScaleProgress = easeOutCubic(scaleProgress);
-
-  const stack1Progress = Math.max(0, Math.min((cascadingProgress - STACK_1_START) / STACK_DURATION, 1));
-  const easedStack1Progress = easeOutCubic(stack1Progress);
-
-  const stack2Progress = Math.max(0, Math.min((cascadingProgress - STACK_2_START) / STACK_DURATION, 1));
-  const easedStack2Progress = easeOutCubic(stack2Progress);
+  // --- Determine which cards should be expanded ---
+  const isCard0Expanded = cascadingProgress >= SCALE_START ? 1 : 0;
+  const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
+  const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
 
 
   const getCardStyle = (index: number): React.CSSProperties => {
@@ -70,23 +62,21 @@ export default function AboutUsExtendedComp({
     switch (index) {
       case 0: {
         const translateX = `${-110 * unstackedProgress}%`;
-        const translateY = (easedScaleProgress * -10) + (easedStack1Progress * stackPushDownOffset) + (easedStack2Progress * stackPushDownOffset);
+        const translateY = (isCard0Expanded * -10) + (isCard1Expanded * stackPushDownOffset) + (isCard2Expanded * stackPushDownOffset);
         
-        width = 320 + (finalWidth - 320) * easedScaleProgress;
-        height = 256 + (finalHeight - 256) * easedScaleProgress;
+        width = 320 + (finalWidth - 320) * isCard0Expanded;
+        height = 256 + (finalHeight - 256) * isCard0Expanded;
 
         transform = `translateX(${translateX}) translateY(${translateY}px)`;
         zIndex = 10;
         break;
       }
       case 1: {
-        if (easedStack1Progress > 0) {
+        if (isCard1Expanded) {
           width = finalWidth;
           height = finalHeight;
-          const startY = 800; 
           const endY = -10;
-          const yBeforePush = startY + (endY - startY) * easedStack1Progress;
-          const yAfterPush = yBeforePush + (easedStack2Progress * stackPushDownOffset);
+          const yAfterPush = endY + (isCard2Expanded * stackPushDownOffset);
 
           transform = `translateY(${yAfterPush}px)`;
           zIndex = 15;
@@ -107,13 +97,11 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 2: {
-        if (easedStack2Progress > 0) {
+        if (isCard2Expanded) {
           width = finalWidth;
           height = finalHeight;
-          const startY = 800;
           const endY = -10;
-          const currentY = startY + (endY - startY) * easedStack2Progress;
-          transform = `translateY(${currentY}px)`;
+          transform = `translateY(${endY}px)`;
           zIndex = 20;
           opacity = 1;
         } else {
@@ -155,64 +143,72 @@ export default function AboutUsExtendedComp({
       <div className="max-w-7xl lg:w-full mx-auto px-4 sm:px-6">
         <div className="relative flex items-center justify-center min-h-[24rem] w-full">
           {cardData.map((card, index) => {
-            const isExpanded = 
-                (index === 0 && easedScaleProgress > 0) || 
-                (index === 1 && easedStack1Progress > 0) ||
-                (index === 2 && easedStack2Progress > 0);
+            let cardExpansionProgress = 0;
+            if (index === 0) cardExpansionProgress = isCard0Expanded;
+            else if (index === 1) cardExpansionProgress = isCard1Expanded;
+            else if (index === 2) cardExpansionProgress = isCard2Expanded;
+
+            const dynamicGap = 8 + cardExpansionProgress * 24;
             
-            const expansionProgress = isExpanded 
-                ? 1 
-                : (index === 0 ? easedScaleProgress : 0);
+            // --- CHANGE START ---
+            
+            // Style for the IMAGE to handle its fade-in animation
+            const imageAnimationStyle: React.CSSProperties = {
+              opacity: cardExpansionProgress,
+              transition: 'opacity 0.5s ease-in-out',
+              transitionDelay: cardExpansionProgress ? '0.4s' : '0s',
+            };
 
-            const dynamicGap = 8 + expansionProgress * 24;
+            // Style for the PARAGRAPH to handle text truncation
+            const paragraphStyle: React.CSSProperties = {
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              // When not expanded, clamp to 3 lines. When expanded, remove clamp.
+              WebkitLineClamp: cardExpansionProgress ? undefined : 3,
+            };
 
-            const textStyle: React.CSSProperties = {
+            const textContainerStyle: React.CSSProperties = {
               flexGrow: 0, flexShrink: 0,
-              flexBasis: expansionProgress > 0 ? `calc(50% - ${dynamicGap / 2}px)` : "100%",
+              flexBasis: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "100%",
               transition: "flex-basis 0.8s ease-in-out",
-              overflow: "hidden", display: "flex", flexDirection: "column",
+              display: 'flex',
+              flexDirection: 'column',
             };
 
             const imageContainerStyle: React.CSSProperties = {
               flexGrow: 0, flexShrink: 0,
-              flexBasis: expansionProgress > 0 ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
-              maxWidth: expansionProgress > 0 ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
-              opacity: expansionProgress,
+              flexBasis: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
+              maxWidth: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
+              opacity: cardExpansionProgress,
               transition: "flex-basis 0.6s ease-in-out, opacity 0.6s ease-in-out, max-width 0.6s ease-in-out",
             };
 
-            const getContentTextStyle = (progress: number): React.CSSProperties => {
-              if (progress > 0.9) return { overflow: "visible", opacity: 1, transition: "opacity 0.6s ease-in-out" };
-              if (progress > 0) {
-                const linesToShow = Math.floor(3 + (12 * progress));
-                return {
-                  overflow: "hidden", display: "-webkit-box", WebkitBoxOrient: "vertical",
-                  WebkitLineClamp: linesToShow, lineClamp: linesToShow, opacity: 1,
-                };
-              }
-              return { overflow: "hidden", display: "-webkit-box", WebkitBoxOrient: "vertical", WebkitLineClamp: 3, lineClamp: 3 };
-            };
-
+            // --- CHANGE END ---
+            
             return (
               <div
                 key={index}
                 className="flex items-center bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 overflow-hidden"
                 style={{ ...getCardStyle(index), gap: `${dynamicGap}px` }}
               >
-                {card.imageSrc && (
-                  // --- FIX: Changed invalid `h-` to `h-full` ---
-                  <div style={imageContainerStyle} className="relative flex items-center h-full">
+                <div style={imageContainerStyle}>
+                  {card.imageSrc && (
                     <img
                       src={card.imageSrc}
                       alt={card.title}
-                      // Your desired UI change: a fixed-size image
-                      className="w-64 h-64 object-cover rounded-xl"
+                      className="w-64  h-64 object-cover rounded-xl"
+                      style={imageAnimationStyle} // Apply animation only to image
                     />
-                  </div>
-                )}
-                <div style={textStyle}>
+                  )}
+                </div>
+                <div style={textContainerStyle}>
+                  {/* Text is now always visible */}
                   <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
-                  <p className="text-gray-300 text-sm leading-relaxed flex-1" style={getContentTextStyle(expansionProgress)}>
+                  <p 
+                    className="text-gray-300 text-sm leading-relaxed flex-1"
+                    style={paragraphStyle} // Apply truncation style here
+                  >
                     {card.content}
                   </p>
                 </div>

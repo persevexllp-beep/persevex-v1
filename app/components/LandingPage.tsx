@@ -293,7 +293,7 @@ const LandingPage: FC = () => {
         const centerProgress = isBeforeRise ? assemblyProgress : 1;
         const initialY = 4;
         const centerTargetVh = -35;
-        const topTargetVh = -72;
+        const topTargetVh = -68;
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 

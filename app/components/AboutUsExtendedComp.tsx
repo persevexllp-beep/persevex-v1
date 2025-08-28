@@ -151,7 +151,6 @@ export default function AboutUsExtendedComp({
       width: `${width}px`,
       height: `${height}px`,
       position: "absolute",
-      // --- FIX #2: Removed width and height from transition for smooth scroll-driven animation ---
       transition:
         "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out",
     };
@@ -159,12 +158,12 @@ export default function AboutUsExtendedComp({
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-16 mt-20 text-white">
-      <div className="max-w-7xl lg:w-full mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl lg-w-full mx-auto px-4 sm:px-6">
         <div className="relative flex items-center justify-center min-h-[24rem] w-full">
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
             
-            // --- FIX #1: Use the correct variable 'expansionProgress' here ---
+            // This is the trigger for the final content to show up
             if (index === 0) cardExpansionProgress = expansionProgress > 0.99 ? 1 : 0;
             else if (index === 1) cardExpansionProgress = isCard1Expanded;
             else if (index === 2) cardExpansionProgress = isCard2Expanded;
@@ -196,12 +195,37 @@ export default function AboutUsExtendedComp({
                 "flex-basis 0.6s ease-in-out, opacity 0.6s ease-in-out, max-width 0.6s ease-in-out",
             };
 
+            // --- CHANGE IS HERE ---
+            // The logic is now very simple:
+            // Is this the first card, has the expansion started, AND has the final content *not* appeared yet?
+            // If yes, the flash is on (opacity: 1). Otherwise, it's off (opacity: 0).
+            const flashOpacity = (index === 0 && expansionProgress > 0 && cardExpansionProgress === 0) ? 1 : 0;
+
             return (
               <div
                 key={index}
                 className="flex items-center bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 overflow-hidden"
                 style={{ ...getCardStyle(index), gap: `${dynamicGap}px` }}
               >
+                {/* The white flash overlay for card 0 during expansion */}
+                {index === 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      background: 'black',
+                      opacity: flashOpacity,
+                      borderRadius: 'inherit',
+                      pointerEvents: 'none',
+                      zIndex: 50,
+                      backdropFilter: 'blur(64px)',
+                      // A CSS transition makes the change from opacity 1 to 0 smooth
+                      transition: 'opacity 0.3s ease-out',
+                    }}
+                  />
+                )}
                 <div style={imageContainerStyle}>
                   {/* --- IMAGE ANIMATION --- */}
                   <AnimatePresence>

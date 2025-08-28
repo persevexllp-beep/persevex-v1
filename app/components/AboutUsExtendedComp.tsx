@@ -1,4 +1,6 @@
+// Make sure to install framer-motion: npm install framer-motion
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion"; // Import motion components
 
 interface AboutUsExtendedCompProps {
   stackingProgress: number;
@@ -33,16 +35,13 @@ export default function AboutUsExtendedComp({
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
 
-  // --- Animation Timeline Definitions ---
   const SCALE_START = 2.2;
-  const STACK_1_START = 4.0; 
-  const STACK_2_START = 5.5; 
+  const STACK_1_START = 4.0;
+  const STACK_2_START = 5.5;
 
-  // --- Determine which cards should be expanded ---
   const isCard0Expanded = cascadingProgress >= SCALE_START ? 1 : 0;
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
-
 
   const getCardStyle = (index: number): React.CSSProperties => {
     let transform = "";
@@ -55,15 +54,18 @@ export default function AboutUsExtendedComp({
     const verticalOffset = 16;
     const revealDistance = 400;
 
-    const finalWidth = 1200; 
+    const finalWidth = 1200;
     const finalHeight = 400;
     const stackPushDownOffset = 24;
 
     switch (index) {
       case 0: {
         const translateX = `${-110 * unstackedProgress}%`;
-        const translateY = (isCard0Expanded * -10) + (isCard1Expanded * stackPushDownOffset) + (isCard2Expanded * stackPushDownOffset);
-        
+        const translateY =
+          isCard0Expanded * -10 +
+          isCard1Expanded * stackPushDownOffset +
+          isCard2Expanded * stackPushDownOffset;
+
         width = 320 + (finalWidth - 320) * isCard0Expanded;
         height = 256 + (finalHeight - 256) * isCard0Expanded;
 
@@ -76,7 +78,7 @@ export default function AboutUsExtendedComp({
           width = finalWidth;
           height = finalHeight;
           const endY = -10;
-          const yAfterPush = endY + (isCard2Expanded * stackPushDownOffset);
+          const yAfterPush = endY + isCard2Expanded * stackPushDownOffset;
 
           transform = `translateY(${yAfterPush}px)`;
           zIndex = 15;
@@ -88,8 +90,11 @@ export default function AboutUsExtendedComp({
           const finalTranslateY = stackingY + revealY;
           const fadeStart = 1.5;
           const fadeDuration = 0.5;
-          const fadeProgress = Math.max(0, Math.min((cascadingProgress - fadeStart) / fadeDuration, 1));
-          
+          const fadeProgress = Math.max(
+            0,
+            Math.min((cascadingProgress - fadeStart) / fadeDuration, 1)
+          );
+
           opacity = 1 - fadeProgress;
           transform = `translateX(0%) translateY(${finalTranslateY}px)`;
           zIndex = 20;
@@ -109,16 +114,21 @@ export default function AboutUsExtendedComp({
           const stackingY = verticalOffset * 2 * easedStackingProgress;
           const stage1Progress = easeOutCubic(Math.min(cascadingProgress, 1));
           const stage1RevealY = stage1Progress * revealDistance;
-          const stage2Progress = easeOutCubic(Math.max(0, Math.min(cascadingProgress - 1, 1)));
+          const stage2Progress = easeOutCubic(
+            Math.max(0, Math.min(cascadingProgress - 1, 1))
+          );
           const stage2RevealY = stage2Progress * revealDistance;
           const finalTranslateY = stackingY + stage1RevealY + stage2RevealY;
           const fadeStart = 2.0;
           const fadeDuration = 0.5;
-          const fadeProgress = Math.max(0, Math.min((cascadingProgress - fadeStart) / fadeDuration, 1));
+          const fadeProgress = Math.max(
+            0,
+            Math.min((cascadingProgress - fadeStart) / fadeDuration, 1)
+          );
 
           opacity = 1 - fadeProgress;
           if (cascadingProgress > STACK_2_START - 0.1) {
-              opacity = 0;
+            opacity = 0;
           }
           transform = `translateX(${translateX}) translateY(${finalTranslateY}px)`;
           zIndex = 30;
@@ -130,11 +140,14 @@ export default function AboutUsExtendedComp({
     }
 
     return {
-      transform, zIndex, opacity,
+      transform,
+      zIndex,
+      opacity,
       width: `${width}px`,
       height: `${height}px`,
       position: "absolute",
-      transition: "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out, width 0.8s ease-in-out, height 0.8s ease-in-out",
+      transition:
+        "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out, width 0.8s ease-in-out, height 0.8s ease-in-out",
     };
   };
 
@@ -149,43 +162,32 @@ export default function AboutUsExtendedComp({
             else if (index === 2) cardExpansionProgress = isCard2Expanded;
 
             const dynamicGap = 8 + cardExpansionProgress * 24;
-            
-            // --- CHANGE START ---
-            
-            // Style for the IMAGE to handle its fade-in animation
-            const imageAnimationStyle: React.CSSProperties = {
-              opacity: cardExpansionProgress,
-              transition: 'opacity 0.5s ease-in-out',
-              transitionDelay: cardExpansionProgress ? '0.4s' : '0s',
-            };
-
-            // Style for the PARAGRAPH to handle text truncation
-            const paragraphStyle: React.CSSProperties = {
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              // When not expanded, clamp to 3 lines. When expanded, remove clamp.
-              WebkitLineClamp: cardExpansionProgress ? undefined : 3,
-            };
 
             const textContainerStyle: React.CSSProperties = {
-              flexGrow: 0, flexShrink: 0,
-              flexBasis: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "100%",
+              flexGrow: 0,
+              flexShrink: 0,
+              flexBasis: cardExpansionProgress
+                ? `calc(50% - ${dynamicGap / 2}px)`
+                : "100%",
               transition: "flex-basis 0.8s ease-in-out",
-              display: 'flex',
-              flexDirection: 'column',
+              display: "flex",
+              flexDirection: "column",
             };
 
             const imageContainerStyle: React.CSSProperties = {
-              flexGrow: 0, flexShrink: 0,
-              flexBasis: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
-              maxWidth: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
+              flexGrow: 0,
+              flexShrink: 0,
+              flexBasis: cardExpansionProgress
+                ? `calc(50% - ${dynamicGap / 2}px)`
+                : "0%",
+              maxWidth: cardExpansionProgress
+                ? `calc(50% - ${dynamicGap / 2}px)`
+                : "0%",
               opacity: cardExpansionProgress,
-              transition: "flex-basis 0.6s ease-in-out, opacity 0.6s ease-in-out, max-width 0.6s ease-in-out",
+              transition:
+                "flex-basis 0.6s ease-in-out, opacity 0.6s ease-in-out, max-width 0.6s ease-in-out",
             };
 
-            // --- CHANGE END ---
-            
             return (
               <div
                 key={index}
@@ -193,24 +195,82 @@ export default function AboutUsExtendedComp({
                 style={{ ...getCardStyle(index), gap: `${dynamicGap}px` }}
               >
                 <div style={imageContainerStyle}>
-                  {card.imageSrc && (
-                    <img
-                      src={card.imageSrc}
-                      alt={card.title}
-                      className="w-64  h-64 object-cover rounded-xl"
-                      style={imageAnimationStyle} // Apply animation only to image
-                    />
-                  )}
+                  {/* --- IMAGE ANIMATION --- */}
+                  <AnimatePresence>
+                    {cardExpansionProgress === 1 && (
+                      <motion.img
+                        key={`image-${index}`}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                        src={card.imageSrc}
+                        alt={card.title}
+                        className="w-68  h-68 object-cover rounded-xl"
+                      />
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div style={textContainerStyle}>
-                  {/* Text is now always visible */}
-                  <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
-                  <p 
-                    className="text-gray-300 text-sm leading-relaxed flex-1"
-                    style={paragraphStyle} // Apply truncation style here
-                  >
-                    {card.content}
-                  </p>
+                  {/* --- TEXT ANIMATION --- */}
+                  <AnimatePresence>
+                    {cardExpansionProgress === 1 ? (
+                      <motion.div
+                        key={`content-${index}`}
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{
+                          visible: { transition: { staggerChildren: 0.05 } },
+                        }}
+                      >
+                        <motion.h3
+                          variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+                          }}
+                          className="text-3xl font-bold mb-6 flex-shrink-0"
+                        >
+                          {card.title}
+                        </motion.h3>
+                        <p className="text-gray-300 text-sm leading-relaxed flex-1">
+                          {card.content.split(" ").map((word, wordIndex) => (
+                            <motion.span
+                              key={`${word}-${wordIndex}`}
+                              variants={{
+                                hidden: { filter: "blur(10px)", opacity: 0 },
+                                visible: { filter: "blur(0px)", opacity: 1 },
+                              }}
+                              transition={{
+                                duration: 0.3,
+                                ease: "easeInOut",
+                                // The staggerChildren on parent handles the delay
+                              }}
+                              className="inline-block"
+                            >
+                              {word}&nbsp;
+                            </motion.span>
+                          ))}
+                        </p>
+                      </motion.div>
+                    ) : (
+                      // --- Initial Truncated Text State ---
+                      <div>
+                        <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
+                        <p
+                          className="text-gray-300 text-sm leading-relaxed flex-1"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            WebkitLineClamp: 3,
+                          }}
+                        >
+                          {card.content}
+                        </p>
+                      </div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             );

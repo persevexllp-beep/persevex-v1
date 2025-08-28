@@ -24,7 +24,7 @@ const cardData = [
     title: "Our Mission",
     imageSrc: "/dog3.jpg",
     content:
-      "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and create a generation of learners who are ready to succeed and ready to lead with knowledge and confidence.",
+      "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and create a generation of learners who are ready to succeed and ready to lead with knowledge and confidence.",
   },
 ];
 
@@ -39,9 +39,13 @@ export default function AboutUsExtendedComp({
   const STACK_1_START = 4.0;
   const STACK_2_START = 5.5;
 
-  const isCard0Expanded = cascadingProgress >= SCALE_START ? 1 : 0;
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
+  
+  // Calculate a smooth progress for card 0's expansion from 0 to 1.
+  const expansionProgress = easeOutCubic(
+    Math.max(0, Math.min(cascadingProgress / SCALE_START, 1))
+  );
 
   const getCardStyle = (index: number): React.CSSProperties => {
     let transform = "";
@@ -61,13 +65,14 @@ export default function AboutUsExtendedComp({
     switch (index) {
       case 0: {
         const translateX = `${-110 * unstackedProgress}%`;
+        
         const translateY =
-          isCard0Expanded * -10 +
+          expansionProgress * -10 + 
           isCard1Expanded * stackPushDownOffset +
           isCard2Expanded * stackPushDownOffset;
 
-        width = 320 + (finalWidth - 320) * isCard0Expanded;
-        height = 256 + (finalHeight - 256) * isCard0Expanded;
+        width = 320 + (finalWidth - 320) * expansionProgress;
+        height = 256 + (finalHeight - 256) * expansionProgress;
 
         transform = `translateX(${translateX}) translateY(${translateY}px)`;
         zIndex = 10;
@@ -118,7 +123,7 @@ export default function AboutUsExtendedComp({
             Math.max(0, Math.min(cascadingProgress - 1, 1))
           );
           const stage2RevealY = stage2Progress * revealDistance;
-          const finalTranslateY = stackingY + stage1RevealY + stage2RevealY;
+          const finalTranslateY = stackingY + (stage1RevealY * 1.50) + stage2RevealY;
           const fadeStart = 2.0;
           const fadeDuration = 0.5;
           const fadeProgress = Math.max(
@@ -146,8 +151,9 @@ export default function AboutUsExtendedComp({
       width: `${width}px`,
       height: `${height}px`,
       position: "absolute",
+      // --- FIX #2: Removed width and height from transition for smooth scroll-driven animation ---
       transition:
-        "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out, width 0.8s ease-in-out, height 0.8s ease-in-out",
+        "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out",
     };
   };
 
@@ -157,7 +163,9 @@ export default function AboutUsExtendedComp({
         <div className="relative flex items-center justify-center min-h-[24rem] w-full">
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
-            if (index === 0) cardExpansionProgress = isCard0Expanded;
+            
+            // --- FIX #1: Use the correct variable 'expansionProgress' here ---
+            if (index === 0) cardExpansionProgress = expansionProgress > 0.99 ? 1 : 0;
             else if (index === 1) cardExpansionProgress = isCard1Expanded;
             else if (index === 2) cardExpansionProgress = isCard2Expanded;
 
@@ -244,7 +252,6 @@ export default function AboutUsExtendedComp({
                               transition={{
                                 duration: 0.3,
                                 ease: "easeInOut",
-                                // The staggerChildren on parent handles the delay
                               }}
                               className="inline-block"
                             >
@@ -254,7 +261,6 @@ export default function AboutUsExtendedComp({
                         </p>
                       </motion.div>
                     ) : (
-                      // --- Initial Truncated Text State ---
                       <div>
                         <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
                         <p

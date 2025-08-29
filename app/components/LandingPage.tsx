@@ -1,3 +1,5 @@
+// LandingPage.tsx (or the first file you provided)
+
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -143,7 +145,6 @@ const LandingPage: FC = () => {
   const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
   const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
   const [stackingProgress, setStackingProgress] = useState<number>(0);
-  // --- 1. ADD NEW STATE FOR THE CASCADING ANIMATION ---
   const [cascadingProgress, setCascadingProgress] = useState<number>(0);
   const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
   const lastScrollTime = useRef<number>(0);
@@ -406,7 +407,6 @@ const LandingPage: FC = () => {
       const aboutUsContentAnimDuration = viewportHeight * 4;
       setAboutUsProgress(clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1));
       
-      // --- 2. MODIFIED LOGIC FOR TWO-PHASE ANIMATION ---
        let newStackingProgress = 0;
       let newCascadingProgress = 0;
 
@@ -414,25 +414,18 @@ const LandingPage: FC = () => {
         const start = cardStackingTop;
         const totalDuration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
         
-        // Stacking happens faster, over the first 30% of the scroll area.
         const stackingDuration = totalDuration * 0.3; 
         
         const cascadeStart = start + stackingDuration;
         
-        // Stacking progress is clamped between 0 and 1.
         newStackingProgress = clamp((currentScroll - start) / stackingDuration, 0, 1);
 
-        // Cascading progress starts after stacking is complete.
-        // It is NOT clamped, allowing it to go beyond 1.
-        // We divide by viewportHeight to control the intensity:
-        // for every viewport-height scrolled, progress increases by 1.0.
         if (currentScroll > cascadeStart) {
           newCascadingProgress = (currentScroll - cascadeStart) / viewportHeight;
         }
       }
       setStackingProgress(newStackingProgress);
       setCascadingProgress(newCascadingProgress);
-      // --- END OF UPDATED LOGIC ---
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -574,8 +567,10 @@ const LandingPage: FC = () => {
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
          
         </div>
-         <div  ref={cardStackingWrapperRef} style={{ height: "1050vh" }}>
-        <div className="sticky top-0 h-screen flex flex-col items-center justify-start pt-32 md:pt-40">
+         <div  ref={cardStackingWrapperRef} style={{ height: "1150vh" }}>
+        {/* --- CHANGE STARTS HERE --- */}
+        <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-32 md:pt-40">
+        {/* --- CHANGE ENDS HERE --- */}
           <div
             className="w-full text-white text-sm"
             style={{ opacity: extendedCompProgress }}

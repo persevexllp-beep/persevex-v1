@@ -35,10 +35,10 @@ export default function AboutUsExtendedComp({
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
 
-  // --- CHANGE STARTS HERE: Animation timeline is spread out for distinct scroll actions ---
-  const SCALE_START = 1.0;
-  const STACK_1_START = 3.0;
-  const STACK_2_START = 5.0;
+  // --- CHANGE STARTS HERE: Animation timeline compressed for faster expansion ---
+  const SCALE_START = 0.6;   // Was 1.0
+  const STACK_1_START = 1.6;   // Was 2.3
+  const STACK_2_START = 2.6;   // Was 3.6
   // --- CHANGE ENDS HERE ---
 
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
@@ -81,7 +81,7 @@ export default function AboutUsExtendedComp({
       }
       case 1: {
         // --- CHANGE STARTS HERE: Adjusted card 1 timeline ---
-        const PRE_STACK_1_START = 2.0; // Was 0.8
+        const PRE_STACK_1_START = 0.8; // Was 1.5
 
         if (isCard1Expanded) {
           width = finalWidth;
@@ -119,7 +119,7 @@ export default function AboutUsExtendedComp({
           const stage1Progress = easeOutCubic(Math.min(cascadingProgress, 1));
           const revealY = stage1Progress * revealDistance;
           const finalTranslateY = stackingY + revealY;
-          const fadeStart = 1.5; // Was 0.4
+          const fadeStart = 0.4; // Was 1.0
           const fadeDuration = 0.4;
           const fadeProgress = Math.max(
             0,
@@ -134,7 +134,7 @@ export default function AboutUsExtendedComp({
       }
       case 2: {
         // --- CHANGE STARTS HERE: Adjusted card 2 timeline ---
-        const PRE_STACK_2_START = 4.0; // Was 1.8
+        const PRE_STACK_2_START = 1.8; // Was 2.8
 
         if (isCard2Expanded) {
           width = finalWidth;
@@ -175,7 +175,7 @@ export default function AboutUsExtendedComp({
           );
           const stage2RevealY = stage2Progress * revealDistance;
           const finalTranslateY = stackingY + (stage1RevealY * 1.50) + stage2RevealY;
-          const fadeStart = 3.5; // Was 1.4
+          const fadeStart = 1.4; // Was 2.3
           const fadeDuration = 0.4;
           const fadeProgress = Math.max(
             0,
@@ -239,9 +239,9 @@ export default function AboutUsExtendedComp({
               opacity: cardExpansionProgress,
             };
 
-            // --- CHANGE STARTS HERE: Using new timeline constants for visibility checks ---
-            const PRE_STACK_1_START = 2.0;
-            const PRE_STACK_2_START = 4.0;
+            // --- CHANGE STARTS HERE: Using new timeline constants ---
+            const PRE_STACK_1_START = 0.8;
+            const PRE_STACK_2_START = 1.8;
 
             let shouldShowContent = true;
             if (index === 0) {

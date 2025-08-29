@@ -1,6 +1,7 @@
 // Make sure to install framer-motion: npm install framer-motion
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // Import motion components
+// motion and AnimatePresence are no longer used for content, but kept for potential future use
+import { motion, AnimatePresence } from "framer-motion"; 
 
 interface AboutUsExtendedCompProps {
   stackingProgress: number;
@@ -42,7 +43,6 @@ export default function AboutUsExtendedComp({
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
   
-  // Calculate a smooth progress for card 0's expansion from 0 to 1.
   const expansionProgress = easeOutCubic(
     Math.max(0, Math.min(cascadingProgress / SCALE_START, 1))
   );
@@ -58,7 +58,7 @@ export default function AboutUsExtendedComp({
     const verticalOffset = 16;
     const revealDistance = 400;
 
-    const finalWidth = 1200;
+    const finalWidth = 1000;
     const finalHeight = 380;
     const stackPushDownOffset = -16;
 
@@ -79,6 +79,8 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 1: {
+        const PRE_STACK_1_START = 3.0;
+
         if (isCard1Expanded) {
           width = finalWidth;
           height = finalHeight;
@@ -88,6 +90,28 @@ export default function AboutUsExtendedComp({
           transform = `translateY(${yAfterPush}px)`;
           zIndex = 15;
           opacity = 1;
+        } else if (cascadingProgress >= PRE_STACK_1_START) {
+          const card1StackingProgress = easeOutCubic(
+            Math.max(
+              0,
+              Math.min(
+                (cascadingProgress - PRE_STACK_1_START) /
+                  (STACK_1_START - PRE_STACK_1_START),
+                1
+              )
+            )
+          );
+          
+          width = finalWidth;
+          height = finalHeight;
+          zIndex = 15;
+          
+          opacity = card1StackingProgress;
+          const startY = 800;
+          const endY = -10;
+          const currentY = startY + (endY - startY) * card1StackingProgress;
+          transform = `translateY(${currentY}px)`;
+
         } else {
           const stackingY = verticalOffset * easedStackingProgress;
           const stage1Progress = easeOutCubic(Math.min(cascadingProgress, 1));
@@ -107,6 +131,8 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 2: {
+        const PRE_STACK_2_START = 4.5;
+
         if (isCard2Expanded) {
           width = finalWidth;
           height = finalHeight;
@@ -114,6 +140,28 @@ export default function AboutUsExtendedComp({
           transform = `translateY(${endY}px)`;
           zIndex = 20;
           opacity = 1;
+        } else if (cascadingProgress >= PRE_STACK_2_START) {
+          const card2StackingProgress = easeOutCubic(
+            Math.max(
+              0,
+              Math.min(
+                (cascadingProgress - PRE_STACK_2_START) /
+                  (STACK_2_START - PRE_STACK_2_START),
+                1
+              )
+            )
+          );
+          
+          width = finalWidth;
+          height = finalHeight;
+          zIndex = 20;
+          
+          opacity = card2StackingProgress;
+          const startY = 800; 
+          const endY = -10;   
+          const currentY = startY + (endY - startY) * card2StackingProgress;
+          transform = `translateY(${currentY}px)`;
+
         } else {
           const translateX = `${110 * unstackedProgress}%`;
           const stackingY = verticalOffset * 2 * easedStackingProgress;
@@ -132,9 +180,6 @@ export default function AboutUsExtendedComp({
           );
 
           opacity = 1 - fadeProgress;
-          if (cascadingProgress > STACK_2_START - 0.1) {
-            opacity = 0;
-          }
           transform = `translateX(${translateX}) translateY(${finalTranslateY}px)`;
           zIndex = 30;
         }
@@ -163,7 +208,6 @@ export default function AboutUsExtendedComp({
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
             
-            // This is the trigger for the final content to show up
             if (index === 0) cardExpansionProgress = expansionProgress > 0.99 ? 1 : 0;
             else if (index === 1) cardExpansionProgress = isCard1Expanded;
             else if (index === 2) cardExpansionProgress = isCard2Expanded;
@@ -195,10 +239,6 @@ export default function AboutUsExtendedComp({
                 "flex-basis 0.6s ease-in-out, opacity 0.6s ease-in-out, max-width 0.6s ease-in-out",
             };
 
-            // --- CHANGE IS HERE ---
-            // The logic is now very simple:
-            // Is this the first card, has the expansion started, AND has the final content *not* appeared yet?
-            // If yes, the flash is on (opacity: 1). Otherwise, it's off (opacity: 0).
             const flashOpacity = (index === 0 && expansionProgress > 0 && cardExpansionProgress === 0) ? 1 : 0;
 
             return (
@@ -207,7 +247,6 @@ export default function AboutUsExtendedComp({
                 className="flex items-center bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 overflow-hidden"
                 style={{ ...getCardStyle(index), gap: `${dynamicGap}px` }}
               >
-                {/* The white flash overlay for card 0 during expansion */}
                 {index === 0 && (
                   <div
                     style={{
@@ -220,87 +259,50 @@ export default function AboutUsExtendedComp({
                       borderRadius: 'inherit',
                       pointerEvents: 'none',
                       zIndex: 50,
-                      backdropFilter: 'blur(64px)',
-                      // A CSS transition makes the change from opacity 1 to 0 smooth
+                      backdropFilter: 'blur(84px)',
                       transition: 'opacity 0.3s ease-out',
                     }}
                   />
                 )}
+                {/* --- CHANGE STARTS HERE: IMAGE SECTION --- */}
                 <div style={imageContainerStyle}>
-                  {/* --- IMAGE ANIMATION --- */}
-                  <AnimatePresence>
-                    {cardExpansionProgress === 1 && (
-                      <motion.img
-                        key={`image-${index}`}
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        transition={{ duration: 0.5, ease: "easeInOut" }}
-                        src={card.imageSrc}
-                        alt={card.title}
-                        className="w-68  h-68 object-cover rounded-xl"
-                      />
-                    )}
-                  </AnimatePresence>
+                  {cardExpansionProgress === 1 && (
+                    <img
+                      src={card.imageSrc}
+                      alt={card.title}
+                      className="w-68 h-68 object-cover rounded-xl"
+                    />
+                  )}
                 </div>
+                {/* --- CHANGE STARTS HERE: TEXT SECTION --- */}
                 <div style={textContainerStyle}>
-                  {/* --- TEXT ANIMATION --- */}
-                  <AnimatePresence>
-                    {cardExpansionProgress === 1 ? (
-                      <motion.div
-                        key={`content-${index}`}
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={{
-                          visible: { transition: { staggerChildren: 0.05 } },
+                  {cardExpansionProgress === 1 ? (
+                    // Expanded view (no animation)
+                    <div>
+                      <h3 className="text-3xl font-bold mb-6 flex-shrink-0">
+                        {card.title}
+                      </h3>
+                      <p className="text-gray-300 text-sm leading-relaxed flex-1">
+                        {card.content}
+                      </p>
+                    </div>
+                  ) : (
+                    // Truncated / default view
+                    <div>
+                      <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
+                      <p
+                        className="text-gray-300 text-sm leading-relaxed flex-1"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          WebkitLineClamp: 3,
                         }}
                       >
-                        <motion.h3
-                          variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-                          }}
-                          className="text-3xl font-bold mb-6 flex-shrink-0"
-                        >
-                          {card.title}
-                        </motion.h3>
-                        <p className="text-gray-300 text-sm leading-relaxed flex-1">
-                          {card.content.split(" ").map((word, wordIndex) => (
-                            <motion.span
-                              key={`${word}-${wordIndex}`}
-                              variants={{
-                                hidden: { filter: "blur(10px)", opacity: 0 },
-                                visible: { filter: "blur(0px)", opacity: 1 },
-                              }}
-                              transition={{
-                                duration: 0.3,
-                                ease: "easeInOut",
-                              }}
-                              className="inline-block"
-                            >
-                              {word}&nbsp;
-                            </motion.span>
-                          ))}
-                        </p>
-                      </motion.div>
-                    ) : (
-                      <div>
-                        <h3 className="text-3xl font-bold mb-6 flex-shrink-0">{card.title}</h3>
-                        <p
-                          className="text-gray-300 text-sm leading-relaxed flex-1"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            WebkitLineClamp: 3,
-                          }}
-                        >
-                          {card.content}
-                        </p>
-                      </div>
-                    )}
-                  </AnimatePresence>
+                        {card.content}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             );

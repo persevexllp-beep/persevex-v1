@@ -37,8 +37,8 @@ export default function AboutUsExtendedComp({
 
   // --- CHANGE STARTS HERE: Animation timeline compressed for faster expansion ---
   const SCALE_START = 0.6;   // Was 1.0
-  const STACK_1_START = 1.6;   // Was 2.3
-  const STACK_2_START = 2.6;   // Was 3.6
+  const STACK_1_START = 1.8;   // Was 2.3
+  const STACK_2_START = 2.8;   // Was 3.6
   // --- CHANGE ENDS HERE ---
 
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
@@ -81,7 +81,7 @@ export default function AboutUsExtendedComp({
       }
       case 1: {
         // --- CHANGE STARTS HERE: Adjusted card 1 timeline ---
-        const PRE_STACK_1_START = 0.8; // Was 1.5
+        const PRE_STACK_1_START = 1.2; // Was 1.5
 
         if (isCard1Expanded) {
           width = finalWidth;

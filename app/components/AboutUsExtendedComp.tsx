@@ -1,6 +1,6 @@
 // Make sure to install framer-motion: npm install framer-motion
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; 
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AboutUsExtendedCompProps {
   stackingProgress: number;
@@ -35,15 +35,13 @@ export default function AboutUsExtendedComp({
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
 
-  // --- CHANGE STARTS HERE: Animation timeline compressed for faster expansion ---
-  const SCALE_START = 0.6;   // Was 1.0
-  const STACK_1_START = 1.6;   // Was 2.3
-  const STACK_2_START = 2.6;   // Was 3.6
-  // --- CHANGE ENDS HERE ---
+  const SCALE_START = 0.6;
+  const STACK_1_START = 1.6;
+  const STACK_2_START = 2.6;
 
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
-  
+
   const expansionProgress = easeOutCubic(
     Math.max(0, Math.min(cascadingProgress / SCALE_START, 1))
   );
@@ -66,9 +64,9 @@ export default function AboutUsExtendedComp({
     switch (index) {
       case 0: {
         const translateX = `${-110 * unstackedProgress}%`;
-        
+
         const translateY =
-          expansionProgress * -10 + 
+          expansionProgress * -10 +
           isCard1Expanded * stackPushDownOffset +
           isCard2Expanded * stackPushDownOffset;
 
@@ -80,8 +78,7 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 1: {
-        // --- CHANGE STARTS HERE: Adjusted card 1 timeline ---
-        const PRE_STACK_1_START = 0.8; // Was 1.5
+        const PRE_STACK_1_START = 0.8;
 
         if (isCard1Expanded) {
           width = finalWidth;
@@ -103,11 +100,11 @@ export default function AboutUsExtendedComp({
               )
             )
           );
-          
+
           width = finalWidth;
           height = finalHeight;
           zIndex = 15;
-          
+
           opacity = card1StackingProgress;
           const startY = 800;
           const endY = -10;
@@ -119,7 +116,7 @@ export default function AboutUsExtendedComp({
           const stage1Progress = easeOutCubic(Math.min(cascadingProgress, 1));
           const revealY = stage1Progress * revealDistance;
           const finalTranslateY = stackingY + revealY;
-          const fadeStart = 0.4; // Was 1.0
+          const fadeStart = 0.4;
           const fadeDuration = 0.4;
           const fadeProgress = Math.max(
             0,
@@ -133,8 +130,7 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 2: {
-        // --- CHANGE STARTS HERE: Adjusted card 2 timeline ---
-        const PRE_STACK_2_START = 1.8; // Was 2.8
+        const PRE_STACK_2_START = 1.8;
 
         if (isCard2Expanded) {
           width = finalWidth;
@@ -154,14 +150,14 @@ export default function AboutUsExtendedComp({
               )
             )
           );
-          
+
           width = finalWidth;
           height = finalHeight;
           zIndex = 20;
-          
+
           opacity = card2StackingProgress;
-          const startY = 800; 
-          const endY = -10;   
+          const startY = 800;
+          const endY = -10;
           const currentY = startY + (endY - startY) * card2StackingProgress;
           transform = `translateY(${currentY}px)`;
 
@@ -175,7 +171,7 @@ export default function AboutUsExtendedComp({
           );
           const stage2RevealY = stage2Progress * revealDistance;
           const finalTranslateY = stackingY + (stage1RevealY * 1.50) + stage2RevealY;
-          const fadeStart = 1.4; // Was 2.3
+          const fadeStart = 1.4;
           const fadeDuration = 0.4;
           const fadeProgress = Math.max(
             0,
@@ -210,13 +206,13 @@ export default function AboutUsExtendedComp({
         <div className="relative flex items-center justify-center min-h-[24rem] w-full">
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
-            
+
             if (index === 0) cardExpansionProgress = expansionProgress > 0.99 ? 1 : 0;
             else if (index === 1) cardExpansionProgress = isCard1Expanded;
             else if (index === 2) cardExpansionProgress = isCard2Expanded;
 
             const dynamicGap = 8 + cardExpansionProgress * 24;
-            
+
             const textContainerStyle: React.CSSProperties = {
               flexGrow: 0,
               flexShrink: 0,
@@ -239,7 +235,6 @@ export default function AboutUsExtendedComp({
               opacity: cardExpansionProgress,
             };
 
-            // --- CHANGE STARTS HERE: Using new timeline constants ---
             const PRE_STACK_1_START = 0.8;
             const PRE_STACK_2_START = 1.8;
 
@@ -258,14 +253,57 @@ export default function AboutUsExtendedComp({
               }
             }
             
+            // --- CHANGE STARTS HERE: Calculate opacity for fading out previous card's content ---
+            let contentOpacity = 1;
+            if (index === 0) {
+              // Fade out card 0 when card 1 starts animating in
+              if (cascadingProgress >= PRE_STACK_1_START) {
+                const fadeProgress = easeOutCubic(
+                  Math.max(
+                    0,
+                    Math.min(
+                      (cascadingProgress - PRE_STACK_1_START) /
+                        (STACK_1_START - PRE_STACK_1_START),
+                      1
+                    )
+                  )
+                );
+                contentOpacity = 1 - fadeProgress;
+              }
+            } else if (index === 1) {
+              // Fade out card 1 when card 2 starts animating in
+              if (cascadingProgress >= PRE_STACK_2_START) {
+                const fadeProgress = easeOutCubic(
+                  Math.max(
+                    0,
+                    Math.min(
+                      (cascadingProgress - PRE_STACK_2_START) /
+                        (STACK_2_START - PRE_STACK_2_START),
+                      1
+                    )
+                  )
+                );
+                contentOpacity = 1 - fadeProgress;
+              }
+            }
+            // --- CHANGE ENDS HERE ---
+
             return (
               <div
                 key={index}
-                className="flex items-center bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 overflow-hidden"
-                style={{ ...getCardStyle(index), gap: `${dynamicGap}px` }}
+                className="bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-8 overflow-hidden"
+                style={{ ...getCardStyle(index) }}
               >
-               {shouldShowContent && (
-                 <>
+                {shouldShowContent && (
+                  // --- CHANGE STARTS HERE: Added a wrapper to control content layout and opacity ---
+                  <div
+                    className="flex items-center w-full h-full"
+                    style={{
+                      opacity: contentOpacity,
+                      gap: `${dynamicGap}px`,
+                      transition: "opacity 0.4s ease-out",
+                    }}
+                  >
                     <div style={imageContainerStyle}>
                       <AnimatePresence>
                         {cardExpansionProgress === 1 && (
@@ -331,8 +369,9 @@ export default function AboutUsExtendedComp({
                         )}
                       </AnimatePresence>
                     </div>
-                 </>
-               )}
+                  </div>
+                   // --- CHANGE ENDS HERE ---
+                )}
               </div>
             );
           })}

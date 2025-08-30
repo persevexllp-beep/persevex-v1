@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react'; // Import React for Fragment
 import Link from 'next/link';
 import { useScroll, SectionKey } from '../contexts/scrollContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +9,25 @@ export default function Navbar() {
   const { scrollToSection } = useScroll();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const programItems = [
-    { name: 'AI & Machine Learning', href: '/programs/ai-ml' },
-    { name: 'Full Stack Development', href: '/programs/full-stack' },
-    { name: 'Data Science', href: '/programs/data-science' },
-    { name: 'Cyber Security', href: '/programs/cyber-security' },
+  // 1. Update the data structure to include categories
+  const programCategories = [
+    {
+      title: 'Technology',
+      items: [
+        { name: 'AI & Machine Learning', href: '/programs/ai-ml' },
+        { name: 'Full Stack Development', href: '/programs/full-stack' },
+        { name: 'Data Science', href: '/programs/data-science' },
+        { name: 'Cyber Security', href: '/programs/cyber-security' },
+      ],
+    },
+    {
+      title: 'Finance',
+      items: [
+        { name: 'Quantitative Finance', href: '/programs/quantitative-finance' },
+        { name: 'Financial Modeling', href: '/programs/financial-modeling' },
+        { name: 'Blockchain & DeFi', href: '/programs/blockchain-defi' },
+      ],
+    },
   ];
 
   const scrollButtons: { name: string; key: SectionKey }[] = [
@@ -29,8 +43,6 @@ export default function Navbar() {
       opacity: 0, 
       y: -10,
       scale: 0.95,
-      // --- FIX IS HERE ---
-      // Add 'as const' to tell TypeScript this is a specific tuple, not a generic array.
       transition: { duration: 0.2, ease: [0.42, 0, 0.58, 1] as const }
     },
     visible: { 
@@ -38,7 +50,7 @@ export default function Navbar() {
       y: 0,
       scale: 1,
       transition: { 
-        type: "spring",
+        type: "spring" as const,
         stiffness: 400,
         damping: 25,
         staggerChildren: 0.05
@@ -75,24 +87,38 @@ export default function Navbar() {
           <AnimatePresence>
             {isDropdownOpen && (
               <motion.div 
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 rounded-md shadow-lg bg-zinc-900 ring-1 ring-white/10 z-10"
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl shadow-lg bg-zinc-900 ring-1 ring-white/10 z-10" // Increased width slightly
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
                 variants={dropdownVariants}
               >
                 <div className="py-2" role="menu" aria-orientation="vertical">
-                  {programItems.map((item) => (
-                    <motion.div key={item.name} variants={itemVariants}>
-                      <Link
-                        href={item.href}
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-zinc-800 hover:text-white rounded-md mx-2 transition-colors duration-200"
-                        role="menuitem"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    </motion.div>
+                  {/* 2. Use nested mapping for categories */}
+                  {programCategories.map((category, index) => (
+                    <React.Fragment key={category.title}>
+                      {/* Add a separator between categories */}
+                      {index > 0 && <div className="my-2 border-t border-white/10 mx-2"></div>}
+                      
+                      {/* Category Title */}
+                      <p className="px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        {category.title}
+                      </p>
+                      
+                      {/* Map through items in the category */}
+                      {category.items.map((item) => (
+                        <motion.div key={item.name} variants={itemVariants}>
+                          <Link
+                            href={item.href}
+                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-zinc-800 hover:text-white rounded-md mx-2 transition-colors duration-200"
+                            role="menuitem"
+                            onClick={() => setIsDropdownOpen(false)}
+                          >
+                            {item.name}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </React.Fragment>
                   ))}
                 </div>
               </motion.div>

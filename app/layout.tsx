@@ -1,14 +1,15 @@
-// app/layout.tsx (or wherever your RootLayout is)
+// app/layout.tsx
+
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Appbar from "./components/Appbar";
 import Navbar from "./components/Appbar";
+import { ScrollProvider } from "./contexts/scrollContext";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-poppins", 
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -22,12 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" >
-      <body
-        className={`${poppins.variable} antialiased`}
-      >
-        <Navbar />
-        {children}
+    <html lang="en">
+      <body className={`${poppins.variable} antialiased`}>
+        {/* 2. Wrap Navbar and children with the provider */}
+        <ScrollProvider>
+          <Navbar />
+          {children}
+        </ScrollProvider>
       </body>
     </html>
   );

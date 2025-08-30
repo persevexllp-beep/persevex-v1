@@ -1,4 +1,4 @@
-// LandingPage.tsx (or the first file you provided)
+// LandingPage.tsx
 
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -24,6 +24,7 @@ import RecognizedBySection from "./RecognizedBySection";
 import AboutUsSection from "./AboutUs";
 import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
+import { useScroll } from "../contexts/scrollContext";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
@@ -41,15 +42,7 @@ interface Testimonial {
   designation: string;
   src: string;
 }
-interface LayoutState {
-  coursesTop: number;
-  edgeTop: number;
-  partnersTop: number;
-  testimonialsTop: number;
-  recognizedByTop: number;
-  aboutUsTop: number;
-  cardStackingTop: number;
-}
+
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   <>
     {letters.map((letter, index) => {
@@ -124,18 +117,20 @@ const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
 
 
 const LandingPage: FC = () => {
+  const { layout, setLayout, setSectionRefs } = useScroll();
+
   const [headerProgress, setHeaderProgress] = useState<number>(0);
   const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
   const watermarkProgressRef = useRef<number>(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
-  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null);
-  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null);
-  const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const cardStackingWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const videoRef = useRef<HTMLVideoElement>(null);
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
@@ -151,15 +146,6 @@ const LandingPage: FC = () => {
   const isInitialLoad = useRef<boolean>(true);
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
-  const [layout, setLayout] = useState<LayoutState>({
-    coursesTop: 0,
-    edgeTop: 0,
-    partnersTop: 0,
-    testimonialsTop: 0,
-    recognizedByTop: 0,
-    aboutUsTop: 0,
-    cardStackingTop: 0,
-  });
 
   const formattedTestimonials: Testimonial[] = useMemo(
     () => testimonialsData.map((t) => ({
@@ -206,7 +192,18 @@ const LandingPage: FC = () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", calculateLayout);
     };
-  }, []);
+  }, [setLayout]);
+
+  useEffect(() => {
+    setSectionRefs({
+      courses: coursesSectionWrapperRef,
+      ourEdge: ourEdgeSectionWrapperRef,
+      partners: partnersSectionWrapperRef,
+      testimonials: testimonialsSectionWrapperRef,
+      recognizedBy: recognizedBySectionWrapperRef,
+      aboutUs: aboutUsSectionWrapperRef,
+    });
+  }, [setSectionRefs]);
 
   const targetProgressRef = useRef(0);
   const smoothedProgressRef = useRef(0);
@@ -365,7 +362,7 @@ const LandingPage: FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (layout.coursesTop === 0) return;
+      if (!layout || layout.coursesTop === 0) return;
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
       const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop, cardStackingTop } = layout;
@@ -435,7 +432,7 @@ const LandingPage: FC = () => {
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       const wrapper = testimonialsSectionWrapperRef.current;
-      if (!wrapper || layout.testimonialsTop === 0) return;
+      if (!wrapper || !layout || layout.testimonialsTop === 0) return;
       const top = layout.testimonialsTop;
       const bottom = top + wrapper.offsetHeight;
       const viewportHeight = window.innerHeight;
@@ -459,11 +456,11 @@ const LandingPage: FC = () => {
     };
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [layout.testimonialsTop, targetTestimonialIndex, formattedTestimonials.length]);
+  }, [layout, targetTestimonialIndex, formattedTestimonials.length]);
   
   useEffect(() => {
-    if (isInitialLoad.current && layout.testimonialsTop > 0) { isInitialLoad.current = false; return; }
-    if (layout.testimonialsTop === 0) return;
+    if (isInitialLoad.current && layout && layout.testimonialsTop > 0) { isInitialLoad.current = false; return; }
+    if (!layout || layout.testimonialsTop === 0) return;
     const maxIndex = formattedTestimonials.length - 1;
     if (maxIndex <= 0) return;
     const testimonialsAnimDurationPx = (testimonialsAnimationDurationVh / 100) * window.innerHeight;
@@ -472,7 +469,7 @@ const LandingPage: FC = () => {
     if (Math.abs(window.scrollY - targetScrollY) > 5) {
       window.scrollTo({ top: targetScrollY, behavior: "smooth" });
     }
-  }, [targetTestimonialIndex, layout.testimonialsTop, formattedTestimonials.length, testimonialsAnimationDurationVh]);
+  }, [targetTestimonialIndex, layout, formattedTestimonials.length, testimonialsAnimationDurationVh]);
   
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
 
@@ -568,9 +565,7 @@ const LandingPage: FC = () => {
          
         </div>
          <div  ref={cardStackingWrapperRef} style={{ height: "1150vh" }}>
-        {/* --- CHANGE STARTS HERE --- */}
         <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-32 md:pt-40">
-        {/* --- CHANGE ENDS HERE --- */}
           <div
             className="w-full text-white text-sm"
             style={{ opacity: extendedCompProgress }}

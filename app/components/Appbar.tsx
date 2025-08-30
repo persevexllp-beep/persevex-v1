@@ -1,28 +1,55 @@
-// components/Appbar.tsx (or Navbar.tsx)
+"use client";
 
-"use client"; // Add this directive because we're using a hook (useScroll)
-
+import { useState } from 'react';
 import Link from 'next/link';
-import { useScroll } from '../contexts/scrollContext';
-
-// Define SectionKey type to match your section keys
-type SectionKey = "courses" | "ourEdge" | "partners" | "testimonials" | "aboutUs";
+import { useScroll, SectionKey } from '../contexts/scrollContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
-  // 2. Get the scroll function from our context
   const { scrollToSection } = useScroll();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // 3. Update the buttons array to include a 'key' for each section
-  const buttons: { name: string; key: SectionKey; link?: undefined }[] = [
+  const programItems = [
+    { name: 'AI & Machine Learning', href: '/programs/ai-ml' },
+    { name: 'Full Stack Development', href: '/programs/full-stack' },
+    { name: 'Data Science', href: '/programs/data-science' },
+    { name: 'Cyber Security', href: '/programs/cyber-security' },
+  ];
+
+  const scrollButtons: { name: string; key: SectionKey }[] = [
     { name: "Courses", key: "courses" },
-    { name: "Our Edge", key: "ourEdge" }, // Added this to match a section
+    { name: "Our Edge", key: "ourEdge" },
     { name: "Partners", key: "partners" },
-    { name: "Testimonials", key: "testimonials" }, // Added this to match a section
+    { name: "Testimonials", key: "testimonials" },
     { name: "About Us", key: "aboutUs" },
   ];
 
-  // Note: I've added 'Our Edge' and 'Testimonials' as examples.
-  // You can decide which sections you want in your navbar.
+  const dropdownVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: -10,
+      scale: 0.95,
+      // --- FIX IS HERE ---
+      // Add 'as const' to tell TypeScript this is a specific tuple, not a generic array.
+      transition: { duration: 0.2, ease: [0.42, 0, 0.58, 1] as const }
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 400,
+        damping: 25,
+        staggerChildren: 0.05
+      } 
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   return (
     <header className="sticky top-0 left-0 right-0 z-50 h-16 bg-transparent flex items-center justify-between p-6 md:p-8 text-white">
@@ -30,8 +57,50 @@ export default function Navbar() {
         PERSEVEX
       </Link>
       <nav className="hidden md:flex items-center gap-8 lg:gap-12">
-        {buttons.map((button) => (
-          // 4. Change Link to a button and add an onClick handler
+        
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsDropdownOpen(true)}
+          onMouseLeave={() => setIsDropdownOpen(false)}
+        >
+          <button
+            className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer flex items-center gap-1"
+            aria-haspopup="true"
+            aria-expanded={isDropdownOpen}
+          >
+            Programs
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          
+          <AnimatePresence>
+            {isDropdownOpen && (
+              <motion.div 
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 rounded-md shadow-lg bg-zinc-900 ring-1 ring-white/10 z-10"
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={dropdownVariants}
+              >
+                <div className="py-2" role="menu" aria-orientation="vertical">
+                  {programItems.map((item) => (
+                    <motion.div key={item.name} variants={itemVariants}>
+                      <Link
+                        href={item.href}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-zinc-800 hover:text-white rounded-md mx-2 transition-colors duration-200"
+                        role="menuitem"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {scrollButtons.map((button) => (
           <button
             key={button.name}
             onClick={() => scrollToSection(button.key)}

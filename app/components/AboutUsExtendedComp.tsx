@@ -392,7 +392,7 @@ export default function AboutUsExtendedComp({
                 {faqData.map((item, index) => {
                     const isExpanded = expandedIndex === index;
                     const gradients = [
-                        'from-[#52443d] to-[#2c231e]',
+                        'from-[#52443d] to-[#000000]',
                         'from-[#a07d51] to-[#7b6242]',
                         'from-[#e58a4a] to-[#c3682a]',
                         'from-[#ff9933] to-[#e77e22]',
@@ -402,7 +402,7 @@ export default function AboutUsExtendedComp({
                         <motion.div key={index} className="flex flex-col">
                             <motion.button
                                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                                className={`flex items-center justify-between w-full p-5 text-left text-white rounded-full border border-white/10 shadow-lg cursor-pointer bg-gradient-to-r ${gradients[index % gradients.length]}`}
+                                className={`flex items-center justify-between w-full p-5 text-left text-white rounded-3xl border border-white/10 shadow-lg cursor-pointer bg-gradient-to-r ${gradients[index % gradients.length]}`}
                                 // --- CHANGE STARTS HERE: Removed the y-translation from the hover effect ---
                                 whileHover={{ scale: 1.02 }}
                                 // --- CHANGE ENDS HERE ---

@@ -9,6 +9,17 @@ export default function Navbar() {
   const { scrollToSection } = useScroll();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+   const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // This is the crucial line: it prevents the default "jump" behavior of the link.
+    e.preventDefault(); 
+    
+    // Now, our smooth scroll command can execute without being overridden.
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   // 1. Update the data structure to include categories
   const programCategories = [
     {
@@ -65,7 +76,11 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 left-0 right-0 z-50 h-16 bg-transparent flex items-center justify-between p-6 md:p-8 text-white">
-      <Link href="/" className="text-2xl md:text-3xl font-bold tracking-wider">
+      <Link 
+        href="/" 
+        className="text-2xl cursor-pointer md:text-3xl font-bold tracking-wider"
+        onClick={handleScrollToTop} // Added the onClick handler here
+      >
         PERSEVEX
       </Link>
       <nav className="hidden md:flex items-center gap-8 lg:gap-12">

@@ -66,6 +66,7 @@ const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
     })}
   </>
 );
+
 const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRef }) => {
   const animatedProgress = useRef<number>(0);
   const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
@@ -114,7 +115,6 @@ const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
     </div>
   </div>
 );
-
 
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
@@ -304,10 +304,8 @@ const LandingPage: FC = () => {
         const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
         const animatedTextOpacity = riseProgress >= 1 ? 0 : 1;
 
-
         textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
         textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
-
 
         if (textMaskContainerRef.current) {
           (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
@@ -404,23 +402,41 @@ const LandingPage: FC = () => {
       const aboutUsContentAnimDuration = viewportHeight * 4;
       setAboutUsProgress(clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1));
       
-       let newStackingProgress = 0;
+      // Improved card stacking calculation with gap
+      let newStackingProgress = 0;
       let newCascadingProgress = 0;
 
-       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
+      if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
         const totalDuration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
         
-        const stackingDuration = totalDuration * 0.3; 
+        // Create phases: gap phase (40%) + stacking phase (30%) + cascade phase (30%)
+        const gapDuration = totalDuration * 0.05;  // 40% for gap/positioning
+        const stackingDuration = totalDuration * 0.09;  // 30% for actual stacking
+        const cascadeDuration = totalDuration * 0.09;  // 30% for cascading
         
-        const cascadeStart = start + stackingDuration;
+        const stackingStart = start + gapDuration;
+        const cascadeStart = stackingStart + stackingDuration;
         
-        newStackingProgress = clamp((currentScroll - start) / stackingDuration, 0, 1);
+        // During gap phase (0-40%): cards come into position but don't stack yet
+        if (currentScroll < stackingStart) {
+          newStackingProgress = 0;  // No stacking during gap phase
+        } 
+        // During stacking phase (40-70%): cards actually start stacking
+        else if (currentScroll < cascadeStart) {
+          newStackingProgress = clamp((currentScroll - stackingStart) / stackingDuration, 0, 1);
+        }
+        // During cascade phase (70-100%): stacking is complete
+        else {
+          newStackingProgress = 1;
+        }
 
+        // Cascading starts after stacking is complete
         if (currentScroll > cascadeStart) {
-          newCascadingProgress = (currentScroll - cascadeStart) / viewportHeight;
+          newCascadingProgress = (currentScroll - cascadeStart) / cascadeDuration;
         }
       }
+      
       setStackingProgress(newStackingProgress);
       setCascadingProgress(newCascadingProgress);
     };
@@ -565,7 +581,7 @@ const LandingPage: FC = () => {
          
         </div>
          <div  ref={cardStackingWrapperRef} style={{ height: "1150vh" }}>
-        <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-32 md:pt-40">
+        <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
           <div
             className="w-full text-white text-sm"
             style={{ opacity: extendedCompProgress }}

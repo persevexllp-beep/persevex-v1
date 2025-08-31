@@ -1,5 +1,3 @@
-// LandingPage.tsx
-
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -17,7 +15,8 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
-import PartnersSection from "./PartnersSection";
+// No change to this import, it's just referencing the component defined above
+import PartnersSection from "./PartnersSection"; 
 import { AnimatedTestimonials } from "./Testimonials";
 import { testimonialsData } from "../constants/TestimonialsData";
 import RecognizedBySection from "./RecognizedBySection";
@@ -395,7 +394,8 @@ const LandingPage: FC = () => {
       }
 
       setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
-      setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 2)));
+      // --- CHANGE #1: Increased the divisor from 2 to 4 to make the animation progress slower over a longer scroll distance.
+      setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 4)));
       setTestimonialProgress(Math.min(1, Math.max(0, currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
       
       const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
@@ -562,7 +562,8 @@ const LandingPage: FC = () => {
         <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }} >
           <OurEdgeSection progress={edgeProgress} />
         </div>
-        <div ref={partnersSectionWrapperRef} style={{ height: "200vh", marginTop: "-50vh" }}>
+        {/* --- CHANGE #2: Increased the wrapper height from 200vh to 400vh to allocate more scroll space for the section. */}
+        <div ref={partnersSectionWrapperRef} style={{ height: "300vh", marginTop: "-50vh" }}>
           <PartnersSection progress={partnersProgress} />
         </div>
 

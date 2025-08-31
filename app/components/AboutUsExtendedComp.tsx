@@ -379,63 +379,62 @@ export default function AboutUsExtendedComp({
           })}
         </div>
         
-        <div className="absolute inset-0 flex items-center justify-center w-full">
-            <motion.div
-                className="w-full max-w-3xl mx-auto flex flex-col gap-4"
-                initial={false}
-                animate={{
-                    opacity: faqOpacity,
-                    translateY: faqTranslateY,
-                }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            >
-                {faqData.map((item, index) => {
-                    const isExpanded = expandedIndex === index;
-                    const gradients = [
-                        'from-[#52443d] to-[#000000]',
-                        'from-[#a07d51] to-[#7b6242]',
-                        'from-[#e58a4a] to-[#c3682a]',
-                        'from-[#ff9933] to-[#e77e22]',
-                    ];
-                    
-                    return (
-                        <motion.div key={index} className="flex flex-col">
-                            <motion.button
-                                onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                                className={`flex items-center justify-between w-full p-5 text-left text-white rounded-3xl border border-white/10 shadow-lg cursor-pointer bg-gradient-to-r ${gradients[index % gradients.length]}`}
-                                // --- CHANGE STARTS HERE: Removed the y-translation from the hover effect ---
-                                whileHover={{ scale: 1.02 }}
-                                // --- CHANGE ENDS HERE ---
-                                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                            >
-                                <span className="font-semibold text-lg">{item.question}</span>
-                                <motion.div
-                                    className="text-2xl font-thin"
-                                    animate={{ rotate: isExpanded ? 45 : 0 }}
-                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                >
-                                    +
-                                </motion.div>
-                            </motion.button>
-                            <AnimatePresence initial={false}>
-                                {isExpanded && (
-                                    <motion.section
-                                        key="content"
-                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                        animate={{ opacity: 1, height: 'auto', marginTop: '16px' }}
-                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                        transition={{ duration: 0.4, ease: 'easeInOut' }}
-                                        className="text-gray-300 text-sm leading-relaxed px-5 overflow-hidden"
-                                    >
-                                        {item.answer}
-                                    </motion.section>
-                                )}
-                            </AnimatePresence>
+
+<div className="absolute inset-0 flex items-center justify-center w-full">
+    <motion.div
+        className="w-full max-w-3xl mx-auto flex flex-col gap-4"
+        initial={false}
+        animate={{
+            opacity: faqOpacity,
+            translateY: faqTranslateY,
+        }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+        {faqData.map((item, index) => {
+            const isExpanded = expandedIndex === index;
+            const gradients = [
+                'from-[#52443d] to-[#000000]',
+                'from-[#52443d] to-[#000000]',
+                'from-[#52443d] to-[#000000]',
+                'from-[#52443d] to-[#000000]',
+            ];
+            
+            return (
+                <motion.div key={index} className="flex  flex-col">
+                    <motion.button
+                        onClick={() => setExpandedIndex(isExpanded ? null : index)}
+                        className={`flex items-center justify-between border border-[rgba(255,255,255,2)] w-full p-5 text-left text-white rounded-3xl cursor-pointer bg-gradient-to-r ${gradients[index % gradients.length]} border-2 border-black`}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                    >
+                        <span className="font-semibold text-lg">{item.question}</span>
+                        <motion.div
+                            className="text-2xl font-thin"
+                            animate={{ rotate: isExpanded ? 45 : 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            +
                         </motion.div>
-                    );
-                })}
-            </motion.div>
-        </div>
+                    </motion.button>
+                    <AnimatePresence initial={false}>
+                        {isExpanded && (
+                            <motion.section
+                                key="content"
+                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                animate={{ opacity: 1, height: 'auto', marginTop: '16px' }}
+                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                                className="text-gray-300 text-sm leading-relaxed px-5 overflow-hidden"
+                            >
+                                {item.answer}
+                            </motion.section>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+            );
+        })}
+    </motion.div>
+</div>
       </div>
     </div>
   );

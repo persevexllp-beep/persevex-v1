@@ -2,10 +2,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
 import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
+import { useRouter } from "next/navigation";
 
 const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedProgress: MotionValue<number>, i: number }) => {
+  const router = useRouter();
   const distance = useTransform(animatedProgress, (p) => p - i);
-
   const initialY = 480;
   const stackOffset = 14;
   const stackScale = 0.05;
@@ -46,20 +47,20 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
   return (
     <motion.div
       key={course.id}
+      onClick={() => router.push(course.route)}
       style={{
         translateY,
         scale,
         opacity: cardOpacity,
         zIndex: i,
       }}
-      className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl"
+      className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-start border border-black/10 bg-white shadow-xl cursor-pointer"
     >
       <div className="w-full h-32 flex items-center justify-center mb-4">
         <Icon />
       </div>
       <h3 className="text-2xl font-bold text-gray-800 text-center">{course.title}</h3>
       <p className="text-gray-600 text-center mt-2">{course.description}</p>
-
       <motion.div
         className="absolute inset-0 bg-black rounded-2xl pointer-events-none"
         style={{ opacity: overlayOpacity }}
@@ -77,7 +78,6 @@ const CoursesSection: React.FC = () => {
   const managementCount = managementCourses.length;
 
   const managementEndProgress = managementCount / totalCount;
-  const technicalStartProgress = (managementCount + 1) / totalCount;
 
   useEffect(() => {
     let raf = 0;
@@ -146,8 +146,8 @@ const CoursesSection: React.FC = () => {
   };
 
   const textTransitionProgress = useTransform(scrollProgress, (p) => {
-    const transitionStartPoint = managementEndProgress;
-    const transitionEndPoint = technicalStartProgress;
+    const transitionStartPoint = managementEndProgress - 0.05;
+    const transitionEndPoint = managementEndProgress + 0.05;
     if (p >= transitionStartPoint && p <= transitionEndPoint) {
       return (p - transitionStartPoint) / (transitionEndPoint - transitionStartPoint);
     }

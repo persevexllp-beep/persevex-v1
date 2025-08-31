@@ -11,13 +11,10 @@ type Testimonial = {
   src: string;
 };
 
-// Component: TestimonialCard
+// Component: TestimonialCard (No changes here)
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    // CHANGE #1: Add `flex` and `flex-col` to the card's main container.
-    // This allows us to control the vertical distribution of space inside the card.
     <div className="relative flex flex-col w-[90vw] max-w-md flex-shrink-0 rounded-2xl border border-neutral-800 bg-neutral-900 p-8 shadow-2xl">
-      {/* Card Header: This part remains the same */}
       <div className="flex items-center gap-4">
         <img
           src={testimonial.src}
@@ -29,11 +26,6 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
           <p className="text-sm text-neutral-400">{testimonial.designation}</p>
         </div>
       </div>
-
-      {/* Card Body: The testimonial quote */}
-      {/* CHANGE #2: Add `flex-grow` to the blockquote. */}
-      {/* This makes the quote area expand to fill any available vertical space, */}
-      {/* ensuring the card's total height is consistent regardless of quote length. */}
       <blockquote className="mt-6 flex-grow text-lg text-neutral-300">
         <p>&ldquo;{testimonial.quote}&rdquo;</p>
       </blockquote>
@@ -41,7 +33,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   );
 };
 
-// Main Component: AnimatedTestimonials
+// Main Component: AnimatedTestimonials (Changes are here)
 export const AnimatedTestimonials = ({
   testimonials,
   progress,
@@ -51,7 +43,11 @@ export const AnimatedTestimonials = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // NEW: State to store the initial offset to center the first card
+  const [initialXOffset, setInitialXOffset] = useState(0);
   const [trackEndTranslate, setTrackEndTranslate] = useState(0);
+  
   const motionProgress = useMotionValue(0);
 
   useEffect(() => {
@@ -63,6 +59,16 @@ export const AnimatedTestimonials = ({
       if (containerRef.current && trackRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const trackWidth = trackRef.current.scrollWidth;
+
+        // NEW: Calculate the offset to center the first card
+        const firstCard = trackRef.current.firstChild as HTMLElement;
+        if (firstCard) {
+            const cardWidth = firstCard.offsetWidth;
+            const offset = (containerWidth - cardWidth) / 3;
+            setInitialXOffset(offset);
+        }
+
+        // The end translation remains the same logic
         const endTranslate = -(trackWidth - containerWidth);
         setTrackEndTranslate(endTranslate);
       }
@@ -73,16 +79,19 @@ export const AnimatedTestimonials = ({
     return () => window.removeEventListener("resize", calculateTranslation);
   }, [testimonials]);
 
-  const x = useTransform(motionProgress, [0, 1], [0, trackEndTranslate]);
+  // CHANGED: Update the transform to start from the centered position
+  const x = useTransform(
+    motionProgress,
+    [0, 1],
+    [initialXOffset, trackEndTranslate]
+  );
 
   return (
     <div
       ref={containerRef}
-      className="relative h-[350px] w-full max-w-6xl mx-auto overflow-hidden"
+      className="relative h-[350px] w-full mx-auto overflow-hidden"
     >
-      {/* CHANGE #3: Change `items-center` to `items-stretch` and add vertical padding. */}
-      {/* `items-stretch` is the key: it forces all flex children (the cards) to have the same height. */}
-      {/* `py-4` adds some vertical spacing for better aesthetics. */}
+     
       <motion.div
         ref={trackRef}
         className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"

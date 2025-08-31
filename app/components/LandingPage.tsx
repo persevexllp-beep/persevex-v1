@@ -567,12 +567,12 @@ const LandingPage: FC = () => {
           <PartnersSection progress={partnersProgress} />
         </div>
 
-        <div style={{ height: "10vh" }} />
-        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
+       <div style={{ height: "10vh" }} />
+        {/* <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <AnimatedTestimonials testimonials={formattedTestimonials} progress={testimonialProgress} />
           </div>
-        </div>
+        </div>  */}
         <div ref={recognizedBySectionWrapperRef} style={{ height: "300vh" }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <RecognizedBySection />

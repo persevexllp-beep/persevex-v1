@@ -25,18 +25,19 @@ export default function Navbar() {
     {
       title: 'Technology',
       items: [
-        { name: 'AI & Machine Learning', href: '/programs/ai-ml' },
-        { name: 'Full Stack Development', href: '/programs/full-stack' },
-        { name: 'Data Science', href: '/programs/data-science' },
-        { name: 'Cyber Security', href: '/programs/cyber-security' },
+        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
+        { name: 'Web Development', href: '/courses/full-stack' },
+        { name: 'Data Science', href: '/courses/data-science' },
+        { name: 'Cyber Security', href: '/courses/cyber-security' },
+        {name: 'Cloud Computing', href: '/courses/cloud-computing' },
       ],
     },
     {
       title: 'Finance',
       items: [
-        { name: 'Quantitative Finance', href: '/programs/quantitative-finance' },
-        { name: 'Financial Modeling', href: '/programs/financial-modeling' },
-        { name: 'Blockchain & DeFi', href: '/programs/blockchain-defi' },
+        { name: 'Finance', href: '/courses/finance' },
+        {name: 'Digital Marketing', href: 'courses/digital-marketing' },
+        {name: 'Modern Human Resourse', href: 'courses/human-resource' },
       ],
     },
   ];

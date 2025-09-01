@@ -47,7 +47,7 @@ const AnimatedLogo = ({ logo, index }: { logo: typeof logos[0]; index: number })
     <div
       ref={ref}
       className={`
-        logo-container group cursor-pointer relative // <--- ADDED 'relative' HERE
+        logo-container group cursor-pointer relative
         ${inView ? "animate-in" : "opacity-0"}
         ${logo.delay}
       `}
@@ -59,11 +59,10 @@ const AnimatedLogo = ({ logo, index }: { logo: typeof logos[0]; index: number })
       {/* Glassmorphic container with hover effects */}
       <div className="
         relative overflow-hidden rounded-2xl
-        bg-white/5 backdrop-blur-sm
-        border border-white/10
+       bg-white
         p-6 md:p-8
         transition-all duration-500 ease-out
-        hover:bg-white/10 hover:border-white/20
+       
         hover:scale-105 hover:-translate-y-2
         hover:shadow-2xl hover:shadow-blue-500/20
         group-hover:backdrop-blur-md
@@ -71,7 +70,7 @@ const AnimatedLogo = ({ logo, index }: { logo: typeof logos[0]; index: number })
         {/* ... rest of the card content is unchanged ... */}
         <div className="
           absolute inset-0 opacity-0 group-hover:opacity-100
-          bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-cyan-500/10
+          bg-white
           transition-opacity duration-500
         " />
         
@@ -96,10 +95,10 @@ const AnimatedLogo = ({ logo, index }: { logo: typeof logos[0]; index: number })
           <Image
             src={logo.src}
             alt={logo.alt}
-            width={120}
-            height={60}
+            width={400}
+            height={200}
             className="
-              object-contain w-full h-full
+              object-contain w-80 h-64
               filter brightness-110 contrast-110
               group-hover:brightness-125 group-hover:contrast-125
               transition-all duration-300

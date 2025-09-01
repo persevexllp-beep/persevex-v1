@@ -1,7 +1,7 @@
 // Filename: Testimonials.tsx
 "use client";
 
-import { motion, useTransform, useMotionValue } from "framer-motion";
+import { motion, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 type Testimonial = {
@@ -44,13 +44,22 @@ export const AnimatedTestimonials = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  // NEW: State to store the initial offset to center the first card
   const [initialXOffset, setInitialXOffset] = useState(0);
   const [trackEndTranslate, setTrackEndTranslate] = useState(0);
   
   const motionProgress = useMotionValue(0);
 
+  // NEW: Create a smoothed version of the progress value.
+  // The spring will "chase" the value of motionProgress, creating a smooth effect
+  // as the user scrolls.
+  const smoothedProgress = useSpring(motionProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
   useEffect(() => {
+    // This sets the target for the spring animation
     motionProgress.set(progress);
   }, [progress, motionProgress]);
 
@@ -60,28 +69,28 @@ export const AnimatedTestimonials = ({
         const containerWidth = containerRef.current.offsetWidth;
         const trackWidth = trackRef.current.scrollWidth;
 
-        // NEW: Calculate the offset to center the first card
         const firstCard = trackRef.current.firstChild as HTMLElement;
         if (firstCard) {
             const cardWidth = firstCard.offsetWidth;
-            const offset = (containerWidth - cardWidth) / 3;
+            // Adjusted offset slightly to better center the first card on most screens
+            const offset = (containerWidth - cardWidth) / 2.5; 
             setInitialXOffset(offset);
         }
 
-        // The end translation remains the same logic
         const endTranslate = -(trackWidth - containerWidth);
         setTrackEndTranslate(endTranslate);
       }
     };
 
     calculateTranslation();
-    window.addEventListener("resize", calculateTranslation);
-    return () => window.removeEventListener("resize", calculateTranslation);
+    const handleResize = () => calculateTranslation();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [testimonials]);
 
-  // CHANGED: Update the transform to start from the centered position
+  // CHANGED: Use the smoothed progress value for the transformation.
   const x = useTransform(
-    motionProgress,
+    smoothedProgress,
     [0, 1],
     [initialXOffset, trackEndTranslate]
   );
@@ -91,7 +100,6 @@ export const AnimatedTestimonials = ({
       ref={containerRef}
       className="relative h-[350px] w-full mx-auto overflow-hidden"
     >
-     
       <motion.div
         ref={trackRef}
         className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"

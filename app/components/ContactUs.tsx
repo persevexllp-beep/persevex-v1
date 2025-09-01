@@ -1,6 +1,4 @@
 import React, { FC, FormEvent } from "react";
-import Lottie from "lottie-react"; // 1. Import Lottie
-import contactAnimationData from "../constants/contact us (1).json"; // 2. Import your animation JSON
 
 const ContactUsSection: FC = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -19,15 +17,7 @@ const ContactUsSection: FC = () => {
           <div className="flex flex-col gap-4 text-center h-full items-center  md:text-left">
             <h1 className="font-bold text-6xl">Contact Us</h1>
             <p className="text-center text-lg w-3/4">Have questions about our courses or need more information? Fill out the form below and our team will get back to you shortly.</p>
-            {/* Left Side: Lottie Animation */}
-            <div className="flex justify-center items-center">
-              {/* 3. Replace the <img> tag with the <Lottie> component */}
-              <Lottie
-                animationData={contactAnimationData}
-                loop={true}
-                className="w-full h-auto max-w-md" // Adjusted styling for Lottie
-              />
-            </div>
+           
           </div>
 
           {/* Right Side: Form */}

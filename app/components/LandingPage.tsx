@@ -26,6 +26,7 @@ import AboutUsSection from "./AboutUs";
 import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
 import { useScroll } from "../contexts/scrollContext";
+import ContactUsSection from "./ContactUs";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
@@ -44,14 +45,7 @@ interface Testimonial {
   src: string;
 }
 
-const ContactUsSection: FC = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-full text-white">
-      <h1 className="text-5xl font-bold mb-4">Contact Us</h1>
-      <p className="text-xl">This is the ContactUsSection</p>
-    </div>
-  );
-};
+
 
 
 
@@ -129,9 +123,7 @@ const LandingPage: FC = () => {
   const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const cardStackingWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
-  // +++ START: NEW REF FOR CONTACT US SECTION +++
   const contactUsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
-  // +++ END: NEW REF FOR CONTACT US SECTION +++
   const videoRef = useRef<HTMLVideoElement>(null);
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);

@@ -16,7 +16,7 @@ const ContactUsSection: FC = () => {
     <div className="flex flex-col items-center justify-center min-h-screen pt- pb-12 px-4 sm:px-6 lg:px-8 text-white">
       <div className="w-full max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div className="flex flex-col gap-8 text-center h-full items-center  md:text-left">
+          <div className="flex flex-col gap-4 text-center h-full items-center  md:text-left">
             <h1 className="font-bold text-6xl">Contact Us</h1>
             <p className="text-center text-lg w-3/4">Have questions about our courses or need more information? Fill out the form below and our team will get back to you shortly.</p>
             {/* Left Side: Lottie Animation */}

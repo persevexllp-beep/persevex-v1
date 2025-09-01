@@ -1,6 +1,6 @@
 // "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
+import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue, useSpring } from "framer-motion";
 import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
 import { useRouter } from "next/navigation";
 
@@ -59,7 +59,7 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
         zIndex: i,
         pointerEvents,
       }}
-      className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between border border-black/10 backdrop-blur-2xl shadow-xl"
+      className="absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl"
     >
       <div className="flex flex-col items-center text-center">
         <div className="w-full h-32 flex items-center justify-center mb-4">
@@ -84,70 +84,33 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
   );
 };
 
-const CoursesSection: React.FC = () => {
+const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const scrollProgress = useMotionValue(0);
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
 
-  // --- NEW LOGIC ---
-  // Define animation "units". Each card animation takes 1 unit.
-  // We add DWELL_TIME_UNITS to create a pause after the last management card is shown.
-  const DWELL_TIME_UNITS = 1; // Increase this value for a longer pause
+  // Apply a spring to the raw scroll progress.
+  // This will smooth out the jitter from scroll events and make the animation feel much more fluid.
+  const smoothedProgress = useSpring(progress, {
+    stiffness: 400,
+    damping: 90,
+  });
+
+  const DWELL_TIME_UNITS = 1;
   const managementUnits = managementCourses.length;
   const technicalUnits = technicalCourses.length;
   const totalUnits = managementUnits + DWELL_TIME_UNITS + technicalUnits;
-
-  // Calculate key points in the scroll progress (0 to 1)
   const managementAnimationEndProgress = managementUnits / totalUnits;
   const technicalAnimationStartProgress = (managementUnits + DWELL_TIME_UNITS) / totalUnits;
-  
-  // The point where the toggle switch should flip, centered in the dwell time.
   const switchPoint = (managementAnimationEndProgress + technicalAnimationStartProgress) / 2;
-  // --- END NEW LOGIC ---
 
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        if (!sectionRef.current) return;
-        const el = sectionRef.current;
-        const rect = el.getBoundingClientRect();
-        const scrollY = window.scrollY;
-        const sectionTop = rect.top + scrollY;
-        const sectionHeight = rect.height;
-        const viewportHeight = window.innerHeight;
+  // --- REMOVED ---
+  // The internal useEffect for calculating scroll progress has been removed.
+  // This responsibility is now handled by the parent `LandingPage` component.
 
-        const coursesStartZone = sectionTop - viewportHeight * 0.8;
-        const coursesEndZone = sectionTop + sectionHeight - viewportHeight;
-
-        let newProgress = 0;
-        if (scrollY >= coursesStartZone && scrollY <= coursesEndZone) {
-          const totalZoneHeight = coursesEndZone - coursesStartZone;
-          const progressInZone = scrollY - coursesStartZone;
-          newProgress = progressInZone / totalZoneHeight;
-        } else if (scrollY > coursesEndZone) {
-          newProgress = 1;
-        }
-
-        scrollProgress.set(Math.max(0, Math.min(1, newProgress)));
-        raf = 0;
-      });
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [scrollProgress]);
-
-  useMotionValueEvent(scrollProgress, "change", (latest) => {
-    // Use the new switchPoint to determine the active view
+  // The event listener for the toggle switch uses the raw `progress` value.
+  // This makes the switch UI feel instantly responsive to the user's scroll,
+  // while the card animations use the smoothed value for fluidity.
+  useMotionValueEvent(progress, "change", (latest) => {
     setActiveView(latest >= switchPoint ? 'technical' : 'management');
   });
 
@@ -164,38 +127,33 @@ const CoursesSection: React.FC = () => {
     const totalZoneHeight = coursesEndZone - coursesStartZone;
 
     if (view === 'management') {
-      // Scroll to a point where management cards are visible
       const managementPosition = coursesStartZone + (totalZoneHeight * (managementAnimationEndProgress / 2));
       window.scrollTo({ top: managementPosition, behavior: 'smooth' });
     } else {
-      // Scroll to a point where technical cards are visible
       const technicalPosition = coursesStartZone + (totalZoneHeight * technicalAnimationStartProgress);
       window.scrollTo({ top: technicalPosition, behavior: 'smooth' });
     }
   };
 
   // --- UPDATED LOGIC ---
-  // The text and stack transition now happens only during the "dwell time".
+  // All `useTransform` hooks now use `smoothedProgress` to drive the visual animations.
   const textTransitionProgress = useTransform(
-    scrollProgress,
+    smoothedProgress,
     [managementAnimationEndProgress, technicalAnimationStartProgress],
     [0, 1]
   );
 
-  // Animate management cards from the start until their animation is supposed to end.
   const managementAnimatedProgress = useTransform(
-    scrollProgress,
+    smoothedProgress,
     [0, managementAnimationEndProgress],
     [-1, managementCourses.length - 1]
   );
   
-  // Animate technical cards only after the dwell time has passed.
   const technicalAnimatedProgress = useTransform(
-    scrollProgress,
+    smoothedProgress,
     [technicalAnimationStartProgress, 1],
     [-1, technicalCourses.length - 1]
   );
-  // --- END UPDATED LOGIC ---
 
   const managementTextOpacity = useTransform(textTransitionProgress, [0, 1], [1, 0]);
   const managementTextY = useTransform(textTransitionProgress, [0, 1], [0, -20]);
@@ -212,9 +170,9 @@ const CoursesSection: React.FC = () => {
     <section
       ref={sectionRef}
       className="relative w-full text-white"
-      style={{ height: `${120 + totalUnits * 70}vh` }} // Adjusted height for dwell time
+      style={{ height: `${120 + totalUnits * 70}vh` }}
     >
-      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-center mx-auto px-8 h-screen items-center relative">
+      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-center mx-auto px-8 h-screen items-center ">
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
           <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
             <motion.div

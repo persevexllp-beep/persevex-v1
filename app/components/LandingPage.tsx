@@ -12,6 +12,7 @@ import {
   useMemo,
 } from "react";
 import * as THREE from "three";
+import { useMotionValue } from "framer-motion"; // Import useMotionValue
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -26,6 +27,7 @@ import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
 import { useScroll } from "../contexts/scrollContext";
 
+// Other components (clamp, DustMaterial, AnimationController, etc.) remain unchanged...
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
@@ -116,8 +118,12 @@ const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
   </div>
 );
 
+
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
+
+  // Create a MotionValue to hold the scroll progress for the CoursesSection.
+  const coursesProgress = useMotionValue(0);
 
   const [headerProgress, setHeaderProgress] = useState<number>(0);
   const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
@@ -144,12 +150,6 @@ const LandingPage: FC = () => {
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
 
-  // --- REMOVED ---
-  // const [targetTestimonialIndex, setTargetTestimonialIndex] = useState<number>(0);
-  // const lastScrollTime = useRef<number>(0);
-  // const isInitialLoad = useRef<boolean>(true);
-  // --- END REMOVED ---
-
   const formattedTestimonials: Testimonial[] = useMemo(
     () => testimonialsData.map((t) => ({
       quote: t.quote,
@@ -160,8 +160,7 @@ const LandingPage: FC = () => {
     []
   );
 
-  // We increase the duration to give more "room" to scroll through the testimonials
-  const testimonialsAnimationDurationVh = 300; // Increased from 150
+  const testimonialsAnimationDurationVh = 300;
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
   useEffect(() => {
@@ -398,10 +397,28 @@ const LandingPage: FC = () => {
         heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
       }
 
+      // --- NEW: Calculate and set progress for CoursesSection ---
+      if (coursesSectionWrapperRef.current && coursesTop > 0) {
+        const sectionEl = coursesSectionWrapperRef.current;
+        const sectionHeight = sectionEl.offsetHeight;
+
+        const coursesStartZone = coursesTop - viewportHeight * 0.8;
+        const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
+
+        let newCoursesProgress = 0;
+        if (currentScroll >= coursesStartZone && currentScroll <= coursesEndZone) {
+          const totalZoneHeight = coursesEndZone - coursesStartZone;
+          const progressInZone = currentScroll - coursesStartZone;
+          newCoursesProgress = progressInZone / totalZoneHeight;
+        } else if (currentScroll > coursesEndZone) {
+          newCoursesProgress = 1;
+        }
+
+        coursesProgress.set(Math.max(0, Math.min(1, newCoursesProgress)));
+      }
+
       setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
       setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 4)));
-      
-      // THIS CALCULATION IS NOW THE ONLY THING DRIVING THE TESTIMONIALS ANIMATION
       setTestimonialProgress(Math.min(1, Math.max(0, (currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight))));
       
       const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
@@ -414,11 +431,9 @@ const LandingPage: FC = () => {
       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
         const totalDuration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
-        
         const gapDuration = totalDuration * 0.05;
         const stackingDuration = totalDuration * 0.09;
         const cascadeDuration = totalDuration * 0.09;
-        
         const stackingStart = start + gapDuration;
         const cascadeStart = stackingStart + stackingDuration;
         
@@ -443,18 +458,8 @@ const LandingPage: FC = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [layout, testimonialsAnimationDurationVh]);
+  }, [layout, testimonialsAnimationDurationVh, coursesProgress]); // Add coursesProgress to dependency array
 
-  // --- REMOVED ---
-  // The entire useEffect that handled the 'wheel' event has been removed.
-  // useEffect(() => { ... handleWheel ... });
-  // --- END REMOVED ---
-
-  // --- REMOVED ---
-  // The entire useEffect that programmatically scrolled the page has been removed.
-  // useEffect(() => { ... window.scrollTo ... });
-  // --- END REMOVED ---
-  
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
 
   return (
@@ -524,7 +529,8 @@ const LandingPage: FC = () => {
 
         <div style={{ height: "10vh" }} />
         <div ref={coursesSectionWrapperRef}>
-          <CoursesSection />
+          {/* Pass the calculated progress down to the CoursesSection */}
+          <CoursesSection progress={coursesProgress} />
         </div>
         <div style={{ height: "50vh" }} />
         <div ref={ourEdgeSectionWrapperRef} style={{ height: `${(NUM_CARDS + 1) * 100}vh` }} >

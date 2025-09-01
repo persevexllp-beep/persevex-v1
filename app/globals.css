@@ -117,3 +117,158 @@ div[style*="--about-us-container-transform"] h2 video {
   will-change: auto; /* Don't animate videos unnecessarily */
   transform: translateZ(0);
 }
+
+
+
+/* Enhanced styles for the logo cards - works with existing .logo-wrapper */
+
+/* Logo card styling - the inner container */
+.logo-card {
+  position: relative;
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Enhanced hover effects for the logo card */
+.logo-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Remove conflicting animations and use your existing .logo-wrapper system */
+.logo-wrapper {
+  position: relative;
+}
+
+/* Keyframe animations for different directions */
+@keyframes slideInFromTopLeft {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-40px) translateX(-40px) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes slideInFromTopRight {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-40px) translateX(40px) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes slideInFromBottomLeft {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px) translateX(-40px) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes slideInFromBottomRight {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px) translateX(40px) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Glow effect on hover - simplified */
+.logo-card:hover {
+  box-shadow: 
+    0 20px 40px rgba(59, 130, 246, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced title animations */
+.title-enhanced {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #e0f2fe 25%,
+    #b3e5fc 50%,
+    #81d4fa 75%,
+    #4fc3f7 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Particle system CSS */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.8) 0%, transparent 70%);
+  animation: particleFloat 8s linear infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-card {
+    padding: 1.5rem;
+  }
+  
+  .logo-card:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+/* Focus accessibility */
+.logo-card:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 4px;
+}
+
+
+
+.sticky-section-wrapper > .sticky {
+  will-change: transform;
+}

@@ -59,19 +59,19 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
         zIndex: i,
         pointerEvents,
       }}
-      className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between border border-black/10 bg-white shadow-xl"
+      className="absolute top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between border border-black/10 backdrop-blur-2xl shadow-xl"
     >
       <div className="flex flex-col items-center text-center">
         <div className="w-full h-32 flex items-center justify-center mb-4">
           <Icon />
         </div>
-        <h3 className="text-2xl font-bold text-gray-800">{course.title}</h3>
-        <p className="text-gray-600 mt-2">{course.description}</p>
+        <h3 className="text-2xl font-bold text-white">{course.title}</h3>
+        <p className="text-gray-200 mt-2">{course.description}</p>
       </div>
 
       <button
         onClick={() => router.push(course.route)}
-        className="w-full py-2.5 px-5 mt-4 font-medium text-white bg-gray-800 rounded-lg transition-colors hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="w-full py-2.5 px-5 cursor-pointer mt-4 font-medium text-white bg-gray-800 rounded-lg transition-colors hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>

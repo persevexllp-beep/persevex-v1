@@ -400,10 +400,10 @@ export default function AboutUsExtendedComp({
             ];
             
             return (
-                <motion.div key={index} className="flex  flex-col">
+                <motion.div key={index} className="flex flex-col">
                     <motion.button
                         onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                        className={`flex items-center justify-between border border-[rgba(255_255_255_1)] w-full p-5 text-left text-white rounded-3xl cursor-pointer bg-gradient-to-r ${gradients[index % gradients.length]} border-2 border-black`}
+                        className={`flex items-center justify-between w-full p-5 text-left text-white rounded-3xl bg-green cursor-pointer  border-2 border-[rgba(255,255,255,0.3)]`}
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                     >

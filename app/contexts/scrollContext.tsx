@@ -6,7 +6,7 @@ import React, { createContext, useContext, useState, RefObject } from 'react';
 
 export const NUM_CARDS = 6;
 
-export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs';
+export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs' | "contactUs";;
 
 export interface LayoutState {
   coursesTop: number;
@@ -16,6 +16,7 @@ export interface LayoutState {
   recognizedByTop: number;
   aboutUsTop: number;
   cardStackingTop: number;
+  contactUsTop: number;
 }
 
 interface ScrollContextType {

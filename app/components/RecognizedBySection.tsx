@@ -163,7 +163,7 @@ const RecognizedBySection = () => {
         
         <h2 className="
           text-5xl md:text-6xl lg:text-7xl font-bold mb-6
-          bg-gradient-to-r from-white via-blue-100 to-cyan-100
+          bg-white
           bg-clip-text text-transparent
           leading-tight
         ">

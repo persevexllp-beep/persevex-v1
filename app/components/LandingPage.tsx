@@ -12,7 +12,7 @@ import {
   useMemo,
 } from "react";
 import * as THREE from "three";
-import { useMotionValue } from "framer-motion"; // Import useMotionValue
+import { useMotionValue } from "framer-motion"; 
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -27,7 +27,6 @@ import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
 import { useScroll } from "../contexts/scrollContext";
 
-// Other components (clamp, DustMaterial, AnimationController, etc.) remain unchanged...
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
@@ -44,6 +43,17 @@ interface Testimonial {
   designation: string;
   src: string;
 }
+
+const ContactUsSection: FC = () => {
+  return (
+    <div className="flex flex-col items-center justify-center h-full text-white">
+      <h1 className="text-5xl font-bold mb-4">Contact Us</h1>
+      <p className="text-xl">This is the ContactUsSection</p>
+    </div>
+  );
+};
+
+
 
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   <>
@@ -99,24 +109,6 @@ const AnimationController: FC<AnimationControllerProps> = ({ watermarkProgressRe
   );
 };
 
-const StickyHeader: FC<{ show: boolean }> = ({ show }) => (
-  <div
-    className="fixed top-0 left-0 w-full px-4 md:px-8 lg:px-16 py-6 flex items-center justify-between z-50 pointer-events-none"
-    style={{
-      opacity: show ? 1 : 0,
-      transition: "opacity 0.5s ease-in-out",
-    }}
-  >
-    <div className="pointer-events-auto">
-      <h2
-        className="text-white text-xl md:text-2xl font-black"
-        style={{ fontFamily: "serif" }}
-      >
-        ABOUT US
-      </h2>
-    </div>
-  </div>
-);
 
 
 const LandingPage: FC = () => {
@@ -137,6 +129,9 @@ const LandingPage: FC = () => {
   const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const cardStackingWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  // +++ START: NEW REF FOR CONTACT US SECTION +++
+  const contactUsSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  // +++ END: NEW REF FOR CONTACT US SECTION +++
   const videoRef = useRef<HTMLVideoElement>(null);
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
@@ -172,7 +167,10 @@ const LandingPage: FC = () => {
         testimonialsSectionWrapperRef.current &&
         recognizedBySectionWrapperRef.current &&
         aboutUsSectionWrapperRef.current &&
-        cardStackingWrapperRef.current
+        cardStackingWrapperRef.current &&
+        // +++ START: ADD CHECK FOR NEW REF +++
+        contactUsSectionWrapperRef.current
+        // +++ END: ADD CHECK FOR NEW REF +++
       ) {
         setLayout({
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
@@ -182,6 +180,9 @@ const LandingPage: FC = () => {
           recognizedByTop: recognizedBySectionWrapperRef.current.offsetTop,
           aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
           cardStackingTop: cardStackingWrapperRef.current.offsetTop,
+          // +++ START: ADD NEW LAYOUT PROPERTY +++
+          contactUsTop: contactUsSectionWrapperRef.current.offsetTop,
+          // +++ END: ADD NEW LAYOUT PROPERTY +++
         });
       }
     };
@@ -205,6 +206,9 @@ const LandingPage: FC = () => {
       testimonials: testimonialsSectionWrapperRef,
       recognizedBy: recognizedBySectionWrapperRef,
       aboutUs: aboutUsSectionWrapperRef,
+      // +++ START: ADD NEW REF TO CONTEXT +++
+      contactUs: contactUsSectionWrapperRef,
+      // +++ END: ADD NEW REF TO CONTEXT +++
     });
   }, [setSectionRefs]);
 
@@ -223,8 +227,11 @@ const LandingPage: FC = () => {
       const currentProgress = smoothedProgressRef.current;
       setHeaderProgress(currentProgress);
       if (textContainerRef.current && window.innerHeight) {
-        let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0;
+        // +++ START: ADD NEW OPACITY VARIABLE +++
+        let persevexOpacity = 0, coursesOpacity = 0, ourEdgeOpacity = 0, partnersOpacity = 0, trustOpacity = 0, recognizedByOpacity = 0, aboutUsOpacity = 0, contactUsOpacity = 0;
+        // +++ END: ADD NEW OPACITY VARIABLE +++
 
+        // +++ START: MODIFY WATERMARK OPACITY LOGIC +++
         if (currentProgress < 1.0) {
           persevexOpacity = (1 - currentProgress) * 0.4;
           coursesOpacity = currentProgress * 0.4;
@@ -248,10 +255,19 @@ const LandingPage: FC = () => {
           const p = currentProgress - 5.0;
           recognizedByOpacity = (1 - p) * 0.4;
           aboutUsOpacity = p * 0.4;
-        } else {
+        } else if (currentProgress < 11.0) { // During "ABOUT US" text animation
           recognizedByOpacity = 0;
           aboutUsOpacity = 0.4;
+        } else if (currentProgress < 12.0) { // Transition from "Our Story" to "Contact US"
+            const p = currentProgress - 11.0;
+            aboutUsOpacity = (1 - p) * 0.4;
+            contactUsOpacity = p * 0.4;
+        } else { // After transition, "Contact US" stays visible
+            recognizedByOpacity = 0;
+            aboutUsOpacity = 0;
+            contactUsOpacity = 0.4;
         }
+        // +++ END: MODIFY WATERMARK OPACITY LOGIC +++
 
         const assemblyStart = 6.0;
         const assemblyDuration = 2.0;
@@ -266,7 +282,13 @@ const LandingPage: FC = () => {
         const videoFadeProgress = clamp((currentProgress - videoFadeStart) / videoFadeDuration, 0, 1);
         const riseProgress = clamp((currentProgress - riseStart) / riseDuration, 0, 1);
         
-        setShowStickyHeader(riseProgress >= 1);
+        // +++ START: MODIFIED LOGIC FOR STICKY HEADER +++
+        const isDisplayingAboutUsContent = riseProgress >= 1;
+        // Start hiding the header as soon as the contact transition begins (progress > 11.0)
+        // A small threshold like 11.01 ensures it doesn't flicker at the exact boundary.
+        const isStartingContactUsTransition = currentProgress > 11.01;
+        setShowStickyHeader(isDisplayingAboutUsContent && !isStartingContactUsTransition);
+        // +++ END: MODIFIED LOGIC FOR STICKY HEADER +++
 
         let fillColor = "white", stroke = "none", textContainerMixBlendMode = "normal", textContainerBackground = "transparent", textContainerBoxShadow = "none", videoOpacity = 0, starfieldOpacity = 0, whiteOverlayOpacity = 0;
 
@@ -298,14 +320,35 @@ const LandingPage: FC = () => {
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
-        const y_pos_before_rise = THREE.MathUtils.lerp(initialY * 16, centerTargetPx, centerProgress);
-        const y_pos_after_rise_starts = THREE.MathUtils.lerp(centerTargetPx, topTargetPx, riseProgress);
-        const containerTranslateY = isBeforeRise ? y_pos_before_rise : y_pos_after_rise_starts;
+        const exitStart = riseStart + riseDuration; // 11.0
+        const exitDuration = 0.1;
+        const exitEnd = exitStart + exitDuration; // 11.5
+        const exitProgress = clamp((currentProgress - exitStart) / exitDuration, 0, 1);
+
+        let containerTranslateY;
+        if (currentProgress < riseStart) { // Before 10.0: Assembly and centering
+            containerTranslateY = THREE.MathUtils.lerp(initialY * 16, centerTargetPx, centerProgress);
+        } else if (currentProgress < exitStart) { // Between 10.0 and 11.0: Rising to top
+            containerTranslateY = THREE.MathUtils.lerp(centerTargetPx, topTargetPx, riseProgress);
+        } else { // After 11.0: Exiting off-screen
+            const exitTargetVh = -100; // Animate to a position off the top of the screen
+            const exitTargetPx = (exitTargetVh * window.innerHeight) / 100;
+            containerTranslateY = THREE.MathUtils.lerp(topTargetPx, exitTargetPx, exitProgress);
+        }
 
         const initial_scale = 1.0;
         const final_scale = 0.45;
         const containerScale = isBeforeRise ? initial_scale : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
-        const animatedTextOpacity = riseProgress >= 1 ? 0 : 1;
+        
+        let animatedTextOpacity;
+        const fadeInProgress = clamp((currentProgress - assemblyStart) / (assemblyDuration / 2), 0, 1);
+        if (currentProgress < assemblyStart) {
+            animatedTextOpacity = 0;
+        } else if (currentProgress < exitEnd) {
+            animatedTextOpacity = fadeInProgress; 
+        } else {
+            animatedTextOpacity = 0; 
+        }
 
         textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
         textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
@@ -352,6 +395,9 @@ const LandingPage: FC = () => {
         textContainerRef.current.style.setProperty("--trust-opacity", `${clamp(trustOpacity, 0, 0.4)}`);
         textContainerRef.current.style.setProperty("--recognized-by-opacity", `${clamp(recognizedByOpacity, 0, 0.4)}`);
         textContainerRef.current.style.setProperty("--about-us-opacity", `${clamp(aboutUsOpacity, 0, 0.4)}`);
+        // +++ START: SET NEW CSS VARIABLE FOR OPACITY +++
+        textContainerRef.current.style.setProperty("--contact-us-opacity", `${clamp(contactUsOpacity, 0, 0.4)}`);
+        // +++ END: SET NEW CSS VARIABLE FOR OPACITY +++
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -366,17 +412,30 @@ const LandingPage: FC = () => {
       if (!layout || layout.coursesTop === 0) return;
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
-      const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop, cardStackingTop } = layout;
+      // +++ START: DESTRUCTURE NEW LAYOUT PROPERTY +++
+      const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop, cardStackingTop, contactUsTop } = layout;
+      // +++ END: DESTRUCTURE NEW LAYOUT PROPERTY +++
 
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
       
-      if (currentScroll >= aboutUsWatermarkAnimStart) {
+      // +++ START: MODIFY SCROLL PROGRESS LOGIC +++
+      // This new block must be first as it checks for the highest scroll value.
+      const contactUsTransitionStart = contactUsTop - viewportHeight;
+      const contactUsTransitionDuration = viewportHeight;
+
+      if (currentScroll >= contactUsTransitionStart) {
+        const progress = clamp((currentScroll - contactUsTransitionStart) / contactUsTransitionDuration, 0, 1);
+        newWatermarkProgress = 11 + progress; // Progress from 11 to 12
+      } else if (currentScroll >= aboutUsWatermarkAnimStart) {
         const progress = clamp((currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration, 0, 1);
-        newWatermarkProgress = 6 + progress * 5;
+        newWatermarkProgress = 6 + progress * 5; // Progress from 6 to 11
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
-        newWatermarkProgress = 4 + Math.min(1, (currentScroll - (recognizedByTop - viewportHeight)) / viewportHeight);
+        // This was recognizedByTop before, but that caused a jump. Correcting to be smooth.
+        const start = testimonialsTop - viewportHeight / 2;
+        const duration = (recognizedByTop - viewportHeight) - start;
+        newWatermarkProgress = 4 + Math.min(1, (currentScroll - start) / duration);
       } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
@@ -388,6 +447,7 @@ const LandingPage: FC = () => {
       } else if (currentScroll >= coursesTop - viewportHeight) {
         newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
       }
+      // +++ END: MODIFY SCROLL PROGRESS LOGIC +++
 
       targetProgressRef.current = newWatermarkProgress;
       
@@ -425,30 +485,32 @@ const LandingPage: FC = () => {
       const aboutUsContentAnimDuration = viewportHeight * 4;
       setAboutUsProgress(clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1));
       
-      let newStackingProgress = 0;
+       let newStackingProgress = 0;
       let newCascadingProgress = 0;
 
       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
-        const totalDuration = cardStackingWrapperRef.current.offsetHeight - viewportHeight;
-        const gapDuration = totalDuration * 0.05;
-        const stackingDuration = totalDuration * 0.09;
-        const cascadeDuration = totalDuration * 0.09;
-        const stackingStart = start + gapDuration;
-        const cascadeStart = stackingStart + stackingDuration;
-        
-        if (currentScroll < stackingStart) {
-          newStackingProgress = 0;
-        } 
-        else if (currentScroll < cascadeStart) {
-          newStackingProgress = clamp((currentScroll - stackingStart) / stackingDuration, 0, 1);
-        }
-        else {
-          newStackingProgress = 1;
-        }
+        const vh = window.innerHeight / 100;
 
+        // Define explicit scroll durations for each animation phase
+        const stackingDuration = 100 * vh;   // Stacking animation occurs over 100vh of scrolling
+        const cascadingDuration = 200 * vh;  // Cascading/FAQ animation occurs over the next 200vh
+        
+        // Define start points for each phase
+        const stackingStart = start;
+        const cascadeStart = stackingStart + stackingDuration;
+
+        // --- Calculate new stacking progress ---
+        newStackingProgress = clamp((currentScroll - stackingStart) / stackingDuration, 0, 1);
+
+        // --- Calculate new cascading progress ---
+        // The animations in AboutUsExtendedComp finish around a progress value of 4.0
+        const CASCADING_MAX_PROGRESS = 4.0; 
         if (currentScroll > cascadeStart) {
-          newCascadingProgress = (currentScroll - cascadeStart) / cascadeDuration;
+          const progressWithinCascade = (currentScroll - cascadeStart) / cascadingDuration;
+          newCascadingProgress = clamp(progressWithinCascade * CASCADING_MAX_PROGRESS, 0, CASCADING_MAX_PROGRESS);
+        } else {
+          newCascadingProgress = 0;
         }
       }
       
@@ -464,7 +526,7 @@ const LandingPage: FC = () => {
 
   return (
     <main>
-      <StickyHeader show={showStickyHeader} />
+     
       
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
@@ -485,6 +547,9 @@ const LandingPage: FC = () => {
         <h2 className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--trust-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", }}>Trust</h2>
         <h2 className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--recognized-by-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Validation</h2>
         <h2 className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--about-us-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Our Story</h2>
+        {/* +++ START: ADD NEW WATERMARK +++ */}
+        <h2 className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none" style={{ opacity: "var(--contact-us-opacity)", WebkitTextStroke: "1px white", transform: "translateX(-50%) translateY(4rem)", whiteSpace: "nowrap", }}>Contact Us</h2>
+        {/* +++ END: ADD NEW WATERMARK +++ */}
         
         <div
           className="absolute left-1/2 z-[-4]"
@@ -499,7 +564,7 @@ const LandingPage: FC = () => {
           <div
             className="relative"
             style={{
-              opacity: "calc(var(--about-us-opacity) * 2.5 * var(--animated-text-opacity, 1))",
+              opacity: "var(--animated-text-opacity, 1)",
               transition: 'opacity 0.3s ease-out',
               isolation: "isolate",
             }}
@@ -554,19 +619,25 @@ const LandingPage: FC = () => {
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}>
          
         </div>
-         <div  ref={cardStackingWrapperRef} style={{ height: "1150vh" }}>
-        <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
-          <div
-            className="w-full text-white text-sm"
-            style={{ opacity: extendedCompProgress }}
-          >
-            <AboutUsExtendedComp
-              stackingProgress={stackingProgress}
-              cascadingProgress={cascadingProgress}
-            />
+         <div  ref={cardStackingWrapperRef} style={{ height: "400vh" }}>
+          <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
+            <div
+              className="w-full text-white text-sm"
+              style={{ opacity: extendedCompProgress }}
+            >
+              <AboutUsExtendedComp
+                stackingProgress={stackingProgress}
+                cascadingProgress={cascadingProgress}
+              />
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* +++ START: ADD NEW SECTION TO THE PAGE +++ */}
+        <div ref={contactUsSectionWrapperRef} style={{ height: "100vh" }}>
+          <ContactUsSection />
+        </div>
+        {/* +++ END: ADD NEW SECTION TO THE PAGE +++ */}
       </div>
     </main>
   );

@@ -364,52 +364,30 @@ const LandingPage: FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!layout || !layout.coursesTop) return;
-      
+      if (!layout || layout.coursesTop === 0) return;
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
       const { coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop, aboutUsTop, cardStackingTop } = layout;
 
-      // --- REVISED AND CORRECTED WATERMARK PROGRESS LOGIC ---
+      const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
+      const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
-
-      if (currentScroll < coursesTop - viewportHeight) {
-        newWatermarkProgress = 0;
-      } else if (currentScroll < edgeTop - viewportHeight) {
-        // From Hero to Courses (0 -> 1)
-        const range = (edgeTop - viewportHeight) - (coursesTop - viewportHeight);
-        const progressInRange = (currentScroll - (coursesTop - viewportHeight)) / range;
-        newWatermarkProgress = Math.min(1, progressInRange);
-      } else if (currentScroll < partnersTop) {
-        // From Courses to Our Edge (1 -> 2)
-        const range = partnersTop - (edgeTop - viewportHeight);
-        const progressInRange = (currentScroll - (edgeTop - viewportHeight)) / range;
-        newWatermarkProgress = 1 + Math.min(1, progressInRange);
-      } else if (currentScroll < testimonialsTop - viewportHeight) {
-        // From Our Edge to Partners (2 -> 3)
-        const range = (testimonialsTop - viewportHeight) - partnersTop;
-        const progressInRange = (currentScroll - partnersTop) / range;
-        newWatermarkProgress = 2 + Math.min(1, progressInRange);
-      } else if (currentScroll < recognizedByTop - viewportHeight) {
-        // From Partners to Testimonials (3 -> 4)
-        const range = (recognizedByTop - viewportHeight) - (testimonialsTop - viewportHeight);
-        const progressInRange = (currentScroll - (testimonialsTop - viewportHeight)) / range;
-        newWatermarkProgress = 3 + Math.min(1, progressInRange);
-      } else if (currentScroll < aboutUsTop - viewportHeight) {
-        // From Testimonials to Recognized By (4 -> 5) and then Recognized By to About Us (5 -> 6)
-        // This is the key fix: we create a continuous transition.
-        const startOfThisBlock = recognizedByTop - viewportHeight;
-        const endOfThisBlock = aboutUsTop - viewportHeight;
-        const range = endOfThisBlock - startOfThisBlock;
-        const progressInRange = (currentScroll - startOfThisBlock) / range;
-        // The transition from 4 to 6 happens over this entire block
-        newWatermarkProgress = 4 + (progressInRange * 2); // Multiplied by 2 because it covers progress 4->5 and 5->6
-      } else {
-        // About Us section and beyond (6 -> 11)
-        const start = aboutUsTop - viewportHeight;
-        const duration = viewportHeight * 6; // As you had before
-        const progressInRange = clamp((currentScroll - start) / duration, 0, 1);
-        newWatermarkProgress = 6 + progressInRange * 5;
+      
+      if (currentScroll >= aboutUsWatermarkAnimStart) {
+        const progress = clamp((currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration, 0, 1);
+        newWatermarkProgress = 6 + progress * 5;
+      } else if (currentScroll >= recognizedByTop - viewportHeight) {
+        newWatermarkProgress = 4 + Math.min(1, (currentScroll - (recognizedByTop - viewportHeight)) / viewportHeight);
+      } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
+        newWatermarkProgress = 4.0;
+      } else if (currentScroll >= testimonialsTop - viewportHeight) {
+        newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / (viewportHeight / 2));
+      } else if (currentScroll >= partnersTop) {
+        newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (testimonialsTop - viewportHeight - partnersTop));
+      } else if (currentScroll >= edgeTop - viewportHeight) {
+        newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
+      } else if (currentScroll >= coursesTop - viewportHeight) {
+        newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
       }
 
       targetProgressRef.current = newWatermarkProgress;
@@ -422,6 +400,8 @@ const LandingPage: FC = () => {
 
       setEdgeProgress(Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)));
       setPartnersProgress(Math.min(1, Math.max(0, currentScroll - partnersTop) / (viewportHeight * 4)));
+      
+      // THIS CALCULATION IS NOW THE ONLY THING DRIVING THE TESTIMONIALS ANIMATION
       setTestimonialProgress(Math.min(1, Math.max(0, (currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight))));
       
       const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
@@ -444,9 +424,11 @@ const LandingPage: FC = () => {
         
         if (currentScroll < stackingStart) {
           newStackingProgress = 0;
-        } else if (currentScroll < cascadeStart) {
+        } 
+        else if (currentScroll < cascadeStart) {
           newStackingProgress = clamp((currentScroll - stackingStart) / stackingDuration, 0, 1);
-        } else {
+        }
+        else {
           newStackingProgress = 1;
         }
 
@@ -458,7 +440,6 @@ const LandingPage: FC = () => {
       setStackingProgress(newStackingProgress);
       setCascadingProgress(newCascadingProgress);
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -554,12 +535,12 @@ const LandingPage: FC = () => {
         </div>
 
         <div style={{ height: "10vh" }} />
-        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }} className="sticky-section-wrapper">
+        <div ref={testimonialsSectionWrapperRef} style={{ height: `${testimonialsSectionHeightVh}vh` }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <AnimatedTestimonials testimonials={formattedTestimonials} progress={testimonialProgress} />
           </div>
         </div>
-        <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }} className="sticky-section-wrapper">
+        <div ref={recognizedBySectionWrapperRef} style={{ height: "300vh" }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <RecognizedBySection />
           </div>

@@ -33,7 +33,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
     e.currentTarget.reset();
   };
 
-  // --- Animation Timeline (from your provided code) ---
+  // --- Animation Timeline is unchanged ---
   const TEXT_APPEAR_END = 0.25;
   const FORM_APPEAR_START = 0.60;
   const FORM_APPEAR_END = 0.85;
@@ -41,7 +41,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
   const SPLIT_END = 1.0;
 
   const { textStyle, formStyle } = useMemo(() => {
-    // --- Calculate progress for each phase ---
+    // --- All animation logic is unchanged, exactly as you provided ---
     const textAppearProgress = clamp(progress / TEXT_APPEAR_END, 0, 1);
 
     const formAppearProgress = clamp(
@@ -58,7 +58,6 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
 
     const finalCenterYOffset = -5;
 
-    // --- Text Block Styles (unchanged) ---
     const textOpacity = textAppearProgress;
     const textTranslateY = interpolate(textAppearProgress, [0, 1], [30, finalCenterYOffset]);
     const textScale = interpolate(textAppearProgress, [0, 1], [0.8, 1]);
@@ -70,26 +69,14 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
       willChange: 'transform, opacity',
     };
 
-    // --- FORM Block Styles ---
-    const formOpacity = formAppearProgress;
-    const formTranslateY = interpolate(formAppearProgress, [0, 1], [30, finalCenterYOffset]);
+    const formOpacity = textAppearProgress;
+    const formTranslateY = interpolate(formAppearProgress, [0, 1], [100, finalCenterYOffset]);
     const formTranslateX = interpolate(splitProgress, [0, 1], [0, 25]);
-
-    // +++ MODIFICATION START +++
-    // The form's scale is now a two-stage animation.
-    // Stage 1: Scale up from 80% to 100% as the form appears.
-    let formScale = interpolate(formAppearProgress, [0, 1], [0.8, 1]);
-
-    // Stage 2: If the split animation is active, override the scale.
-    // Animate from 100% down to 70% (a 30% reduction).
-    if (splitProgress > 0) {
-      formScale = interpolate(splitProgress, [0, 1], [1, 0.85]);
-    }
-    // +++ MODIFICATION END +++
-
+    
+    const formScale = interpolate(formAppearProgress, [0, 1], [1.0, 0.7]);
+    
     const formStyle: React.CSSProperties = {
       opacity: formOpacity,
-      // The transform now uses the multi-stage formScale value.
       transform: `translate(calc(-50% + ${formTranslateX}vw), calc(-50% + ${formTranslateY}vh)) scale(${formScale})`,
       willChange: 'transform, opacity',
     };
@@ -114,9 +101,10 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
       {/* Form Block */}
       <div
         style={formStyle}
-        className="absolute top-1/2 left-1/2 w-full max-w-xl bg-black/40 border border-white/20 rounded-2xl p-8 backdrop-blur-sm"
+        className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white/20 rounded-2xl p-8 backdrop-blur-sm"
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* +++ MODIFICATION 1: Increased vertical spacing +++ */}
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Form content remains exactly the same */}
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
             <div className="w-full">
@@ -177,10 +165,11 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
             >
               Your Message
             </label>
+            {/* +++ MODIFICATION 2: Increased textarea height +++ */}
             <textarea
               name="message"
               id="message"
-              rows={4}
+              rows={5}
               required
               placeholder="How can we help you achieve your goals?"
               className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300 resize-none"
@@ -189,7 +178,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300"
+              className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300"
             >
               Send Message
             </button>

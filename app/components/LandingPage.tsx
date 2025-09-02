@@ -752,7 +752,7 @@ const LandingPage: FC = () => {
         const start = cardStackingTop;
         const vh = window.innerHeight / 100;
         const stackingDuration = 100 * vh;
-        const cascadingDuration = 200 * vh;
+         const cascadingDuration = 400 * vh;
         const stackingStart = start;
         const cascadeStart = stackingStart + stackingDuration;
         newStackingProgress = clamp(
@@ -1015,7 +1015,7 @@ const LandingPage: FC = () => {
           </div>
         </div>
         <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}></div>
-        <div ref={cardStackingWrapperRef} style={{ height: "400vh" }}>
+        <div ref={cardStackingWrapperRef} style={{ height: "600vh" }}>
           <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
             <div
               className="w-full text-white text-sm"

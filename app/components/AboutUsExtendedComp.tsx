@@ -49,6 +49,19 @@ const faqData = [
     }
 ];
 
+// Updated animation timing constants
+const SCALE_START = 0.8;
+const PRE_STACK_1_START = 1.0;
+const STACK_1_START = 1.8;
+const PRE_STACK_2_START = 2.0;
+const STACK_2_START = 2.8;
+
+const CARD_FADE_START_PROGRESS = 3.0;
+const CARD_FADE_DURATION = 0.5;
+
+const FAQ_RISE_START_PROGRESS = CARD_FADE_START_PROGRESS + CARD_FADE_DURATION;
+const FAQ_RISE_DURATION = 0.5;
+
 
 export default function AboutUsExtendedComp({
   stackingProgress,
@@ -56,10 +69,6 @@ export default function AboutUsExtendedComp({
 }: AboutUsExtendedCompProps) {
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
-
-  const SCALE_START = 0.6;
-  const STACK_1_START = 1.6;
-  const STACK_2_START = 2.6;
 
   const isCard1Expanded = cascadingProgress >= STACK_1_START ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= STACK_2_START ? 1 : 0;
@@ -69,12 +78,6 @@ export default function AboutUsExtendedComp({
   );
   
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const CARD_FADE_START_PROGRESS = 2.8;
-  const CARD_FADE_DURATION = 0.5;
-
-  const FAQ_RISE_START_PROGRESS = CARD_FADE_START_PROGRESS + CARD_FADE_DURATION;
-  const FAQ_RISE_DURATION = 0.5;
 
   const cardFadeProgress = easeOutCubic(
     Math.max(
@@ -132,8 +135,6 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 1: {
-        const PRE_STACK_1_START = 0.8;
-
         if (isCard1Expanded) {
           width = finalWidth;
           height = finalHeight;
@@ -184,8 +185,6 @@ export default function AboutUsExtendedComp({
         break;
       }
       case 2: {
-        const PRE_STACK_2_START = 1.8;
-
         if (isCard2Expanded) {
           width = finalWidth;
           height = finalHeight;
@@ -286,10 +285,7 @@ export default function AboutUsExtendedComp({
               maxWidth: cardExpansionProgress ? `calc(50% - ${dynamicGap / 2}px)` : "0%",
               opacity: cardExpansionProgress,
             };
-
-            const PRE_STACK_1_START = 0.8;
-            const PRE_STACK_2_START = 1.8;
-
+            
             let shouldShowContent = true;
             if (index === 0) {
               if (expansionProgress > 0 && expansionProgress <= 0.99) { shouldShowContent = false; }

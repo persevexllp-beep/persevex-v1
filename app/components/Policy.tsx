@@ -13,7 +13,7 @@ const PolicySection: FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-4 text-center h-full items-center md:text-left">
             <h1 className="font-bold text-6xl">Privacy Policy</h1>
-            <p className="text-center text-lg w-3/4">
+            <p className="text-center  text-lg w-3/4">
               Important documents about our policies, terms, and procedures.
               Please review these to understand your rights and our
               responsibilities.
@@ -33,7 +33,7 @@ const PolicySection: FC = () => {
                   Privacy Policy
                 </AnimatedTitle>
               </Link>
-              <p>
+              <p className="text-gray-200">
                 We value your privacy and are committed to safeguarding your
                 personal information. Our Privacy Policy explains in detail how
                 we collect data, why we use it, and the steps we take to ensure
@@ -53,7 +53,7 @@ const PolicySection: FC = () => {
                   Terms and Conditions
                 </AnimatedTitle>
               </Link>
-              <p>
+              <p className="text-gray-200">
                  By accessing and using our services, you agree to follow the
                 guidelines outlined in our Terms and Conditions. These terms
                 cover user responsibilities, acceptable usage, limitations of
@@ -73,7 +73,7 @@ const PolicySection: FC = () => {
                   Return Policy
                 </AnimatedTitle>
               </Link>
-              <p>
+              <p className="text-gray-200">
                 We aim to provide the best learning experience. If you’re
                 unsatisfied with a course, our Return Policy explains the
                 process for cancellations, refunds, and eligibility criteria,

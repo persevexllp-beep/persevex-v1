@@ -154,6 +154,7 @@ const LandingPage: FC = () => {
   const [cascadingProgress, setCascadingProgress] = useState<number>(0);
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
+   const [contactUsProgress, setContactUsProgress] = useState<number>(0);
 
   const formattedTestimonials: Testimonial[] = useMemo(
     () =>
@@ -737,6 +738,17 @@ const LandingPage: FC = () => {
 
       setStackingProgress(newStackingProgress);
       setCascadingProgress(newCascadingProgress);
+
+       if (contactUsTop > 0) {
+        const animationStart = contactUsTop - viewportHeight;
+        const animationDuration = viewportHeight * 2; // Animate over 200vh of scroll
+        const progress = clamp(
+          (currentScroll - animationStart) / animationDuration,
+          0,
+          1
+        );
+        setContactUsProgress(progress);
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -971,8 +983,10 @@ const LandingPage: FC = () => {
           </div>
         </div>
 
-        <div ref={contactUsSectionWrapperRef} style={{ height: "100vh" }}>
-          <ContactUsSection />
+          <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
+          <div className="sticky top-0 h-screen w-full overflow-hidden">
+            <ContactUsSection progress={contactUsProgress} />
+          </div>
         </div>
 
         {/* +++ MODIFICATION START +++ */}

@@ -21,10 +21,10 @@ const ContactUsSection: FC = () => {
           </div>
 
           {/* Right Side: Form */}
-          <div className="w-full">
+          <div className=" mb-20  ">
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 bg-transparent border border-white/20 rounded-2xl p-8 backdrop-blur-sm"
+              className="space-y-6 bg-transparent border w-4/5 lg:ml-24  max-w-2xl border-white/20 rounded-2xl p-8 backdrop-blur-sm"
             >
               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
                 <div className="w-full">

@@ -164,7 +164,9 @@ const LandingPage: FC = () => {
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
   const [contactUsProgress, setContactUsProgress] = useState<number>(0);
- const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>; 
+  const footerSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as React.RefObject<HTMLDivElement>;
   const formattedTestimonials: Testimonial[] = useMemo(
     () =>
       testimonialsData.map((t) => ({
@@ -229,7 +231,7 @@ const LandingPage: FC = () => {
       aboutUs: aboutUsSectionWrapperRef,
       contactUs: contactUsSectionWrapperRef,
       policy: policySectionWrapperRef,
-       footer: footerSectionWrapperRef,
+      footer: footerSectionWrapperRef,
     });
   }, [setSectionRefs]);
 
@@ -257,7 +259,7 @@ const LandingPage: FC = () => {
           aboutUsOpacity = 0,
           contactUsOpacity = 0,
           policyOpacity = 0,
-           footerOpacity = 0; 
+          footerOpacity = 0;
 
         if (currentProgress < 1.0) {
           persevexOpacity = (1 - currentProgress) * 0.4;
@@ -296,7 +298,8 @@ const LandingPage: FC = () => {
           const p = currentProgress - 12.0;
           contactUsOpacity = (1 - p) * 0.4;
           policyOpacity = p * 0.4;
-        } else if (currentProgress < 14.0) { // 7. Add transition from Privacy to Footer
+        } else if (currentProgress < 14.0) {
+          // 7. Add transition from Privacy to Footer
           const p = currentProgress - 13.0;
           policyOpacity = (1 - p) * 0.4;
           footerOpacity = p * 1.0;
@@ -538,7 +541,10 @@ const LandingPage: FC = () => {
           `${clamp(policyOpacity, 0, 0.4)}`
         );
 
-        textContainerRef.current.style.setProperty("--footer-opacity", `${clamp(footerOpacity, 0, 1.0)}`); 
+        textContainerRef.current.style.setProperty(
+          "--footer-opacity",
+          `${clamp(footerOpacity, 0, 1.0)}`
+        );
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -570,40 +576,104 @@ const LandingPage: FC = () => {
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
 
-       const footerTransitionStart = footerTop - viewportHeight;
+      const footerTransitionStart = footerTop - viewportHeight;
       const footerTransitionDuration = viewportHeight;
       const policyTransitionStart = policyTop - viewportHeight;
       const policyTransitionDuration = viewportHeight;
       const contactUsTransitionStart = contactUsTop - viewportHeight;
       const contactUsTransitionDuration = viewportHeight;
 
+      // START: FIX FOR WATERMARK TIMING
+      // Define a scroll duration for the "Validation" to "Our Story" watermark transition.
+      const validationToStoryTransitionDuration = viewportHeight;
+
       if (currentScroll >= footerTransitionStart) {
-        const progress = clamp((currentScroll - footerTransitionStart) / footerTransitionDuration, 0, 1);
+        const progress = clamp(
+          (currentScroll - footerTransitionStart) / footerTransitionDuration,
+          0,
+          1
+        );
         newWatermarkProgress = 13 + progress; // Progress from 13 to 14
       } else if (currentScroll >= policyTransitionStart) {
-        const progress = clamp((currentScroll - policyTransitionStart) / policyTransitionDuration, 0, 1);
+        const progress = clamp(
+          (currentScroll - policyTransitionStart) / policyTransitionDuration,
+          0,
+          1
+        );
         newWatermarkProgress = 12 + progress; // Progress from 12 to 13
       } else if (currentScroll >= contactUsTransitionStart) {
-        const progress = clamp((currentScroll - contactUsTransitionStart) / contactUsTransitionDuration, 0, 1);
+        const progress = clamp(
+          (currentScroll - contactUsTransitionStart) /
+            contactUsTransitionDuration,
+          0,
+          1
+        );
         newWatermarkProgress = 11 + progress; // Progress from 11 to 12
-      // ... (rest of the progress logic is unchanged)
+      } else if (
+        currentScroll >=
+        aboutUsWatermarkAnimStart + validationToStoryTransitionDuration
+      ) {
+        // Main "About Us" animation (progress 6.0 -> 11.0)
+        // This now starts *after* the Validation->Story transition is complete.
+        const animStart =
+          aboutUsWatermarkAnimStart + validationToStoryTransitionDuration;
+        const animDuration =
+          aboutUsWatermarkAnimDuration - validationToStoryTransitionDuration;
+        const progress = clamp((currentScroll - animStart) / animDuration, 0, 1);
+        newWatermarkProgress = 6.0 + progress * 5;
       } else if (currentScroll >= aboutUsWatermarkAnimStart) {
-        const progress = clamp((currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration, 0, 1);
-        newWatermarkProgress = 6 + progress * 5;
+        // Transition from "Validation" to "Our Story" (progress 5.0 -> 6.0)
+        // This happens as the "Recognized By" section scrolls off the screen.
+        const animStart = aboutUsWatermarkAnimStart;
+        const progress = clamp(
+          (currentScroll - animStart) / validationToStoryTransitionDuration,
+          0,
+          1
+        );
+        newWatermarkProgress = 5.0 + progress;
+      } else if (currentScroll >= recognizedByTop - viewportHeight / 2) {
+        // Hold "Validation" watermark steady (progress 5.0) while the section is in view.
+        newWatermarkProgress = 5.0;
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
-        const start = testimonialsTop - viewportHeight / 2;
-        const duration = recognizedByTop - viewportHeight - start;
-        newWatermarkProgress = 4 + Math.min(1, (currentScroll - start) / duration);
+        // Transition from "Trust" to "Validation" (progress 4.0 -> 5.0) as the section scrolls on screen.
+        const start = recognizedByTop - viewportHeight;
+        const duration = viewportHeight / 2;
+        const progress = clamp((currentScroll - start) / duration, 0, 1);
+        newWatermarkProgress = 4.0 + progress;
       } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
+        // Hold the "Trust" watermark steady at 4.0 after its transition.
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
-        newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / (viewportHeight / 2));
+        // Transition from "Partners" (3.0) to "Trust" (4.0).
+        const transitionDuration = viewportHeight / 2;
+        newWatermarkProgress =
+          3 +
+          Math.min(
+            1,
+            (currentScroll - (testimonialsTop - viewportHeight)) /
+              transitionDuration
+          );
+        // END: FIX FOR WATERMARK TIMING
       } else if (currentScroll >= partnersTop) {
-        newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (testimonialsTop - viewportHeight - partnersTop));
+        newWatermarkProgress =
+          2 +
+          Math.min(
+            1,
+            (currentScroll - partnersTop) /
+              (testimonialsTop - viewportHeight - partnersTop)
+          );
       } else if (currentScroll >= edgeTop - viewportHeight) {
-        newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
+        newWatermarkProgress =
+          1 +
+          Math.min(
+            1,
+            (currentScroll - (edgeTop - viewportHeight)) / viewportHeight
+          );
       } else if (currentScroll >= coursesTop - viewportHeight) {
-        newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
+        newWatermarkProgress = Math.min(
+          1,
+          (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
+        );
       }
 
       targetProgressRef.current = newWatermarkProgress;
@@ -835,11 +905,11 @@ const LandingPage: FC = () => {
         >
           Privacy
         </h2>
-         <h2
+        <h2
           className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
           style={{
             opacity: "var(--footer-opacity)", // This line connects it to the scroll animation
-            textShadow: '0 0 30px rgba(255, 255, 255, 1.0)',
+            textShadow: "0 0 30px rgba(255, 255, 255, 1.0)",
           }}
         >
           PERSEVEX
@@ -939,7 +1009,7 @@ const LandingPage: FC = () => {
             />
           </div>
         </div>
-        <div ref={recognizedBySectionWrapperRef} style={{ height: "300vh" }}>
+        <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
           <div className="sticky top-0 flex h-screen items-center justify-center">
             <RecognizedBySection />
           </div>
@@ -969,7 +1039,7 @@ const LandingPage: FC = () => {
           <PolicySection />
         </div>
 
-         <div ref={footerSectionWrapperRef}>
+        <div ref={footerSectionWrapperRef}>
           <FooterSection />
         </div>
       </div>

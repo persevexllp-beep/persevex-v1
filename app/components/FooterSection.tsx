@@ -46,7 +46,7 @@ export default function FooterSection() {
                     <li key={link}>
                       <a
                         href="#"
-                        className="text-gray-700 hover:text-white transition-colors duration-300"
+                        className="text-white hover:text-gray-800 transition-colors duration-300"
                       >
                         {link}
                       </a>

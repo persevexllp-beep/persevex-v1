@@ -970,11 +970,11 @@ const LandingPage: FC = () => {
       </div>
 
       <div className="relative z-20">
-        <div
+         <div
           ref={heroWrapperRef}
           className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
         >
-          <div className="w-full mr-74 mb-36 pointer-events-none">
+          <div className="w-full md:mr-74 md:mb-36 pointer-events-none">
             <Hero />
           </div>
         </div>

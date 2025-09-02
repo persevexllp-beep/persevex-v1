@@ -1,5 +1,3 @@
-// Filename: LandingPage.tsx
-
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -28,14 +26,12 @@ import AboutUsExtendedComp from "./AboutUsExtendedComp";
 import { useScroll } from "../contexts/scrollContext";
 import ContactUsSection from "./ContactUs";
 import PolicySection from "./Policy";
+import FooterSection from "./FooterSection";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
 
-interface DustMaterial extends THREE.ShaderMaterial {
-  uniforms: { uOpacity: { value: number } };
-}
 interface AnimationControllerProps {
   watermarkProgressRef: MutableRefObject<number>;
 }
@@ -70,6 +66,10 @@ const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   </>
 );
 
+interface DustMaterial extends THREE.ShaderMaterial {
+  uniforms: { uOpacity: { value: number } };
+}
+
 const AnimationController: FC<AnimationControllerProps> = ({
   watermarkProgressRef,
 }) => {
@@ -83,14 +83,25 @@ const AnimationController: FC<AnimationControllerProps> = ({
       0.05
     );
     const currentProgress = animatedProgress.current;
+
     if (dustPlaneRef.current) {
-      let dustOpacity = 1.0;
-      if (currentProgress > 1.0) {
-        dustOpacity = Math.max(0, 1.0 - (currentProgress - 1.0));
+      let dustOpacity = 0;
+
+      if (currentProgress <= 1.0) {
+        dustOpacity = 1.0;
+      } else if (currentProgress > 1.0 && currentProgress < 2.0) {
+        dustOpacity = 1.0 - (currentProgress - 1.0);
+      } else if (currentProgress >= 12.0 && currentProgress < 13.0) {
+        dustOpacity = currentProgress - 12.0;
+      } else if (currentProgress >= 13.0) {
+        // This rule ensures the dust stays visible for the Policy section
+        // AND the new Footer section, as their progress values will be >= 13.0
+        dustOpacity = 1.0;
       }
+
       const material = dustPlaneRef.current.material;
       if (material.uniforms.uOpacity) {
-        material.uniforms.uOpacity.value = dustOpacity;
+        material.uniforms.uOpacity.value = clamp(dustOpacity, 0, 1);
       }
     }
   });
@@ -137,11 +148,9 @@ const LandingPage: FC = () => {
   const contactUsSectionWrapperRef = useRef<HTMLDivElement>(
     null
   ) as React.RefObject<HTMLDivElement>;
-  // +++ MODIFICATION START +++
   const policySectionWrapperRef = useRef<HTMLDivElement>(
     null
   ) as React.RefObject<HTMLDivElement>;
-  // +++ MODIFICATION END +++
   const videoRef = useRef<HTMLVideoElement>(null);
   const starfieldOverlayRef = useRef<HTMLDivElement>(null);
   const whiteOverlayRef = useRef<HTMLDivElement>(null);
@@ -154,8 +163,8 @@ const LandingPage: FC = () => {
   const [cascadingProgress, setCascadingProgress] = useState<number>(0);
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
-   const [contactUsProgress, setContactUsProgress] = useState<number>(0);
-
+  const [contactUsProgress, setContactUsProgress] = useState<number>(0);
+ const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>; 
   const formattedTestimonials: Testimonial[] = useMemo(
     () =>
       testimonialsData.map((t) => ({
@@ -181,9 +190,8 @@ const LandingPage: FC = () => {
         aboutUsSectionWrapperRef.current &&
         cardStackingWrapperRef.current &&
         contactUsSectionWrapperRef.current &&
-        // +++ MODIFICATION START +++
-        policySectionWrapperRef.current
-        // +++ MODIFICATION END +++
+        policySectionWrapperRef.current &&
+        footerSectionWrapperRef.current
       ) {
         setLayout({
           coursesTop: coursesSectionWrapperRef.current.offsetTop,
@@ -194,9 +202,8 @@ const LandingPage: FC = () => {
           aboutUsTop: aboutUsSectionWrapperRef.current.offsetTop,
           cardStackingTop: cardStackingWrapperRef.current.offsetTop,
           contactUsTop: contactUsSectionWrapperRef.current.offsetTop,
-          // +++ MODIFICATION START +++
           policyTop: policySectionWrapperRef.current.offsetTop,
-          // +++ MODIFICATION END +++
+          footerTop: footerSectionWrapperRef.current.offsetTop,
         });
       }
     };
@@ -221,9 +228,8 @@ const LandingPage: FC = () => {
       recognizedBy: recognizedBySectionWrapperRef,
       aboutUs: aboutUsSectionWrapperRef,
       contactUs: contactUsSectionWrapperRef,
-      // +++ MODIFICATION START +++
       policy: policySectionWrapperRef,
-      // +++ MODIFICATION END +++
+       footer: footerSectionWrapperRef,
     });
   }, [setSectionRefs]);
 
@@ -242,7 +248,6 @@ const LandingPage: FC = () => {
       const currentProgress = smoothedProgressRef.current;
       setHeaderProgress(currentProgress);
       if (textContainerRef.current && window.innerHeight) {
-        // +++ MODIFICATION START +++
         let persevexOpacity = 0,
           coursesOpacity = 0,
           ourEdgeOpacity = 0,
@@ -251,10 +256,9 @@ const LandingPage: FC = () => {
           recognizedByOpacity = 0,
           aboutUsOpacity = 0,
           contactUsOpacity = 0,
-          policyOpacity = 0;
-        // +++ MODIFICATION END +++
+          policyOpacity = 0,
+           footerOpacity = 0; 
 
-        // +++ MODIFICATION START: Modify watermark opacity logic +++
         if (currentProgress < 1.0) {
           persevexOpacity = (1 - currentProgress) * 0.4;
           coursesOpacity = currentProgress * 0.4;
@@ -292,14 +296,14 @@ const LandingPage: FC = () => {
           const p = currentProgress - 12.0;
           contactUsOpacity = (1 - p) * 0.4;
           policyOpacity = p * 0.4;
+        } else if (currentProgress < 14.0) { // 7. Add transition from Privacy to Footer
+          const p = currentProgress - 13.0;
+          policyOpacity = (1 - p) * 0.4;
+          footerOpacity = p * 1.0;
         } else {
-          // After transition, "Privacy" stays visible
-          recognizedByOpacity = 0;
-          aboutUsOpacity = 0;
-          contactUsOpacity = 0;
-          policyOpacity = 0.4;
+          policyOpacity = 0;
+          footerOpacity = 1.0;
         }
-        // +++ MODIFICATION END +++
 
         const assemblyStart = 6.0;
         const assemblyDuration = 2.0;
@@ -390,22 +394,19 @@ const LandingPage: FC = () => {
 
         let containerTranslateY;
         if (currentProgress < riseStart) {
-          // Before 10.0: Assembly and centering
           containerTranslateY = THREE.MathUtils.lerp(
             initialY * 16,
             centerTargetPx,
             centerProgress
           );
         } else if (currentProgress < exitStart) {
-          // Between 10.0 and 11.0: Rising to top
           containerTranslateY = THREE.MathUtils.lerp(
             centerTargetPx,
             topTargetPx,
             riseProgress
           );
         } else {
-          // After 11.0: Exiting off-screen
-          const exitTargetVh = -100; // Animate to a position off the top of the screen
+          const exitTargetVh = -100;
           const exitTargetPx = (exitTargetVh * window.innerHeight) / 100;
           containerTranslateY = THREE.MathUtils.lerp(
             topTargetPx,
@@ -532,12 +533,12 @@ const LandingPage: FC = () => {
           "--contact-us-opacity",
           `${clamp(contactUsOpacity, 0, 0.4)}`
         );
-        // +++ MODIFICATION START +++
         textContainerRef.current.style.setProperty(
           "--policy-opacity",
           `${clamp(policyOpacity, 0, 0.4)}`
         );
-        // +++ MODIFICATION END +++
+
+        textContainerRef.current.style.setProperty("--footer-opacity", `${clamp(footerOpacity, 0, 1.0)}`); 
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -549,10 +550,9 @@ const LandingPage: FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!layout || layout.coursesTop === 0) return;
+      if (!layout || !layout.footerTop) return;
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
-      // +++ MODIFICATION START +++
       const {
         coursesTop,
         edgeTop,
@@ -563,79 +563,48 @@ const LandingPage: FC = () => {
         cardStackingTop,
         contactUsTop,
         policyTop,
+        footerTop,
       } = layout;
-      // +++ MODIFICATION END +++
 
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
 
-      // +++ MODIFICATION START: Modify scroll progress logic +++
+       const footerTransitionStart = footerTop - viewportHeight;
+      const footerTransitionDuration = viewportHeight;
       const policyTransitionStart = policyTop - viewportHeight;
       const policyTransitionDuration = viewportHeight;
       const contactUsTransitionStart = contactUsTop - viewportHeight;
       const contactUsTransitionDuration = viewportHeight;
 
-      if (currentScroll >= policyTransitionStart) {
-        const progress = clamp(
-          (currentScroll - policyTransitionStart) / policyTransitionDuration,
-          0,
-          1
-        );
+      if (currentScroll >= footerTransitionStart) {
+        const progress = clamp((currentScroll - footerTransitionStart) / footerTransitionDuration, 0, 1);
+        newWatermarkProgress = 13 + progress; // Progress from 13 to 14
+      } else if (currentScroll >= policyTransitionStart) {
+        const progress = clamp((currentScroll - policyTransitionStart) / policyTransitionDuration, 0, 1);
         newWatermarkProgress = 12 + progress; // Progress from 12 to 13
       } else if (currentScroll >= contactUsTransitionStart) {
-        const progress = clamp(
-          (currentScroll - contactUsTransitionStart) /
-            contactUsTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - contactUsTransitionStart) / contactUsTransitionDuration, 0, 1);
         newWatermarkProgress = 11 + progress; // Progress from 11 to 12
+      // ... (rest of the progress logic is unchanged)
       } else if (currentScroll >= aboutUsWatermarkAnimStart) {
-        const progress = clamp(
-          (currentScroll - aboutUsWatermarkAnimStart) /
-            aboutUsWatermarkAnimDuration,
-          0,
-          1
-        );
-        newWatermarkProgress = 6 + progress * 5; // Progress from 6 to 11
+        const progress = clamp((currentScroll - aboutUsWatermarkAnimStart) / aboutUsWatermarkAnimDuration, 0, 1);
+        newWatermarkProgress = 6 + progress * 5;
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
         const start = testimonialsTop - viewportHeight / 2;
         const duration = recognizedByTop - viewportHeight - start;
-        newWatermarkProgress =
-          4 + Math.min(1, (currentScroll - start) / duration);
+        newWatermarkProgress = 4 + Math.min(1, (currentScroll - start) / duration);
       } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
-        newWatermarkProgress =
-          3 +
-          Math.min(
-            1,
-            (currentScroll - (testimonialsTop - viewportHeight)) /
-              (viewportHeight / 2)
-          );
+        newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / (viewportHeight / 2));
       } else if (currentScroll >= partnersTop) {
-        newWatermarkProgress =
-          2 +
-          Math.min(
-            1,
-            (currentScroll - partnersTop) /
-              (testimonialsTop - viewportHeight - partnersTop)
-          );
+        newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (testimonialsTop - viewportHeight - partnersTop));
       } else if (currentScroll >= edgeTop - viewportHeight) {
-        newWatermarkProgress =
-          1 +
-          Math.min(
-            1,
-            (currentScroll - (edgeTop - viewportHeight)) / viewportHeight
-          );
+        newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
       } else if (currentScroll >= coursesTop - viewportHeight) {
-        newWatermarkProgress = Math.min(
-          1,
-          (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
-        );
+        newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
       }
-      // +++ MODIFICATION END +++
 
       targetProgressRef.current = newWatermarkProgress;
 
@@ -739,7 +708,7 @@ const LandingPage: FC = () => {
       setStackingProgress(newStackingProgress);
       setCascadingProgress(newCascadingProgress);
 
-       if (contactUsTop > 0) {
+      if (contactUsTop > 0) {
         const animationStart = contactUsTop - viewportHeight;
         const animationDuration = viewportHeight * 2; // Animate over 200vh of scroll
         const progress = clamp(
@@ -855,7 +824,6 @@ const LandingPage: FC = () => {
         >
           Contact Us
         </h2>
-        {/* +++ MODIFICATION START +++ */}
         <h2
           className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
           style={{
@@ -867,7 +835,15 @@ const LandingPage: FC = () => {
         >
           Privacy
         </h2>
-        {/* +++ MODIFICATION END +++ */}
+         <h2
+          className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
+          style={{
+            opacity: "var(--footer-opacity)", // This line connects it to the scroll animation
+            textShadow: '0 0 30px rgba(255, 255, 255, 1.0)',
+          }}
+        >
+          PERSEVEX
+        </h2>
 
         <div
           className="absolute left-1/2 z-[-4]"
@@ -983,17 +959,19 @@ const LandingPage: FC = () => {
           </div>
         </div>
 
-          <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
+        <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
           <div className="sticky top-0 h-screen w-full overflow-hidden">
             <ContactUsSection progress={contactUsProgress} />
           </div>
         </div>
 
-        {/* +++ MODIFICATION START +++ */}
         <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
           <PolicySection />
         </div>
-        {/* +++ MODIFICATION END +++ */}
+
+         <div ref={footerSectionWrapperRef}>
+          <FooterSection />
+        </div>
       </div>
     </main>
   );

@@ -6,7 +6,8 @@ import React, { createContext, useContext, useState, RefObject } from 'react';
 
 export const NUM_CARDS = 6;
 
-export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs' | "contactUs" | 'policy';
+// The types are already correct, no changes needed here
+export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs' | "contactUs" | 'policy' | 'footer';
 
 export interface LayoutState {
   coursesTop: number;
@@ -17,7 +18,8 @@ export interface LayoutState {
   aboutUsTop: number;
   cardStackingTop: number;
   contactUsTop: number;
-  policyTop: number
+  policyTop: number;
+  footerTop: number;
 }
 
 interface ScrollContextType {
@@ -55,11 +57,8 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     }
-    // --- CHANGE STARTS HERE ---
-    // Special handling for "About Us" to land on the video animation
+    // Special handling for "About Us"
     else if (key === 'aboutUs' && layout) {
-      // This calculation lands the scroll at the point where the watermark animation
-      // progress is 9.0, which is the middle of the video-in-text effect.
       const targetY = layout.aboutUsTop + (window.innerHeight * 2.6);
       window.scrollTo({
         top: targetY,
@@ -67,9 +66,20 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     }
-    // --- CHANGE ENDS HERE ---
+    // +++ MODIFICATION START +++
+    // Add special handling for "Footer"
+    else if (key === 'footer' && layout) {
+      // We explicitly scroll to the calculated top of the footer section.
+      // This is the most reliable way to get to the end of the page.
+      window.scrollTo({
+        top: layout.footerTop,
+        behavior: 'smooth',
+      });
+      return;
+    }
+    // +++ MODIFICATION END +++
 
-    // Default behavior for all other sections
+    // Default behavior for all other sections (like Courses, Contact Us, etc.)
     if (ref?.current) {
       ref.current.scrollIntoView({
         behavior: 'smooth',

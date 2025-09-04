@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue, useSpring } from "framer-motion";
 import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
@@ -59,7 +59,10 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
         zIndex: i,
         pointerEvents,
       }}
-      className="absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl"
+      // RESPONSIVENESS CHANGE:
+      // - `w-[90vw] md:w-full`: On mobile, the card width is 90% of the viewport width to prevent overflow.
+      //   On desktop (`md` and up), it's 100% of its parent container. `max-w-sm` still applies to both.
+      className="absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl"
     >
       <div className="flex flex-col items-center text-center">
         <div className="w-full h-32 flex items-center justify-center mb-4">
@@ -103,13 +106,6 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   const technicalAnimationStartProgress = (managementUnits + DWELL_TIME_UNITS) / totalUnits;
   const switchPoint = (managementAnimationEndProgress + technicalAnimationStartProgress) / 2;
 
-  // --- REMOVED ---
-  // The internal useEffect for calculating scroll progress has been removed.
-  // This responsibility is now handled by the parent `LandingPage` component.
-
-  // The event listener for the toggle switch uses the raw `progress` value.
-  // This makes the switch UI feel instantly responsive to the user's scroll,
-  // while the card animations use the smoothed value for fluidity.
   useMotionValueEvent(progress, "change", (latest) => {
     setActiveView(latest >= switchPoint ? 'technical' : 'management');
   });
@@ -172,7 +168,12 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
       className="relative w-full text-white"
       style={{ height: `${120 + totalUnits * 70}vh` }}
     >
-      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-center mx-auto px-8 h-screen items-center ">
+      {/* RESPONSIVENESS FIX 1: 
+          - On mobile (flex-col), changed `justify-center` to `justify-start` to align content to the top.
+          - Added `pt-32` on mobile to push content down, preventing it from overlapping with the toggle switch.
+          - Kept original behavior for desktop (`md:` screens) to avoid changing the desktop design.
+      */}
+      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-start md:justify-center mx-auto px-8 h-screen items-center pt-32 md:pt-0">
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
           <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
             <motion.div
@@ -196,9 +197,13 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
             </button>
           </div>
         </div>
-
-        <div className="w-full md:w-full flex mb-44 items-center justify-center">
-          <div className="relative w-full ml-24 h-80">
+        
+        {/* RESPONSIVENESS FIX 2: 
+            - Removed the large `mb-44` which was causing inflexible spacing on mobile. 
+            - Spacing is now handled by the parent's `gap-8`, creating a cleaner vertical flow.
+        */}
+        <div className="w-full md:w-full flex items-center lg:mb-44 justify-center">
+          <div className="relative w-full lg:ml-24  lg:h-80">
             <motion.div
               className="absolute top-0 left-0 w-full"
               style={{
@@ -233,7 +238,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
           </div>
         </div>
 
-        <div className="relative w-full md:w-1/2 h-[480px] flex items-center justify-center">
+        <div className="relative w-full md:w-1/2 h-[480px] mt-88 lg:mt-0 flex items-center justify-center">
           <motion.div
             className="absolute inset-0 flex justify-center items-center"
             style={{ 

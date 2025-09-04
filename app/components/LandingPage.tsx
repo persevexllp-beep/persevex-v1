@@ -810,111 +810,115 @@ const LandingPage: FC = () => {
         ref={textContainerRef}
         className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
       >
-        <h2
-          className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--persevex-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Persevex
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--courses-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Courses
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--our-edge-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Our Edge
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--partners-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Partners
-        </h2>
-        <h2
-          className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--trust-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-          }}
-        >
-          Trust
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--recognized-by-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Validation
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--about-us-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Our Story
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--contact-us-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Contact Us
-        </h2>
-        <h2
-          className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-          style={{
-            opacity: "var(--policy-opacity)",
-            WebkitTextStroke: "1px white",
-            transform: "translateX(-50%) translateY(4rem)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Privacy
-        </h2>
-        <h2
-          className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
-          style={{
-            opacity: "var(--footer-opacity)", // This line connects it to the scroll animation
-            textShadow: "0 0 30px rgba(255, 255, 255, 1.0)",
-          }}
-        >
-          PERSEVEX
-        </h2>
+        {/* --- CHANGE: Wrapped all watermarks in a div with responsive visibility classes --- */}
+        <div className="hidden md:block">
+          <h2
+            className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--persevex-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+            }}
+          >
+            Persevex
+          </h2>
+          <h2
+            className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--courses-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+            }}
+          >
+            Courses
+          </h2>
+          <h2
+            className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--our-edge-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Our Edge
+          </h2>
+          <h2
+            className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--partners-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+            }}
+          >
+            Partners
+          </h2>
+          <h2
+            className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--trust-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+            }}
+          >
+            Trust
+          </h2>
+          <h2
+            className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--recognized-by-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Validation
+          </h2>
+          <h2
+            className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--about-us-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Our Story
+          </h2>
+          <h2
+            className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--contact-us-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Contact Us
+          </h2>
+          <h2
+            className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            style={{
+              opacity: "var(--policy-opacity)",
+              WebkitTextStroke: "1px white",
+              transform: "translateX(-50%) translateY(4rem)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Privacy
+          </h2>
+          <h2
+            className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
+            style={{
+              opacity: "var(--footer-opacity)",
+              textShadow: "0 0 30px rgba(255, 255, 255, 1.0)",
+            }}
+          >
+            PERSEVEX
+          </h2>
+        </div>
 
+        {/* This is the "ABOUT US" text animation, which should remain visible on all screen sizes */}
         <div
           className="absolute left-1/2 z-[-4]"
           style={

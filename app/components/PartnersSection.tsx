@@ -1,9 +1,31 @@
 "use client"; 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image'; 
 
-// Enhanced parallax with more natural speed variations
+// --- HELPER HOOK ---
+// Reusing our mobile detection hook.
+const useIsMobile = (breakpoint = 768) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkDevice = () => {
+      // Ensure window is defined (for SSR)
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < breakpoint);
+      }
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+    };
+  }, [breakpoint]);
+
+  return isMobile;
+};
+
+// --- DATA (Unchanged) ---
 const partners = [
   { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 2.8 },
   { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 1.4 },
@@ -30,6 +52,9 @@ interface PartnersSectionProps {
 }
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
+  const isMobile = useIsMobile();
+  
+  // --- DESKTOP ANIMATION LOGIC (Only runs when needed) ---
   const movementStartProgress = 0.45;
   const movementEndProgress = 0.75; 
   const opacityPeakProgress = 0.55; 
@@ -52,18 +77,57 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const textTravelDistance = 600; 
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 
+  // --- CONDITIONAL RENDERING ---
+  if (isMobile) {
+    // --- MOBILE LAYOUT ---
+    // A simple, static grid that's easy to read and performant on mobile.
+    return (
+      <div className="flex flex-col text-white w-full items-center justify-center py-24 px-4 ">
+        <div className="text-center mb-12">
+          <h2 className="mb-4 text-3xl font-semibold text-white">
+            Partnering with leading innovators.
+          </h2>
+          <p className="text-lg text-gray-300">
+            Together, we're shaping the future of learning.
+          </p>
+        </div>
+        
+        {/* Simple and clean grid for logos */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 w-full max-w-2xl">
+          {partners.slice(0, 12).map((partner, index) => ( // Using slice to not overcrowd the mobile view
+            <div
+              key={`${partner.name}-${index}`} 
+              className="bg-gray-800 rounded-lg p-4 flex items-center justify-center h-24"
+            >
+              <div className="relative h-12 w-full">
+                 <Image
+                    src={partner.src}
+                    alt={`${partner.name} logo`}
+                    fill
+                    className="object-contain"
+                 />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // --- DESKTOP LAYOUT (Original Parallax Version) ---
   return (
     <div className="sticky top-0 flex text-white h-screen w-full items-center justify-center overflow-hidden">
       <div className="relative h-full w-full">
         
         <div
-          className="absolute ml-84 left-1/2 top-1/2 z-10 w-4/5 max-w-2xl -translate-x-1/2 -translate-y-12 text-center"
+          className="absolute left-1/2 top-1/2 z-10 w-4/5 max-w-2xl text-center"
           style={{
             opacity: textOpacity,
             transform: `translate(-50%, -50%) translateY(${textTranslateY}px)`,
+            willChange: 'opacity, transform', // Performance hint
           }}
         >
-          <h2 className="mb- text-4xl font-semibold text-white md:text-5xl">
+          <h2 className="mb-4 text-4xl font-semibold text-white md:text-5xl">
             Partnering with leading institutions and innovators.
           </h2>
           <p className="text-4xl font-semibold text-white md:text-5xl">
@@ -90,14 +154,15 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
                 left: partner.left,
                 transform: `translate(-50%, -50%) translateY(${translateY * partner.speed}px)`,
                 opacity: logoOpacity,
+                willChange: 'transform, opacity', // Performance hint
               }}
             >
               <div className="relative h-16 w-32 transition-all">
                  <Image
                     src={partner.src}
                     alt={`${partner.name} logo`}
-                    fill // <-- FIX #1
-                    className="object-contain" // <-- FIX #2
+                    fill
+                    className="object-contain"
                  />
               </div>
             </div>

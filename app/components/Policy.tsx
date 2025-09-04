@@ -8,7 +8,7 @@ import { ShieldCheck, FileText, Undo2 } from 'lucide-react';
 
 const PolicySection: FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen pb-12 px-4 sm-px-6 lg:px-8 text-white">
+    <div className="flex flex-col items-center mt-20 lg:mt-0 justify-center min-h-screen pb-12 px-4 sm-px-6 lg:px-8 text-white">
       <div className="w-full max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-4 mb-16 text-center justify-center h-full items-center md:text-left">

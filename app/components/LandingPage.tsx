@@ -1050,7 +1050,7 @@ const LandingPage: FC = () => {
           </div>
 
           <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
-            <div className="sticky top-0 h-screen w-full overflow-hidden">
+            <div className="sticky top-0  h-screen w-full overflow-hidden">
               <ContactUsSection progress={contactUsProgress} />
             </div>
           </div>

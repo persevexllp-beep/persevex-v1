@@ -4,15 +4,19 @@ export interface Testimonial {
   name: string;
   title: string;
   image: string;
+  bgImage: string;
+  bgPosition: string; // <-- Add this new property
 }
 
 export const testimonialsData: Testimonial[] = [
   {
     headline: "Brandby is phenomenal",
-    quote: "Brandby is phenomenal. Insanely high quality work product, very responsive and easy to work with. Simon has integrated himself in the team, helping us drive product decisions and build a world-class platform.",
-    name: "William Fry",
-    title: "CEO @Mainshares",
+    quote: "The Portfolio Management course provided me with a structured approach to asset allocation and risk management. My clients have seen consistent returns even in volatile markets.",
+    name: "David K.",
+    title: "Goldman Sachs",
     image: "/dog6.jpg",
+    bgImage: '/hat.png',
+    bgPosition: 'top 40% right 50%' // Example: Top right
   },
   {
     headline: "Choosing Brandby was one of the best decisions",
@@ -20,6 +24,8 @@ export const testimonialsData: Testimonial[] = [
     name: "Reece Akhtar",
     title: "CEO & Co-Founder @Deeper Signals",
     image: "/dog5.jpeg",
+    bgImage: '/hat.png',
+    bgPosition: 'bottom 40% left 10%' // Example: Bottom left
   },
   {
     headline: "Right balance of beautiful design",
@@ -27,6 +33,8 @@ export const testimonialsData: Testimonial[] = [
     name: "Scott Willman",
     title: "EVP of Product Management @SmartCloud",
     image: "/cat2.jpeg",
+    bgImage: '/hat.png',
+    bgPosition: 'bottom 50% left 80%' // Example: Bottom right
   },
   {
     headline: "One of the most talented design teams",
@@ -34,13 +42,18 @@ export const testimonialsData: Testimonial[] = [
     name: "Amneet Bains",
     title: "Marketing Lead @Stepsize",
     image: "/bear1.jpg",
+    bgImage: '/hat.png',
+    bgPosition: 'top 15% left 15%' // Example: Top left
   },
+  // ... continue adding unique positions for the rest of your testimonials
   {
     headline: "Amazing to work with",
     quote: "Our product and website redesign went great, and we're thrilled with the end result. But more than that, Brandby was just amazing to work with and made the whole process fun and stress free. They're always super responsive.",
     name: "Patrick Kelly",
     title: "CEO & Founder @ClickMagick",
     image: "/dog3.jpg",
+    bgImage: '/hat.png',
+    bgPosition: 'center right 10%'
   },
   {
     headline: "Outstanding product design",
@@ -48,6 +61,8 @@ export const testimonialsData: Testimonial[] = [
     name: "Marta Tloczek",
     title: "Product Owner @Plix",
     image: "/cat1.jpg",
+    bgImage: '/hat.png',
+    bgPosition: 'bottom center'
   },
     {
     headline: "Reliable, Fast, Easy",
@@ -55,6 +70,7 @@ export const testimonialsData: Testimonial[] = [
     name: "Jackie Sheely",
     title: "Co-Founder @Legacy Blueprint",
     image: "/dog1.jpeg",
+    bgImage: '/hat.png',
+    bgPosition: 'top left'
   },
-  
 ];

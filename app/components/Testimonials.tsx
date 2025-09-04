@@ -2,20 +2,37 @@
 "use client";
 
 import { motion, useTransform, useMotionValue, useSpring } from "framer-motion";
+import Image from "next/image"; // Import the Next.js Image component
 import { useEffect, useRef, useState } from "react";
 
+// 1. Update the Testimonial type to include a background image property
 type Testimonial = {
   quote: string;
   name: string;
   designation: string;
   src: string;
+  bgImage: string; // <-- New property for the card's background
+  bgPosition: string
 };
 
-// Component: TestimonialCard (No changes here)
+// Component: TestimonialCard (Updated with a background image)
+// Alternative Component: TestimonialCard (Using CSS background)
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    <div className="relative flex flex-col w-[90vw] max-w-md flex-shrink-0 rounded-2xl border border-neutral-800 bg-neutral-900 p-8 shadow-2xl">
-      <div className="flex items-center gap-4">
+    <div 
+      className="relative flex flex-col w-[90vw] max-w-md flex-shrink-0 rounded-2xl border border-neutral-800 p-8 shadow-2xl overflow-hidden"
+      style={{
+        backgroundImage: `url(${testimonial.bgImage})`,
+        backgroundSize: '150%',
+        backgroundPosition: testimonial.bgPosition,
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/50 rounded-2xl"></div>
+
+      {/* Content sits on top with relative positioning */}
+      <div className="relative z-10 flex items-center gap-4">
         <img
           src={testimonial.src}
           alt={testimonial.name}
@@ -26,14 +43,14 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
           <p className="text-sm text-neutral-400">{testimonial.designation}</p>
         </div>
       </div>
-      <blockquote className="mt-6 flex-grow text-lg text-neutral-300">
+      <blockquote className="relative z-10 mt-6 flex-grow text-sm italic text-neutral-300">
         <p>&ldquo;{testimonial.quote}&rdquo;</p>
       </blockquote>
     </div>
   );
 };
 
-// Main Component: AnimatedTestimonials (Changes are here)
+// Main Component: AnimatedTestimonials (No changes needed here)
 export const AnimatedTestimonials = ({
   testimonials,
   progress,
@@ -49,9 +66,6 @@ export const AnimatedTestimonials = ({
   
   const motionProgress = useMotionValue(0);
 
-  // NEW: Create a smoothed version of the progress value.
-  // The spring will "chase" the value of motionProgress, creating a smooth effect
-  // as the user scrolls.
   const smoothedProgress = useSpring(motionProgress, {
     stiffness: 100,
     damping: 30,
@@ -59,7 +73,6 @@ export const AnimatedTestimonials = ({
   });
 
   useEffect(() => {
-    // This sets the target for the spring animation
     motionProgress.set(progress);
   }, [progress, motionProgress]);
 
@@ -72,7 +85,6 @@ export const AnimatedTestimonials = ({
         const firstCard = trackRef.current.firstChild as HTMLElement;
         if (firstCard) {
             const cardWidth = firstCard.offsetWidth;
-            // Adjusted offset slightly to better center the first card on most screens
             const offset = (containerWidth - cardWidth) / 2.5; 
             setInitialXOffset(offset);
         }
@@ -88,7 +100,6 @@ export const AnimatedTestimonials = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [testimonials]);
 
-  // CHANGED: Use the smoothed progress value for the transformation.
   const x = useTransform(
     smoothedProgress,
     [0, 1],

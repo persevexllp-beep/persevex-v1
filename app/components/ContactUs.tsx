@@ -108,7 +108,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
 
         <motion.div
           variants={itemVariants}
-          className="w-full max-w-lg bg-black/40 border border-white/20 rounded-2xl p-6 backdrop-blur-sm"
+          className="w-full max-w-lg bg-black/40  border-white border rounded-2xl p-6 backdrop-blur-sm"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col space-y-6">
@@ -149,7 +149,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           the form below and our team will get back to you shortly.
         </p>
       </div>
-      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white/20 rounded-2xl p-8 backdrop-blur-sm">
+      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white rounded-2xl p-8 backdrop-blur-sm">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
             <div className="w-full">

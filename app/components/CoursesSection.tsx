@@ -4,7 +4,24 @@ import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue,
 import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
 import { useRouter } from "next/navigation";
 
-const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedProgress: MotionValue<number>, i: number }) => {
+// --- HELPER HOOK ---
+const useIsMobile = (breakpoint = 768) => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(typeof window !== "undefined" && window.innerWidth < breakpoint);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+    };
+  }, [breakpoint]);
+  return isMobile;
+};
+
+// --- CARD COMPONENT (Updated for mobile scaling) ---
+const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, animatedProgress: MotionValue<number>, i: number, isMobile: boolean }) => {
   const router = useRouter();
   const distance = useTransform(animatedProgress, (p) => p - i);
   const initialY = 480;
@@ -26,13 +43,21 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
     return initialY;
   });
 
+  // --- FIX #1: REDUCE SCALE ON MOBILE ---
   const scale = useTransform(distance, (d) => {
-    if (d >= 0) return 1 - d * stackScale;
+    // On mobile, the final scale is smaller (0.85 vs 1.0)
+    const finalScale = isMobile ? 0.85 : 1.0;
+    const initialScale = isMobile ? 0.7 : 0.8;
+    const scaleRange = finalScale - initialScale;
+
+    if (d >= 0) {
+      return finalScale - d * stackScale;
+    }
     if (d > -1) {
       const localProgress = 1 + d;
-      return 0.8 + 0.2 * localProgress;
+      return initialScale + scaleRange * localProgress;
     }
-    return 0.8;
+    return initialScale;
   });
 
   const cardOpacity = useTransform(distance, (d) => {
@@ -58,14 +83,15 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
         zIndex: i,
         pointerEvents,
       }}
-      className="absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl"
+      // --- FIX #2: REDUCE CARD DIMENSIONS ON MOBILE ---
+      className={`absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[400px] p-8'}`}
     >
       <div className="flex flex-col items-center text-center">
-        <div className="w-full h-32 flex items-center justify-center mb-4">
+        <div className="w-full h-28 md:h-32 flex items-center justify-center mb-2 md:mb-4">
           <Icon />
         </div>
-        <h3 className="text-2xl font-bold text-white">{course.title}</h3>
-        <p className="text-gray-200 mt-2">{course.description}</p>
+        <h3 className="text-xl md:text-2xl font-bold text-white">{course.title}</h3>
+        <p className="text-sm md:text-base text-gray-200 mt-2">{course.description}</p>
       </div>
 
       <button
@@ -83,9 +109,11 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
   );
 };
 
+// --- MAIN SECTION COMPONENT (Updated) ---
 const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
+  const isMobile = useIsMobile();
 
   const smoothedProgress = useSpring(progress, {
     stiffness: 400,
@@ -157,7 +185,9 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   return (
     <div
       ref={sectionRef as React.RefObject<HTMLDivElement>}
-      className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center"
+      // --- FIX #3: ADD BOTTOM PADDING ON MOBILE ---
+      // This pushes the `justify-end` content up from the bottom edge, moving it visually down.
+      className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0"
     >
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
         <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
@@ -183,7 +213,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
           </div>
       </div>
         
-      <div className="absolute top-0 left-0 w-full pt-40 px-8 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
+      <div className="absolute top-0 left-0 w-full pt-36 px-8 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
         <div className="relative w-full lg:ml-24 lg:h-80">
             <motion.div
               className="absolute top-0 left-0 w-full"
@@ -192,11 +222,11 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: managementTextY,
               }}
             >
-              <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
+              <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
                 {managementContent.heading}
                 <span className="block opacity-80">{managementContent.subheading}</span>
               </h2>
-              <p className="text-lg md:text-xl opacity-90 mt-6">
+              <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-4">
                 {managementContent.paragraph}
               </p>
             </motion.div>
@@ -208,11 +238,11 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: technicalTextY,
               }}
             >
-              <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
+              <h2 className="text-2xl md:text-6xl font-extrabold leading-tight">
                 {technicalContent.heading}
                 <span className="block opacity-80">{technicalContent.subheading}</span>
               </h2>
-              <p className="text-lg md:text-xl opacity-90 mt-6">
+              <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-2">
                 {technicalContent.paragraph}
               </p>
             </motion.div>
@@ -221,26 +251,26 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
 
       <div className="relative w-full md:w-1/2 h-[480px] lg:mt-0 flex items-center justify-center">
         <motion.div
-            className="absolute inset-0 flex justify-center items-center"
+            className="absolute inset-0 flex justify-center mt-40 lg:mt-0 items-center"
             style={{ 
               opacity: managementStackOpacity,
               pointerEvents: managementPointerEvents 
             }}
           >
             {managementCourses.map((course, i) => (
-              <Card key={course.id} course={course} animatedProgress={managementAnimatedProgress} i={i} />
+              <Card key={course.id} course={course} animatedProgress={managementAnimatedProgress} i={i} isMobile={isMobile} />
             ))}
           </motion.div>
 
           <motion.div
-            className="absolute inset-0 flex justify-center items-center"
+            className="absolute inset-0 flex justify-center mt-40 lg:mt-0 items-center"
             style={{ 
               opacity: technicalStackOpacity,
               pointerEvents: technicalPointerEvents 
             }}
           >
             {technicalCourses.map((course, i) => (
-              <Card key={course.id} course={course} animatedProgress={technicalAnimatedProgress} i={i} />
+              <Card key={course.id} course={course} animatedProgress={technicalAnimatedProgress} i={i} isMobile={isMobile} />
             ))}
           </motion.div>
       </div>

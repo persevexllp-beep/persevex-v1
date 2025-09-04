@@ -59,6 +59,8 @@ interface Testimonial {
   name: string;
   designation: string;
   src: string;
+  bgImage: string; 
+  bgPosition: string
 }
 
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
@@ -68,7 +70,7 @@ const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
       return (
         <h2
           key={index}
-          className="relative text-[20vw] md:text-[16vw] lg:text-[200px] font-black leading-none"
+          className="relative text-[16vw] md:text-[16vw] lg:text-[200px] font-black leading-none"
           style={
             {
               fontFamily: "serif",
@@ -184,15 +186,17 @@ const LandingPage: FC = () => {
     null
   ) as React.RefObject<HTMLDivElement>;
   const formattedTestimonials: Testimonial[] = useMemo(
-    () =>
-      testimonialsData.map((t) => ({
-        quote: t.quote,
-        name: t.name,
-        designation: t.title,
-        src: t.image,
-      })),
-    []
-  );
+  () =>
+    testimonialsData.map((t) => ({
+      quote: t.quote,
+      name: t.name,
+      designation: t.title,
+      src: t.image,
+      bgImage: t.bgImage, // Add this mapping
+      bgPosition: t.bgPosition
+    })),
+  []
+);
 
   const testimonialsAnimationDurationVh = 300;
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;

@@ -27,10 +27,29 @@ import { useScroll } from "../contexts/scrollContext";
 import ContactUsSection from "./ContactUs";
 import PolicySection from "./Policy";
 import FooterSection from "./FooterSection";
+import { managementCourses, technicalCourses } from "../constants/courseConstant";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
+
+const useIsMobile = (breakpoint = 768) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+
+  return isMobile;
+};
 
 interface AnimationControllerProps {
   watermarkProgressRef: MutableRefObject<number>;
@@ -94,8 +113,6 @@ const AnimationController: FC<AnimationControllerProps> = ({
       } else if (currentProgress >= 12.0 && currentProgress < 13.0) {
         dustOpacity = currentProgress - 12.0;
       } else if (currentProgress >= 13.0) {
-        // This rule ensures the dust stays visible for the Policy section
-        // AND the new Footer section, as their progress values will be >= 13.0
         dustOpacity = 1.0;
       }
 
@@ -116,9 +133,8 @@ const AnimationController: FC<AnimationControllerProps> = ({
 
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
-
+  const isMobile = useIsMobile();
   const coursesProgress = useMotionValue(0);
-
   const [headerProgress, setHeaderProgress] = useState<number>(0);
   const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
   const watermarkProgressRef = useRef<number>(0);
@@ -181,6 +197,12 @@ const LandingPage: FC = () => {
   const testimonialsAnimationDurationVh = 300;
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
+  const managementUnits = managementCourses.length;
+  const technicalUnits = technicalCourses.length;
+  const DWELL_TIME_UNITS = 1;
+  const totalUnits = managementUnits + DWELL_TIME_UNITS + technicalUnits;
+  const coursesSectionHeight = 120 + totalUnits * 70;
+
   useEffect(() => {
     const calculateLayout = () => {
       if (
@@ -192,7 +214,6 @@ const LandingPage: FC = () => {
         aboutUsSectionWrapperRef.current &&
         cardStackingWrapperRef.current &&
         contactUsSectionWrapperRef.current &&
-        policySectionWrapperRef.current &&
         footerSectionWrapperRef.current
       ) {
         setLayout({
@@ -285,21 +306,17 @@ const LandingPage: FC = () => {
           recognizedByOpacity = (1 - p) * 0.4;
           aboutUsOpacity = p * 0.4;
         } else if (currentProgress < 11.0) {
-          // During "ABOUT US" text animation
           recognizedByOpacity = 0;
           aboutUsOpacity = 0.4;
         } else if (currentProgress < 12.0) {
-          // Transition from "Our Story" to "Contact US"
           const p = currentProgress - 11.0;
           aboutUsOpacity = (1 - p) * 0.4;
           contactUsOpacity = p * 0.4;
         } else if (currentProgress < 13.0) {
-          // Transition from "Contact US" to "Privacy"
           const p = currentProgress - 12.0;
           contactUsOpacity = (1 - p) * 0.4;
           policyOpacity = p * 0.4;
         } else if (currentProgress < 14.0) {
-          // 7. Add transition from Privacy to Footer
           const p = currentProgress - 13.0;
           policyOpacity = (1 - p) * 0.4;
           footerOpacity = p * 1.0;
@@ -386,9 +403,9 @@ const LandingPage: FC = () => {
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
-        const exitStart = riseStart + riseDuration; // 11.0
+        const exitStart = riseStart + riseDuration;
         const exitDuration = 0.1;
-        const exitEnd = exitStart + exitDuration; // 11.5
+        const exitEnd = exitStart + exitDuration;
         const exitProgress = clamp(
           (currentProgress - exitStart) / exitDuration,
           0,
@@ -583,8 +600,6 @@ const LandingPage: FC = () => {
       const contactUsTransitionStart = contactUsTop - viewportHeight;
       const contactUsTransitionDuration = viewportHeight;
 
-      // START: FIX FOR WATERMARK TIMING
-      // Define a scroll duration for the "Validation" to "Our Story" watermark transition.
       const validationToStoryTransitionDuration = viewportHeight;
 
       if (currentScroll >= footerTransitionStart) {
@@ -593,14 +608,14 @@ const LandingPage: FC = () => {
           0,
           1
         );
-        newWatermarkProgress = 13 + progress; // Progress from 13 to 14
+        newWatermarkProgress = 13 + progress;
       } else if (currentScroll >= policyTransitionStart) {
         const progress = clamp(
           (currentScroll - policyTransitionStart) / policyTransitionDuration,
           0,
           1
         );
-        newWatermarkProgress = 12 + progress; // Progress from 12 to 13
+        newWatermarkProgress = 12 + progress;
       } else if (currentScroll >= contactUsTransitionStart) {
         const progress = clamp(
           (currentScroll - contactUsTransitionStart) /
@@ -608,13 +623,11 @@ const LandingPage: FC = () => {
           0,
           1
         );
-        newWatermarkProgress = 11 + progress; // Progress from 11 to 12
+        newWatermarkProgress = 11 + progress;
       } else if (
         currentScroll >=
         aboutUsWatermarkAnimStart + validationToStoryTransitionDuration
       ) {
-        // Main "About Us" animation (progress 6.0 -> 11.0)
-        // This now starts *after* the Validation->Story transition is complete.
         const animStart =
           aboutUsWatermarkAnimStart + validationToStoryTransitionDuration;
         const animDuration =
@@ -622,8 +635,6 @@ const LandingPage: FC = () => {
         const progress = clamp((currentScroll - animStart) / animDuration, 0, 1);
         newWatermarkProgress = 6.0 + progress * 5;
       } else if (currentScroll >= aboutUsWatermarkAnimStart) {
-        // Transition from "Validation" to "Our Story" (progress 5.0 -> 6.0)
-        // This happens as the "Recognized By" section scrolls off the screen.
         const animStart = aboutUsWatermarkAnimStart;
         const progress = clamp(
           (currentScroll - animStart) / validationToStoryTransitionDuration,
@@ -632,19 +643,15 @@ const LandingPage: FC = () => {
         );
         newWatermarkProgress = 5.0 + progress;
       } else if (currentScroll >= recognizedByTop - viewportHeight / 2) {
-        // Hold "Validation" watermark steady (progress 5.0) while the section is in view.
         newWatermarkProgress = 5.0;
       } else if (currentScroll >= recognizedByTop - viewportHeight) {
-        // Transition from "Trust" to "Validation" (progress 4.0 -> 5.0) as the section scrolls on screen.
         const start = recognizedByTop - viewportHeight;
         const duration = viewportHeight / 2;
         const progress = clamp((currentScroll - start) / duration, 0, 1);
         newWatermarkProgress = 4.0 + progress;
       } else if (currentScroll >= testimonialsTop - viewportHeight / 2) {
-        // Hold the "Trust" watermark steady at 4.0 after its transition.
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
-        // Transition from "Partners" (3.0) to "Trust" (4.0).
         const transitionDuration = viewportHeight / 2;
         newWatermarkProgress =
           3 +
@@ -653,7 +660,6 @@ const LandingPage: FC = () => {
             (currentScroll - (testimonialsTop - viewportHeight)) /
               transitionDuration
           );
-        // END: FIX FOR WATERMARK TIMING
       } else if (currentScroll >= partnersTop) {
         newWatermarkProgress =
           2 +
@@ -711,12 +717,14 @@ const LandingPage: FC = () => {
         coursesProgress.set(Math.max(0, Math.min(1, newCoursesProgress)));
       }
 
+      const edgeAnimationDurationFactor = isMobile ? 3 : NUM_CARDS;
       setEdgeProgress(
         Math.min(
           1,
-          Math.max(0, currentScroll - edgeTop) / (viewportHeight * NUM_CARDS)
+          Math.max(0, currentScroll - edgeTop) / (viewportHeight * edgeAnimationDurationFactor)
         )
       );
+
       setPartnersProgress(
         Math.min(
           1,
@@ -780,7 +788,7 @@ const LandingPage: FC = () => {
 
       if (contactUsTop > 0) {
         const animationStart = contactUsTop - viewportHeight;
-        const animationDuration = viewportHeight * 2; // Animate over 200vh of scroll
+        const animationDuration = viewportHeight * 2;
         const progress = clamp(
           (currentScroll - animationStart) / animationDuration,
           0,
@@ -792,12 +800,14 @@ const LandingPage: FC = () => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [layout, testimonialsAnimationDurationVh, coursesProgress]);
+  }, [layout, testimonialsAnimationDurationVh, coursesProgress, isMobile]);
 
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
+  const ourEdgeSectionHeightVh = isMobile ? 400 : (NUM_CARDS + 1) * 100;
+  const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
 
   return (
-    <main>
+    <>
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
@@ -805,249 +815,256 @@ const LandingPage: FC = () => {
           </Suspense>
         </Canvas>
       </div>
-
-      <div
-        ref={textContainerRef}
-        className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-      >
-        {/* --- CHANGE: Wrapped all watermarks in a div with responsive visibility classes --- */}
-        <div className="hidden md:block">
-          <h2
-            className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--persevex-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-            }}
-          >
-            Persevex
-          </h2>
-          <h2
-            className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--courses-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-            }}
-          >
-            Courses
-          </h2>
-          <h2
-            className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--our-edge-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Our Edge
-          </h2>
-          <h2
-            className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--partners-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-            }}
-          >
-            Partners
-          </h2>
-          <h2
-            className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--trust-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-            }}
-          >
-            Trust
-          </h2>
-          <h2
-            className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--recognized-by-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Validation
-          </h2>
-          <h2
-            className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--about-us-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Our Story
-          </h2>
-          <h2
-            className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--contact-us-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Contact Us
-          </h2>
-          <h2
-            className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
-            style={{
-              opacity: "var(--policy-opacity)",
-              WebkitTextStroke: "1px white",
-              transform: "translateX(-50%) translateY(4rem)",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Privacy
-          </h2>
-          <h2
-            className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
-            style={{
-              opacity: "var(--footer-opacity)",
-              textShadow: "0 0 30px rgba(255, 255, 255, 1.0)",
-            }}
-          >
-            PERSEVEX
-          </h2>
-        </div>
-
-        {/* This is the "ABOUT US" text animation, which should remain visible on all screen sizes */}
+      <main>
         <div
-          className="absolute left-1/2 z-[-4]"
-          style={
-            {
-              bottom: "1.5rem",
-              transform:
-                "var(--about-us-container-transform, translateX(-50%))",
-              whiteSpace: "nowrap",
-            } as React.CSSProperties
-          }
+          ref={textContainerRef}
+          className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
         >
+          <div className="hidden md:block">
+            <h2
+              className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--persevex-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+              }}
+            >
+              Persevex
+            </h2>
+            <h2
+              className="absolute bottom-0 left-1/2 z-[1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--courses-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+              }}
+            >
+              Courses
+            </h2>
+            <h2
+              className="absolute bottom-0 left-1/2 z-[0] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--our-edge-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Our Edge
+            </h2>
+            <h2
+              className="absolute bottom-0 left-1/2 z-[-1] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--partners-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+              }}
+            >
+              Partners
+            </h2>
+            <h2
+              className="absolute bottom-0 left-1/2 z-[-2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--trust-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+              }}
+            >
+              Trust
+            </h2>
+            <h2
+              className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--recognized-by-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Validation
+            </h2>
+            <h2
+              className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--about-us-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Our Story
+            </h2>
+            <h2
+              className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--contact-us-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Contact Us
+            </h2>
+            <h2
+              className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+              style={{
+                opacity: "var(--policy-opacity)",
+                WebkitTextStroke: "1px white",
+                transform: "translateX(-50%) translateY(4rem)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Privacy
+            </h2>
+            <h2
+              className="absolute -bottom-[5vh] left-1/2 -translate-x-1/2 text-[18vw] font-black text-white leading-none pointer-events-none z-[-8]"
+              style={{
+                opacity: "var(--footer-opacity)",
+                textShadow: "0 0 30px rgba(255, 255, 255, 1.0)",
+              }}
+            >
+              PERSEVEX
+            </h2>
+          </div>
+
           <div
-            className="relative"
-            style={{
-              opacity: "var(--animated-text-opacity, 1)",
-              transition: "opacity 0.3s ease-out",
-              isolation: "isolate",
-            }}
+            className="absolute left-1/2 z-[-4]"
+            style={
+              {
+                bottom: "1.5rem",
+                transform:
+                  "var(--about-us-container-transform, translateX(-50%))",
+                whiteSpace: "nowrap",
+              } as React.CSSProperties
+            }
           >
-            <div className="absolute inset-0 w-full h-full">
-              <video
-                ref={videoRef}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute top-0 left-0 w-full h-full object-cover"
-                style={{ opacity: 0 }}
-              >
-                <source src="/videos/N2.mp4" type="video/mp4" />
-              </video>
+            <div
+              className="relative"
+              style={{
+                opacity: "var(--animated-text-opacity, 1)",
+                transition: "opacity 0.3s ease-out",
+                isolation: "isolate",
+              }}
+            >
+              <div className="absolute inset-0 w-full h-full">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  style={{ opacity: 0 }}
+                >
+                  <source src="/videos/N2.mp4" type="video/mp4" />
+                </video>
+                <div
+                  ref={whiteOverlayRef}
+                  className="absolute inset-0 bg-white"
+                  style={{ opacity: 0 }}
+                />
+              </div>
               <div
-                ref={whiteOverlayRef}
-                className="absolute inset-0 bg-white"
-                style={{ opacity: 0 }}
-              />
-            </div>
-            <div
-              ref={textMaskContainerRef}
-              className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
-            >
-              <AboutUsLetters letters={lettersWithSpaces} />
-            </div>
-            <div
-              ref={starfieldOverlayRef}
-              className="absolute inset-0 pointer-events-none"
-              style={{ opacity: 0, overflow: "hidden" }}
-            >
-              <SimpleStars />
+                ref={textMaskContainerRef}
+                className="flex items-center justify-center space-x-1 md:space-x-2 w-full h-full"
+              >
+                <AboutUsLetters letters={lettersWithSpaces} />
+              </div>
+              <div
+                ref={starfieldOverlayRef}
+                className="absolute inset-0 pointer-events-none"
+                style={{ opacity: 0, overflow: "hidden" }}
+              >
+                <SimpleStars />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="relative z-20">
-         <div
-          ref={heroWrapperRef}
-          className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
-        >
-          <div className="w-full md:mr-74 md:mb-36 pointer-events-none">
-            <Hero />
+        <div className="relative z-20">
+          <div
+            ref={heroWrapperRef}
+            className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
+          >
+            <div className="w-full md:mr-74 md:mb-36 pointer-events-none">
+              <Hero />
+            </div>
           </div>
-        </div>
 
-        <div style={{ height: "10vh" }} />
-        <div ref={coursesSectionWrapperRef}>
-          <CoursesSection progress={coursesProgress} />
-        </div>
-        <div style={{ height: "50vh" }} />
-        <div
-          ref={ourEdgeSectionWrapperRef}
-          style={{ height: `${(NUM_CARDS + 1) * 100}vh` }}
-        >
-          <OurEdgeSection progress={edgeProgress} />
-        </div>
-        <div
-          ref={partnersSectionWrapperRef}
-          style={{ height: "400vh", marginTop: "-50vh" }}
-        >
-          <PartnersSection progress={partnersProgress} />
-        </div>
+          <div style={{ height: "10vh" }} />
+          <div
+            ref={coursesSectionWrapperRef}
+            style={{ height: `${coursesSectionHeight}vh` }}
+          >
+            <div className="sticky top-0 h-screen w-full">
+              <CoursesSection progress={coursesProgress} />
+            </div>
+          </div>
+          <div style={{ height: "50vh" }} />
+          <div
+            ref={ourEdgeSectionWrapperRef}
+            style={{ height: `${ourEdgeSectionHeightVh}vh` }}
+          >
+            <OurEdgeSection progress={edgeProgress} />
+          </div>
 
-        <div style={{ height: "10vh" }} />
-        <div
-          ref={testimonialsSectionWrapperRef}
-          style={{ height: `${testimonialsSectionHeightVh}vh` }}
-        >
-          <div className="sticky top-0 flex h-screen items-center justify-center">
-            <AnimatedTestimonials
-              testimonials={formattedTestimonials}
-              progress={testimonialProgress}
-            />
+          <div
+            ref={partnersSectionWrapperRef}
+            style={{ height: "400vh", marginTop: partnersSectionMarginTop }}
+          >
+            <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+              <PartnersSection progress={partnersProgress} />
+            </div>
           </div>
-        </div>
-        <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
-          <div className="sticky top-0 flex h-screen items-center justify-center">
-            <RecognizedBySection />
-          </div>
-        </div>
-        <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}></div>
-        <div ref={cardStackingWrapperRef} style={{ height: "600vh" }}>
-          <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
-            <div
-              className="w-full text-white text-sm"
-              style={{ opacity: extendedCompProgress }}
-            >
-              <AboutUsExtendedComp
-                stackingProgress={stackingProgress}
-                cascadingProgress={cascadingProgress}
+
+          <div style={{ height: "10vh" }} />
+          <div
+            ref={testimonialsSectionWrapperRef}
+            style={{ height: `${testimonialsSectionHeightVh}vh` }}
+          >
+            <div className="sticky top-0 flex h-screen items-center justify-center">
+              <AnimatedTestimonials
+                testimonials={formattedTestimonials}
+                progress={testimonialProgress}
               />
             </div>
           </div>
-        </div>
+          <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
+            <div className="sticky top-0 flex h-screen items-center justify-center">
+              <RecognizedBySection />
+            </div>
+          </div>
+          <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}></div>
+          <div ref={cardStackingWrapperRef} style={{ height: "600vh" }}>
+            <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
+              <div
+                className="w-full text-white text-sm"
+                style={{ opacity: extendedCompProgress }}
+              >
+                <AboutUsExtendedComp
+                  stackingProgress={stackingProgress}
+                  cascadingProgress={cascadingProgress}
+                />
+              </div>
+            </div>
+          </div>
 
-        <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
-          <div className="sticky top-0 h-screen w-full overflow-hidden">
-            <ContactUsSection progress={contactUsProgress} />
+          <div ref={contactUsSectionWrapperRef} style={{ height: "250vh" }}>
+            <div className="sticky top-0 h-screen w-full overflow-hidden">
+              <ContactUsSection progress={contactUsProgress} />
+            </div>
+          </div>
+
+          <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
+            <PolicySection />
+          </div>
+
+          <div ref={footerSectionWrapperRef}>
+            <FooterSection />
           </div>
         </div>
-
-        <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
-          <PolicySection />
-        </div>
-
-        <div ref={footerSectionWrapperRef}>
-          <FooterSection />
-        </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 };
 export default LandingPage;

@@ -4,7 +4,6 @@ import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue,
 import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
 import { useRouter } from "next/navigation";
 
-// The Card component from the previous step remains the same.
 const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedProgress: MotionValue<number>, i: number }) => {
   const router = useRouter();
   const distance = useTransform(animatedProgress, (p) => p - i);
@@ -59,9 +58,6 @@ const Card = ({ course, animatedProgress, i }: { course: CourseType, animatedPro
         zIndex: i,
         pointerEvents,
       }}
-      // RESPONSIVENESS CHANGE:
-      // - `w-[90vw] md:w-full`: On mobile, the card width is 90% of the viewport width to prevent overflow.
-      //   On desktop (`md` and up), it's 100% of its parent container. `max-w-sm` still applies to both.
       className="absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm h-[400px] rounded-2xl p-8 flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl"
     >
       <div className="flex flex-col items-center text-center">
@@ -91,8 +87,6 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   const sectionRef = useRef<HTMLElement | null>(null);
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
 
-  // Apply a spring to the raw scroll progress.
-  // This will smooth out the jitter from scroll events and make the animation feel much more fluid.
   const smoothedProgress = useSpring(progress, {
     stiffness: 400,
     damping: 90,
@@ -131,8 +125,6 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
     }
   };
 
-  // --- UPDATED LOGIC ---
-  // All `useTransform` hooks now use `smoothedProgress` to drive the visual animations.
   const textTransitionProgress = useTransform(
     smoothedProgress,
     [managementAnimationEndProgress, technicalAnimationStartProgress],
@@ -163,19 +155,12 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   const technicalPointerEvents = useTransform(technicalStackOpacity, (o) => (o > 0.1 ? "auto" : "none"));
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full text-white"
-      style={{ height: `${120 + totalUnits * 70}vh` }}
+    <div
+      ref={sectionRef as React.RefObject<HTMLDivElement>}
+      className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center"
     >
-      {/* RESPONSIVENESS FIX 1: 
-          - On mobile (flex-col), changed `justify-center` to `justify-start` to align content to the top.
-          - Added `pt-32` on mobile to push content down, preventing it from overlapping with the toggle switch.
-          - Kept original behavior for desktop (`md:` screens) to avoid changing the desktop design.
-      */}
-      <div className="sticky top-0 flex flex-col md:flex-row gap-8 justify-start md:justify-center mx-auto px-8 h-screen items-center pt-32 md:pt-0">
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
-          <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
+        <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
             <motion.div
               className="absolute left-1 top-1 h-[calc(100%-0.5rem)] w-[110px] rounded-full bg-white"
               animate={{ x: activeView === 'management' ? '0%' : '100%' }}
@@ -196,14 +181,10 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
               Technical
             </button>
           </div>
-        </div>
+      </div>
         
-        {/* RESPONSIVENESS FIX 2: 
-            - Removed the large `mb-44` which was causing inflexible spacing on mobile. 
-            - Spacing is now handled by the parent's `gap-8`, creating a cleaner vertical flow.
-        */}
-        <div className="w-full md:w-full flex items-center lg:mb-44 justify-center">
-          <div className="relative w-full lg:ml-24  lg:h-80">
+      <div className="absolute top-0 left-0 w-full pt-40 px-8 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
+        <div className="relative w-full lg:ml-24 lg:h-80">
             <motion.div
               className="absolute top-0 left-0 w-full"
               style={{
@@ -236,10 +217,10 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
               </p>
             </motion.div>
           </div>
-        </div>
+      </div>
 
-        <div className="relative w-full md:w-1/2 h-[480px] mt-88 lg:mt-0 flex items-center justify-center">
-          <motion.div
+      <div className="relative w-full md:w-1/2 h-[480px] lg:mt-0 flex items-center justify-center">
+        <motion.div
             className="absolute inset-0 flex justify-center items-center"
             style={{ 
               opacity: managementStackOpacity,
@@ -262,9 +243,8 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
               <Card key={course.id} course={course} animatedProgress={technicalAnimatedProgress} i={i} />
             ))}
           </motion.div>
-        </div>
       </div>
-    </section>
+    </div>
   );
 }
 

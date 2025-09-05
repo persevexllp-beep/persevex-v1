@@ -142,7 +142,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
 
   return (
     <div className="relative flex items-center justify-center h-screen px-4 sm:px-6 lg:px-8 text-white">
-      <div style={textStyle} className="absolute top-1/2 left-1/2 w-full max-w-lg flex flex-col gap-4 text-center md:text-left">
+      <div style={textStyle} className="absolute top-1/2 left-1/2  w-full max-w-lg flex flex-col gap-4 text-center md:text-left">
         <h1 className="font-bold text-6xl">Contact Us</h1>
         <p className="text-center md:text-left text-lg">
           Have questions about our courses or need more information? Fill out

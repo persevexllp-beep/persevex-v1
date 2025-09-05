@@ -810,7 +810,7 @@ const LandingPage: FC = () => {
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
   const aboutUsSectionHeightVh = isMobile ? 500 : 545;
-  const cardStackingSectionHeightVh = isMobile ? 150 : 600;
+  const cardStackingSectionHeightVh = isMobile ? 200 : 600; // FIXED: Increased from 150 to 350
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (

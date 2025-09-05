@@ -77,7 +77,7 @@ export default function AboutUsExtendedComp({
   // An interactive accordion-style layout for cards.
   if (isMobile) {
     return (
-      <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32 text-white gap-20">
+      <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32  text-white gap-20">
         
         {/* Story Cards Section */}
         <motion.div
@@ -88,7 +88,7 @@ export default function AboutUsExtendedComp({
           viewport={{ once: true, amount: 0.2 }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-center"></h2>
+          <h2 className="text-3xl font-bold mb-4 bg-amber-300 text-center"></h2>
           {cardData.map((card, index) => {
             const isExpanded = expandedCardIndex === index;
             return (
@@ -97,22 +97,15 @@ export default function AboutUsExtendedComp({
                 layout
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="bg-black/30  backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg overflow-hidden flex flex-col"
+                onClick={() => setExpandedCardIndex(isExpanded ? null : index)}
+                className="bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg overflow-hidden cursor-pointer"
               >
-                <motion.button
-                  layout
-                  onClick={() => setExpandedCardIndex(isExpanded ? null : index)}
-                  className="flex items-center justify-between w-full p-5 text-left text-white cursor-pointer"
-                >
-                  <h3 className="text-xl font-bold">{card.title}</h3>
-                  <motion.div
-                      className="text-xl font-thin"
-                      animate={{ rotate: isExpanded ? 45 : 0 }}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  >
-                      +
-                  </motion.div>
-                </motion.button>
+                <motion.div layout className="relative h-48 w-full">
+                    <img src={card.imageSrc} alt={card.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex items-end p-5">
+                        <h3 className="text-2xl font-bold text-white">{card.title}</h3>
+                    </div>
+                </motion.div>
                 
                 <AnimatePresence initial={false}>
                   {isExpanded && (
@@ -128,8 +121,7 @@ export default function AboutUsExtendedComp({
                       transition={{ duration: 0.4, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <div className="p-5 pt-0 flex flex-col gap-4">
-                        <img src={card.imageSrc} alt={card.title} className="w-full h-48 object-cover rounded-xl" />
+                      <div className="p-5">
                         <p className="text-gray-300 text-sm leading-relaxed">{card.content}</p>
                       </div>
                     </motion.section>

@@ -1,10 +1,8 @@
-// AboutUsExtendedComp.tsx
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- HELPER HOOK ---
-// We'll use this to switch between the two different component versions.
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -18,12 +16,15 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
+// --- MODIFIED PROPS INTERFACE ---
 interface AboutUsExtendedCompProps {
   stackingProgress: number;
   cascadingProgress: number;
+  // This new prop is a function to pass the sentinel element ref up to the parent
+  setSentinelRef?: (el: HTMLDivElement | null) => void;
 }
 
-// Data remains the same for both versions
+// Data remains the same
 const cardData = [
   {
     title: "Who We Are?",
@@ -68,13 +69,29 @@ const faqData = [
 export default function AboutUsExtendedComp({
   stackingProgress,
   cascadingProgress,
+  setSentinelRef // Destructure the new prop
 }: AboutUsExtendedCompProps) {
   const isMobile = useIsMobile();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null); // For FAQ
-  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null); // For Mobile Cards
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
+  
+  // --- NEW ---
+  // Create a ref for the sentinel element
+  const mobileSentinelRef = useRef<HTMLDivElement>(null);
 
-  // --- MOBILE VERSION ---
-  // An interactive accordion-style layout for cards.
+  // --- NEW ---
+  // Use an effect to pass the ref's current element up to the parent
+  useEffect(() => {
+    if (isMobile && setSentinelRef) {
+      setSentinelRef(mobileSentinelRef.current);
+    }
+    // Clean up when switching to desktop
+    return () => {
+        if(setSentinelRef) setSentinelRef(null);
+    }
+  }, [isMobile, setSentinelRef]);
+
+
   if (isMobile) {
     return (
       <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32  text-white gap-20">
@@ -88,7 +105,6 @@ export default function AboutUsExtendedComp({
           viewport={{ once: true, amount: 0.2 }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
-          <h2 className="text-3xl font-bold mb-4 bg-amber-300 text-center"></h2>
           {cardData.map((card, index) => {
             const isExpanded = expandedCardIndex === index;
             return (
@@ -182,6 +198,12 @@ export default function AboutUsExtendedComp({
              })}
           </div>
         </motion.div>
+        
+        {/* --- NEW --- 
+            This is the invisible sentinel element. 
+            It's placed at the very end of all the mobile content. 
+        */}
+        <div ref={mobileSentinelRef} style={{ height: '1px', width: '1px', pointerEvents: 'none' }} />
       </div>
     );
   }

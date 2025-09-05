@@ -186,10 +186,59 @@ const LandingPage: FC = () => {
     null
   ) as React.RefObject<HTMLDivElement>;
   const contentWrapperRef = useRef<HTMLDivElement>(null);
-  // --- START OF CHANGE (1/3) ---
-  // Create a ref for the new fade overlay element.
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
-  // --- END OF CHANGE (1/3) ---
+  
+  // --- NEW ---
+  // A ref to hold the opacity value for the text, controlled by the IntersectionObserver
+  const textFadeOutOpacityRef = useRef<number>(1);
+  // A state to hold the sentinel element passed up from the child
+  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
+
+  // --- NEW: IntersectionObserver logic ---
+  useEffect(() => {
+    if (!sentinel) {
+      // Ensure opacity is reset to 1 if we switch from mobile to desktop
+      textFadeOutOpacityRef.current = 1;
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+            // The range over which the fade will happen.
+            // Starts fading when sentinel is at 80% of viewport height from top.
+            // Finishes fading when it's at 40%.
+            const fadeStart = window.innerHeight * 0.8;
+            const fadeEnd = window.innerHeight * 0.4;
+            
+            const currentY = entry.boundingClientRect.y;
+            const progress = clamp((currentY - fadeEnd) / (fadeStart - fadeEnd), 0, 1);
+            
+            textFadeOutOpacityRef.current = progress;
+        } else {
+            // If it's not intersecting, check its position to see if it's above or below
+            if (entry.boundingClientRect.y < 0) {
+                // It has scrolled past the top
+                textFadeOutOpacityRef.current = 0;
+            } else {
+                // It is below the viewport
+                textFadeOutOpacityRef.current = 1;
+            }
+        }
+      },
+      {
+        // Observe the element from the top of the viewport to the bottom.
+        rootMargin: '0px 0px 0px 0px',
+        threshold: Array.from(Array(101).keys(), i => i/100), // Fine-grained threshold
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [sentinel]);
 
   const formattedTestimonials: Testimonial[] = useMemo(
   () =>
@@ -198,7 +247,7 @@ const LandingPage: FC = () => {
       name: t.name,
       designation: t.title,
       src: t.image,
-      bgImage: t.bgImage, // Add this mapping
+      bgImage: t.bgImage,
       bgPosition: t.bgPosition
     })),
   []
@@ -250,7 +299,7 @@ const LandingPage: FC = () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", calculateLayout);
     };
-  }, [setLayout, isMobile]); // Added isMobile to trigger recalculation on resize
+  }, [setLayout, isMobile]);
 
   useEffect(() => {
     setSectionRefs({
@@ -450,19 +499,22 @@ const LandingPage: FC = () => {
         const containerScale = isBeforeRise
           ? initial_scale
           : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
-
-        let animatedTextOpacity;
+        
+        // --- FINAL CORRECTED LOGIC ---
         const fadeInProgress = clamp(
           (currentProgress - assemblyStart) / (assemblyDuration / 2),
           0,
           1
         );
+        
+        let animatedTextOpacity;
         if (currentProgress < assemblyStart) {
-          animatedTextOpacity = 0;
-        } else if (currentProgress < exitEnd) {
-          animatedTextOpacity = fadeInProgress;
+            animatedTextOpacity = 0;
         } else {
-          animatedTextOpacity = 0;
+            // On mobile, the opacity is now controlled by the reliable IntersectionObserver value.
+            // On desktop, it uses the original, working scroll-progress logic.
+            const fadeOutOpacity = isMobile ? textFadeOutOpacityRef.current : (1 - clamp((currentProgress - 11.0) / 0.5, 0, 1));
+            animatedTextOpacity = Math.min(fadeInProgress, fadeOutOpacity);
         }
 
         textContainerRef.current.style.setProperty(
@@ -583,8 +635,6 @@ const LandingPage: FC = () => {
             }
         }
         
-        // --- START OF CHANGE (2/3) ---
-        // Control the visibility of the fade overlay based on scroll progress and screen size.
         if (fadeOverlayRef.current) {
             if (isMobile && inAboutUsContentSection) {
                 fadeOverlayRef.current.style.opacity = '1';
@@ -592,7 +642,6 @@ const LandingPage: FC = () => {
                 fadeOverlayRef.current.style.opacity = '0';
             }
         }
-        // --- END OF CHANGE (2/3) ---
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -714,7 +763,7 @@ const LandingPage: FC = () => {
       }
 
       targetProgressRef.current = newWatermarkProgress;
-
+      
       if (heroWrapperRef.current) {
         const heroProgress = Math.min(
           1,
@@ -837,7 +886,7 @@ const LandingPage: FC = () => {
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
   const aboutUsSectionHeightVh = isMobile ? 500 : 545;
-  const cardStackingSectionHeightVh = isMobile ? 150 : 600; // FIXED: Increased from 150 to 350
+  const cardStackingSectionHeightVh = isMobile ? 150 : 600; // Adjusted for mobile content
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (
@@ -850,9 +899,6 @@ const LandingPage: FC = () => {
         </Canvas>
       </div>
       <main>
-        {/* --- START OF CHANGE (3/3) --- */}
-        {/* This div creates the fade-out effect at the top of the screen for mobile. */}
-        {/* Its opacity is controlled by the animation loop. */}
         <div
           ref={fadeOverlayRef}
           className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"
@@ -862,7 +908,6 @@ const LandingPage: FC = () => {
             transition: 'opacity 0.4s ease-in-out',
           }}
         />
-        {/* --- END OF CHANGE (3/3) --- */}
         <div
           ref={textContainerRef}
           className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
@@ -1091,6 +1136,7 @@ const LandingPage: FC = () => {
                 <AboutUsExtendedComp
                   stackingProgress={stackingProgress}
                   cascadingProgress={cascadingProgress}
+                  setSentinelRef={setSentinel} // Pass the state setter to the child
                 />
               </div>
             </div>

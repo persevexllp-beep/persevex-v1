@@ -244,7 +244,7 @@ const LandingPage: FC = () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", calculateLayout);
     };
-  }, [setLayout]);
+  }, [setLayout, isMobile]); // Added isMobile to trigger recalculation on resize
 
   useEffect(() => {
     setSectionRefs({
@@ -403,7 +403,7 @@ const LandingPage: FC = () => {
         const centerProgress = isBeforeRise ? assemblyProgress : 1;
         const initialY = 4;
         const centerTargetVh = -35;
-        const topTargetVh = -68;
+        const topTargetVh = isMobile ? -80 : -68;
         const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
         const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
@@ -440,7 +440,7 @@ const LandingPage: FC = () => {
         }
 
         const initial_scale = 1.0;
-        const final_scale = 0.45;
+        const final_scale = isMobile ? 0.7 : 0.45;
         const containerScale = isBeforeRise
           ? initial_scale
           : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
@@ -573,7 +573,7 @@ const LandingPage: FC = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [layout, lettersWithSpaces]);
+  }, [layout, lettersWithSpaces, isMobile]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -810,6 +810,11 @@ const LandingPage: FC = () => {
   const ourEdgeSectionHeightVh = isMobile ? 400 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
 
+  // --- CHANGE MADE HERE ---
+  // Conditionally set heights for mobile to reduce the "dead scroll" zone.
+  const aboutUsSectionHeightVh = isMobile ? 500 : 545;
+  const cardStackingSectionHeightVh = isMobile ? 150 : 600;
+
   return (
     <>
       <div className="fixed top-0 left-0 w-full h-full z-0">
@@ -1038,11 +1043,11 @@ const LandingPage: FC = () => {
               <RecognizedBySection />
             </div>
           </div>
-          <div ref={aboutUsSectionWrapperRef} style={{ height: "545vh" }}></div>
-          <div ref={cardStackingWrapperRef} style={{ height: "600vh" }}>
-            <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start  md:pt-24">
+          <div ref={aboutUsSectionWrapperRef} style={{ height: `${aboutUsSectionHeightVh}vh` }}></div>
+          <div ref={cardStackingWrapperRef} style={{ height: `${cardStackingSectionHeightVh}vh` }}>
+            <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-8 md:pt-24">
               <div
-                className="w-full text-white text-sm"
+                className="w-full text-white"
                 style={{ opacity: extendedCompProgress }}
               >
                 <AboutUsExtendedComp

@@ -70,35 +70,75 @@ export default function AboutUsExtendedComp({
   cascadingProgress,
 }: AboutUsExtendedCompProps) {
   const isMobile = useIsMobile();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  
-  // --- MOBILE VERSION ---
-  // A clean, vertically-stacked layout with simple, elegant entrance animations.
-  if (isMobile) {
-    const cardVariants = {
-      hidden: { opacity: 0, y: 50 },
-      visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-    };
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null); // For FAQ
+  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null); // For Mobile Cards
 
+  // --- MOBILE VERSION ---
+  // An interactive accordion-style layout for cards.
+  if (isMobile) {
     return (
-      <div className="flex flex-col items-center w-full px-4 py-16 text-white gap-16">
+      <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32 text-white gap-20">
+        
         {/* Story Cards Section */}
-        <div className="flex flex-col gap-10 w-full max-w-md">
-          {cardData.map((card, index) => (
-            <motion.div
-              key={index}
-              className="bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6 flex flex-col gap-4"
-              
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <h3 className="text-2xl font-bold">{card.title}</h3>
-              <img src={card.imageSrc} alt={card.title} className="w-full h-48 object-cover rounded-xl" />
-              <p className="text-gray-300 text-sm leading-relaxed">{card.content}</p>
-            </motion.div>
-          ))}
-        </div>
+        <motion.div
+          className="flex flex-col gap-4 w-full max-w-md"
+          layout
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+        >
+          <h2 className="text-3xl font-bold mb-4 text-center"></h2>
+          {cardData.map((card, index) => {
+            const isExpanded = expandedCardIndex === index;
+            return (
+              <motion.div
+                key={index}
+                layout
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg overflow-hidden flex flex-col"
+              >
+                <motion.button
+                  layout
+                  onClick={() => setExpandedCardIndex(isExpanded ? null : index)}
+                  className="flex items-center justify-between w-full p-5 text-left text-white cursor-pointer"
+                >
+                  <h3 className="text-xl font-bold">{card.title}</h3>
+                  <motion.div
+                      className="text-xl font-thin"
+                      animate={{ rotate: isExpanded ? 45 : 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                      +
+                  </motion.div>
+                </motion.button>
+                
+                <AnimatePresence initial={false}>
+                  {isExpanded && (
+                    <motion.section
+                      key="content"
+                      initial="collapsed"
+                      animate="open"
+                      exit="collapsed"
+                      variants={{
+                        open: { opacity: 1, height: 'auto' },
+                        collapsed: { opacity: 0, height: 0 }
+                      }}
+                      transition={{ duration: 0.4, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-5 pt-0 flex flex-col gap-4">
+                        <img src={card.imageSrc} alt={card.title} className="w-full h-48 object-cover rounded-xl" />
+                        <p className="text-gray-300 text-sm leading-relaxed">{card.content}</p>
+                      </div>
+                    </motion.section>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
         {/* FAQ Section */}
         <motion.div 

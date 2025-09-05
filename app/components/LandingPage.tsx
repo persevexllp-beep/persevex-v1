@@ -185,6 +185,12 @@ const LandingPage: FC = () => {
   const footerSectionWrapperRef = useRef<HTMLDivElement>(
     null
   ) as React.RefObject<HTMLDivElement>;
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  // --- START OF CHANGE (1/3) ---
+  // Create a ref for the new fade overlay element.
+  const fadeOverlayRef = useRef<HTMLDivElement>(null);
+  // --- END OF CHANGE (1/3) ---
+
   const formattedTestimonials: Testimonial[] = useMemo(
   () =>
     testimonialsData.map((t) => ({
@@ -508,7 +514,7 @@ const LandingPage: FC = () => {
             timeCursor += unitDuration * spacePauseFactor;
             return;
           }
-          const start = timeCursor * compressionFactor;
+          const start = isMobile ? 0 : timeCursor * compressionFactor;
           const letterProgress = clamp(
             (assemblyProgress - start) / animationWindow,
             0,
@@ -566,6 +572,27 @@ const LandingPage: FC = () => {
           "--footer-opacity",
           `${clamp(footerOpacity, 0, 1.0)}`
         );
+
+        const inAboutUsContentSection = currentProgress >= 10.0 && currentProgress < 11.0;
+
+        if (contentWrapperRef.current) {
+            if (isMobile && inAboutUsContentSection) {
+                contentWrapperRef.current.style.zIndex = '5';
+            } else {
+                contentWrapperRef.current.style.zIndex = '20';
+            }
+        }
+        
+        // --- START OF CHANGE (2/3) ---
+        // Control the visibility of the fade overlay based on scroll progress and screen size.
+        if (fadeOverlayRef.current) {
+            if (isMobile && inAboutUsContentSection) {
+                fadeOverlayRef.current.style.opacity = '1';
+            } else {
+                fadeOverlayRef.current.style.opacity = '0';
+            }
+        }
+        // --- END OF CHANGE (2/3) ---
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -810,7 +837,7 @@ const LandingPage: FC = () => {
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
   const aboutUsSectionHeightVh = isMobile ? 500 : 545;
-  const cardStackingSectionHeightVh = isMobile ? 200 : 600; // FIXED: Increased from 150 to 350
+  const cardStackingSectionHeightVh = isMobile ? 150 : 600; // FIXED: Increased from 150 to 350
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (
@@ -823,6 +850,19 @@ const LandingPage: FC = () => {
         </Canvas>
       </div>
       <main>
+        {/* --- START OF CHANGE (3/3) --- */}
+        {/* This div creates the fade-out effect at the top of the screen for mobile. */}
+        {/* Its opacity is controlled by the animation loop. */}
+        <div
+          ref={fadeOverlayRef}
+          className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, black 50%, transparent)',
+            opacity: 0,
+            transition: 'opacity 0.4s ease-in-out',
+          }}
+        />
+        {/* --- END OF CHANGE (3/3) --- */}
         <div
           ref={textContainerRef}
           className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
@@ -987,8 +1027,8 @@ const LandingPage: FC = () => {
             </div>
           </div>
         </div>
-
-        <div className="relative z-20">
+        
+        <div ref={contentWrapperRef} className="relative z-20">
           <div
             ref={heroWrapperRef}
             className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"

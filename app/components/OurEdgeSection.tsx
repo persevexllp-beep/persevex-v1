@@ -109,7 +109,7 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
             {edgeData.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex items-center gap-4 shadow-lg"
+                className="bg-transparent border border-white/20 w-full p-6 rounded-2xl flex items-center gap-4 shadow-lg"
                
                 initial="hidden"
                 whileInView="visible"

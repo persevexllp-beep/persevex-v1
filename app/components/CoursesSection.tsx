@@ -185,12 +185,10 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   return (
     <div
       ref={sectionRef as React.RefObject<HTMLDivElement>}
-      // --- FIX #3: ADD BOTTOM PADDING ON MOBILE ---
-      // This pushes the `justify-end` content up from the bottom edge, moving it visually down.
       className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0"
     >
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
-        <div className="relative flex w-fit items-center rounded-full bg-transparent p-1 backdrop-blur-sm">
+        <div className="relative flex w-fit items-center rounded-full bg-transparent px-1 lg:p-1 backdrop-blur-sm">
             <motion.div
               className="absolute left-1 top-1 h-[calc(100%-0.5rem)] w-[110px] rounded-full bg-white"
               animate={{ x: activeView === 'management' ? '0%' : '100%' }}
@@ -198,7 +196,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
             />
             <button
               onClick={() => handleSwitch('management')}
-              className={`relative z-10 w-[110px] cursor-pointer rounded-full py-2 text-sm font-semibold transition-colors duration-300 ${activeView === 'management' ? 'text-gray-900' : 'text-white'
+              className={`relative z-10 w-[110px] cursor-pointer rounded-full lg:py-2 text-sm font-semibold transition-colors duration-300 ${activeView === 'management' ? 'text-gray-900' : 'text-white'
                 }`}
             >
               Management
@@ -251,7 +249,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
 
       <div className="relative w-full md:w-1/2 h-[480px] lg:mt-0 flex items-center justify-center">
         <motion.div
-            className="absolute inset-0 flex justify-center mt-40 lg:mt-0 items-center"
+            className="absolute inset-0 flex justify-center mt-20 lg:mt-0 items-center"
             style={{ 
               opacity: managementStackOpacity,
               pointerEvents: managementPointerEvents 
@@ -263,7 +261,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
           </motion.div>
 
           <motion.div
-            className="absolute inset-0 flex justify-center mt-40 lg:mt-0 items-center"
+            className="absolute inset-0 flex justify-center mt-20 lg:mt-0 items-center"
             style={{ 
               opacity: technicalStackOpacity,
               pointerEvents: technicalPointerEvents 

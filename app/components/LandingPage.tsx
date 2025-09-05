@@ -809,12 +809,8 @@ const LandingPage: FC = () => {
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
-
   const aboutUsSectionHeightVh = isMobile ? 500 : 545;
   const cardStackingSectionHeightVh = isMobile ? 150 : 600;
-
-  // --- CHANGE MADE HERE ---
-  // Conditionally set the height for the Contact Us section to reduce mobile scroll.
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (

@@ -51,16 +51,17 @@ const desktopPartners = [
 // A curated subset of logos with positions adjusted for a narrower, portrait screen.
 // Notice the 'left' values are less extreme to prevent horizontal overflow.
 const mobilePartners = [
-  { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 2.8 },
-  { name: 'Accenture', src: '/accent.png', top: '45%', left: '20%', speed: 4.4 },
+  { name: 'Amazon', src: '/amazon.png', top: '10%', left: '80%', speed: 2.8 },
+  { name: 'Accenture', src: '/accent.png', top: '65%', left: '25%', speed: 4.4 },
   { name: 'Dell', src: '/Dell.png', top: '26%', left: '15%', speed: 3.2 },
   { name: 'Deloitte', src: '/Deloitte.png', top: '75%', left: '75%', speed: 1.8 },
-  { name: 'ey', src: '/ey.png', top: '5%', left: '60%', speed: 4.5 },
+  { name: 'ey', src: '/ey.png', top: '5%', left: '80%', speed: 4.5 },
   { name: 'Harman', src: '/harman.png', top: '20%', left: '55%', speed: 8.5 },
-  { name: 'KPMG', src: '/kpmg.png', top: '85%', left: '40%', speed: 3.4 },
+  { name: 'KPMG', src: '/kpmg.png', top: '85%', left: '70%', speed: 3.4 },
   { name: 'Walmart', src: '/wal.png', top: '80%', left: '15%', speed: 4.8 },
   { name: 'Wipro', src: '/wipr.png', top: '60%', left: '85%', speed: 2.3 },
   { name: 'PWC', src: '/pwclogo.png', top: '5%', left: '25%', speed: 3.7 },
+  { name: 'MindTree', src: '/mind.png', top: '90%', left: '38%', speed: 2.6 },
 ];
 
 

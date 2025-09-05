@@ -97,7 +97,7 @@ export default function AboutUsExtendedComp({
                 layout
                 variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="bg-black/30 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg overflow-hidden flex flex-col"
+                className="bg-black/30  backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg overflow-hidden flex flex-col"
               >
                 <motion.button
                   layout

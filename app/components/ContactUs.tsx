@@ -97,10 +97,10 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
       >
         <motion.div
           variants={itemVariants} 
-          className="w-full max-w-lg flex flex-col gap-4 text-center mb-12"
+          className="w-full max-w-lg flex flex-col gap-2 text-center mb-12"
         >
-          <h1 className="font-bold text-4xl">Contact Us</h1>
-          <p className="text-lg text-gray-300">
+          <h1 className="font-bold mt-8 text-4xl">Contact Us</h1>
+          <p className="text-sm text-gray-300">
             Have questions about our courses or need more information? Fill out
             the form and our team will get back to you shortly.
           </p>
@@ -110,7 +110,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           variants={itemVariants}
           className="w-full max-w-lg bg-black/40  border-white border rounded-2xl p-6 backdrop-blur-sm"
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-6">
               <div className="w-full">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -127,7 +127,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
             </div>
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Your Message</label>
-              <textarea name="message" id="message" rows={5} required placeholder="How can we help you?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 resize-none"/>
+              <textarea name="message" id="message" rows={3} required placeholder="How can we help you?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 resize-none"/>
             </div>
             <div>
               <button type="submit" className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">

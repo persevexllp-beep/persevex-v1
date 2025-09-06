@@ -507,13 +507,16 @@ const LandingPage: FC = () => {
           1
         );
         
-        let animatedTextOpacity;
+         let animatedTextOpacity;
         if (currentProgress < assemblyStart) {
             animatedTextOpacity = 0;
+        } else if (isMobile) {
+            // On mobile, the global text is visible until the hand-off point,
+            // at which point it instantly becomes invisible.
+            animatedTextOpacity = isDisplayingAboutUsContent ? 0 : fadeInProgress;
         } else {
-            // On mobile, the opacity is now controlled by the reliable IntersectionObserver value.
-            // On desktop, it uses the original, working scroll-progress logic.
-            const fadeOutOpacity = isMobile ? textFadeOutOpacityRef.current : (1 - clamp((currentProgress - 11.0) / 0.5, 0, 1));
+            // Desktop uses the original, smooth fade-out logic.
+            const fadeOutOpacity = (1 - clamp((currentProgress - 11.0) / 0.5, 0, 1));
             animatedTextOpacity = Math.min(fadeInProgress, fadeOutOpacity);
         }
 

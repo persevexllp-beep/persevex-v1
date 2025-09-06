@@ -208,7 +208,7 @@ export default function AboutUsExtendedComp({
     );
   }
 
-  // --- DESKTOP VERSION (Original Code) ---
+  // --- DESKTOP VERSION (Original Code - Unchanged) ---
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
   const isCard1Expanded = cascadingProgress >= 1.8 ? 1 : 0;

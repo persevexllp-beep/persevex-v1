@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-// --- HELPER HOOK ---
+// --- HELPER HOOK (Unchanged) ---
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -24,7 +24,7 @@ const useIsMobile = (breakpoint = 768) => {
 };
 
 
-// --- DATA FOR DESKTOP ---
+// --- DATA (Unchanged) ---
 const desktopPartners = [
   { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 2.8 },
   { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 1.4 },
@@ -45,8 +45,6 @@ const desktopPartners = [
   { name: 'Walart', src: '/wal.png', top: '60%', left: '35%', speed: 2.2 },
   { name: 'Wipo', src: '/wal.png', top: '40%', left: '85%', speed: 2.4 },
 ];
-
-// --- DATA FOR MOBILE ---
 const mobilePartners = [
   { name: 'Amazon', src: '/amazon.png', top: '10%', left: '80%', speed: 2.8 },
   { name: 'Accenture', src: '/accent.png', top: '65%', left: '25%', speed: 4.4 },
@@ -61,7 +59,6 @@ const mobilePartners = [
   { name: 'MindTree', src: '/mind.png', top: '90%', left: '38%', speed: 2.6 },
 ];
 
-
 interface PartnersSectionProps {
   progress: number;
 }
@@ -70,6 +67,7 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const isMobile = useIsMobile();
   const partners = isMobile ? mobilePartners : desktopPartners;
 
+  // --- Text animation logic remains the same ---
   const movementStartProgress = 0.45;
   const movementEndProgress = 0.75;
   const opacityPeakProgress = 0.55;
@@ -92,10 +90,22 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const textTravelDistance = 600;
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 
+  // --- Logo animation constants ---
+  const logoFadeStart = 0.5;
+  const logoFadeDuration = 0.5; // 1.0 - 0.5
+  const initialOffset = 500;
+  const totalTravel = 900;
+
   return (
     <div className="sticky top-0 flex text-white h-screen w-full items-center justify-center overflow-hidden">
-      <div className="relative h-full w-full">
-
+      {/* 
+        Apply the single CSS variable to this container. 
+        All children will inherit it.
+      */}
+      <div 
+        className="relative h-full w-full"
+        style={{ '--scroll-progress': progress } as React.CSSProperties}
+      >
         <div
           className="absolute left-1/2 top-1/2 z-10 w-[90%] md:w-4/5 max-w-2xl text-center"
           style={{
@@ -112,39 +122,32 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
           </p>
         </div>
 
-        {partners.map((partner, index) => {
-          const initialOffset = 500;
-          const totalTravel = 900;
-          const translateY = initialOffset - (progress * totalTravel);
-
-          const logoFadeStart = 0.5;
-          const logoFadeDuration = 1.0 - logoFadeStart;
-          const logoFadeProgress = Math.max(0, (progress - logoFadeStart) / logoFadeDuration);
-          const logoOpacity = 1 - logoFadeProgress;
-
-          return (
-            <div
-              key={`${partner.name}-${index}`}
-              className="absolute transition-[transform,opacity] duration-100 ease-out"
-              style={{
-                top: partner.top,
-                left: partner.left,
-                transform: `translate3d(-50%, -50%, 0) translateY(${translateY * partner.speed}px)`,
-                opacity: logoOpacity,
-                willChange: 'transform, opacity',
-              }}
-            >
-              <div className="relative h-12 w-24 md:h-16 md:w-32 transition-all">
-                 <Image
-                    src={partner.src}
-                    alt={`${partner.name} logo`}
-                    fill
-                    className="object-contain"
-                 />
-              </div>
+        {partners.map((partner, index) => (
+          <div
+            key={`${partner.name}-${index}`}
+            className="absolute"
+            style={{
+              top: partner.top,
+              left: partner.left,
+              // These variables are now static and defined once.
+              '--speed': partner.speed,
+              // The transform and opacity now only reference inherited or static variables.
+              // The browser can optimize this much more effectively.
+              transform: `translate3d(-50%, -50%, 0) translateY(calc((${initialOffset}px - (var(--scroll-progress) * ${totalTravel}px)) * var(--speed)))`,
+              opacity: `max(0, 1 - (max(0, var(--scroll-progress) - ${logoFadeStart}) / ${logoFadeDuration}))`,
+              willChange: 'transform, opacity',
+            } as React.CSSProperties}
+          >
+            <div className="relative h-12 w-24 md:h-16 md:w-32 transition-all">
+               <Image
+                  src={partner.src}
+                  alt={`${partner.name} logo`}
+                  fill
+                  className="object-contain"
+               />
             </div>
-          )
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

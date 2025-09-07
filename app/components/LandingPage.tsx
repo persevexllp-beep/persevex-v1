@@ -127,8 +127,8 @@ const AnimationController: FC<AnimationControllerProps> = ({
   return (
     <>
       <color attach="background" args={["black"]} />
-      <StarField hover={false} />
-      <DustPlane ref={dustPlaneRef} renderOrder={-2} />
+      {/* <StarField hover={false} />
+      <DustPlane ref={dustPlaneRef} renderOrder={-2} /> */}
     </>
   );
 };

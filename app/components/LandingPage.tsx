@@ -59,7 +59,7 @@ interface Testimonial {
   name: string;
   designation: string;
   src: string;
-  bgImage: string; 
+  bgImage: string;
   bgPosition: string
 }
 
@@ -188,6 +188,10 @@ const LandingPage: FC = () => {
   const contentWrapperRef = useRef<HTMLDivElement>(null);
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
 
+  // Refs for smoothing partners progress
+  const targetPartnersProgressRef = useRef(0);
+  const smoothedPartnersProgressRef = useRef(0);
+
   const formattedTestimonials: Testimonial[] = useMemo(
   () =>
     testimonialsData.map((t) => ({
@@ -275,6 +279,15 @@ const LandingPage: FC = () => {
         0.075
       );
       watermarkProgressRef.current = targetProgressRef.current;
+      
+      // Smooth partners progress
+      smoothedPartnersProgressRef.current = THREE.MathUtils.lerp(
+        smoothedPartnersProgressRef.current,
+        targetPartnersProgressRef.current,
+        0.075
+      );
+      setPartnersProgress(smoothedPartnersProgressRef.current);
+
       const currentProgress = smoothedProgressRef.current;
       setHeaderProgress(currentProgress);
       if (textContainerRef.current && window.innerHeight) {
@@ -508,20 +521,22 @@ const LandingPage: FC = () => {
             if (videoRef.current) videoRef.current.style.opacity = '0';
             if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = '0';
             if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = '0';
-            textContainerRef.current.style.setProperty("--animated-text-opacity", "0");
+            if(textContainerRef.current) textContainerRef.current.style.setProperty("--animated-text-opacity", "0");
             aboutUsOpacity = 0; // Hide watermark
         }
 
-        textContainerRef.current.style.setProperty("--persevex-opacity", `${clamp(persevexOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--courses-opacity", `${clamp(coursesOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--our-edge-opacity", `${clamp(ourEdgeOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--partners-opacity", `${clamp(partnersOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--trust-opacity", `${clamp(trustOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--recognized-by-opacity", `${clamp(recognizedByOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--about-us-opacity", `${clamp(aboutUsOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--contact-us-opacity", `${clamp(contactUsOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--policy-opacity", `${clamp(policyOpacity, 0, 0.4)}`);
-        textContainerRef.current.style.setProperty("--footer-opacity", `${clamp(footerOpacity, 0, 1.0)}`);
+        if(textContainerRef.current){
+            textContainerRef.current.style.setProperty("--persevex-opacity", `${clamp(persevexOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--courses-opacity", `${clamp(coursesOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--our-edge-opacity", `${clamp(ourEdgeOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--partners-opacity", `${clamp(partnersOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--trust-opacity", `${clamp(trustOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--recognized-by-opacity", `${clamp(recognizedByOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--about-us-opacity", `${clamp(aboutUsOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--contact-us-opacity", `${clamp(contactUsOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--policy-opacity", `${clamp(policyOpacity, 0, 0.4)}`);
+            textContainerRef.current.style.setProperty("--footer-opacity", `${clamp(footerOpacity, 0, 1.0)}`);
+        }
 
         const inAboutUsContentSection = currentProgress >= 10.0 && currentProgress < 11.0;
         
@@ -710,13 +725,15 @@ const LandingPage: FC = () => {
           Math.max(0, currentScroll - edgeTop) / (viewportHeight * edgeAnimationDurationFactor)
         )
       );
+      
+      // Update the target ref for partners progress instead of state
+      if (partnersSectionWrapperRef.current && partnersTop > 0) {
+        const partnersSectionHeight = partnersSectionWrapperRef.current.offsetHeight;
+        const animationDuration = isMobile ? partnersSectionHeight * 0.75 : partnersSectionHeight / 2;
+        const progress = clamp( (currentScroll - partnersTop) / animationDuration, 0, 1);
+        targetPartnersProgressRef.current = progress;
+      }
 
-      setPartnersProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - partnersTop) / (viewportHeight * 4)
-        )
-      );
       setTestimonialProgress(
         Math.min(
           1,

@@ -76,7 +76,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 left-0 right-0 z-50 h-16 flex items-center justify-between p-6 md:p-8 text-white bg-black/10 backdrop-blur-sm">
+      <header className="sticky top-0 left-0 right-0 z-50 h-16 flex items-center justify-between p-6 md:p-8 text-white ">
         <Link 
           href="/" 
           className="text-2xl cursor-pointer md:text-3xl font-bold tracking-wider"

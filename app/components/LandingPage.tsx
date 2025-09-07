@@ -814,7 +814,7 @@ const LandingPage: FC = () => {
             transition: 'opacity 0.4s ease-in-out',
           }}
         />
-        {/* <div
+        <div
           ref={textContainerRef}
           className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
         >
@@ -977,7 +977,7 @@ const LandingPage: FC = () => {
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
         
         <div ref={contentWrapperRef} className="relative z-20">
           <div

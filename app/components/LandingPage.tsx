@@ -127,8 +127,8 @@ const AnimationController: FC<AnimationControllerProps> = ({
   return (
     <>
       <color attach="background" args={["black"]} />
-      {/* <StarField hover={false} />
-      <DustPlane ref={dustPlaneRef} renderOrder={-2} /> */}
+      <StarField hover={false} />
+      <DustPlane ref={dustPlaneRef} renderOrder={-2} />
     </>
   );
 };
@@ -186,10 +186,7 @@ const LandingPage: FC = () => {
     null
   ) as React.RefObject<HTMLDivElement>;
   const contentWrapperRef = useRef<HTMLDivElement>(null);
-  // --- START OF CHANGE (1/3) ---
-  // Create a ref for the new fade overlay element.
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
-  // --- END OF CHANGE (1/3) ---
 
   const formattedTestimonials: Testimonial[] = useMemo(
   () =>
@@ -198,7 +195,7 @@ const LandingPage: FC = () => {
       name: t.name,
       designation: t.title,
       src: t.image,
-      bgImage: t.bgImage, // Add this mapping
+      bgImage: t.bgImage,
       bgPosition: t.bgPosition
     })),
   []
@@ -250,7 +247,7 @@ const LandingPage: FC = () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", calculateLayout);
     };
-  }, [setLayout, isMobile]); // Added isMobile to trigger recalculation on resize
+  }, [setLayout, isMobile]);
 
   useEffect(() => {
     setSectionRefs({
@@ -366,215 +363,168 @@ const LandingPage: FC = () => {
           isDisplayingAboutUsContent && !isStartingContactUsTransition
         );
 
-        let fillColor = "white",
-          stroke = "none",
-          textContainerMixBlendMode = "normal",
-          textContainerBackground = "transparent",
-          textContainerBoxShadow = "none",
-          videoOpacity = 0,
-          starfieldOpacity = 0,
-          whiteOverlayOpacity = 0;
+        if (!isMobile) {
+            let fillColor = "white",
+            stroke = "none",
+            textContainerMixBlendMode = "normal",
+            textContainerBackground = "transparent",
+            textContainerBoxShadow = "none",
+            videoOpacity = 0,
+            starfieldOpacity = 0,
+            whiteOverlayOpacity = 0;
 
-        if (assemblyProgress < 1) {
-          fillColor = "white";
-          stroke = "none";
-        } else if (videoFadeProgress < 1) {
-          fillColor = "white";
-          stroke = "none";
-          textContainerMixBlendMode = "multiply";
-          textContainerBackground = "black";
-          textContainerBoxShadow = "0 0 20px 20px black";
-          videoOpacity = 1;
-          whiteOverlayOpacity = 2 * Math.abs(videoFadeProgress - 0.5);
-          const starFadeStartPoint = 0.9;
-          const starFadeProgress = clamp(
-            (videoFadeProgress - starFadeStartPoint) /
-              (1.0 - starFadeStartPoint),
-            0,
-            1
-          );
-          starfieldOpacity = 1 - starFadeProgress;
-        } else {
-          fillColor = "white";
-          stroke = "none";
-          textContainerMixBlendMode = "normal";
-          textContainerBackground = "transparent";
-          textContainerBoxShadow = "none";
-          videoOpacity = 0;
-          whiteOverlayOpacity = 0;
-          starfieldOpacity = 0;
-        }
-
-        const isBeforeRise = currentProgress < riseStart;
-        const centerProgress = isBeforeRise ? assemblyProgress : 1;
-        const initialY = 4;
-        const centerTargetVh = -35;
-        const topTargetVh = isMobile ? -80 : -68;
-        const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
-        const topTargetPx = (topTargetVh * window.innerHeight) / 100;
-
-        const exitStart = riseStart + riseDuration;
-        const exitDuration = 0.1;
-        const exitEnd = exitStart + exitDuration;
-        const exitProgress = clamp(
-          (currentProgress - exitStart) / exitDuration,
-          0,
-          1
-        );
-
-        let containerTranslateY;
-        if (currentProgress < riseStart) {
-          containerTranslateY = THREE.MathUtils.lerp(
-            initialY * 16,
-            centerTargetPx,
-            centerProgress
-          );
-        } else if (currentProgress < exitStart) {
-          containerTranslateY = THREE.MathUtils.lerp(
-            centerTargetPx,
-            topTargetPx,
-            riseProgress
-          );
-        } else {
-          const exitTargetVh = -100;
-          const exitTargetPx = (exitTargetVh * window.innerHeight) / 100;
-          containerTranslateY = THREE.MathUtils.lerp(
-            topTargetPx,
-            exitTargetPx,
-            exitProgress
-          );
-        }
-
-        const initial_scale = 1.0;
-        const final_scale = isMobile ? 0.7 : 0.45;
-        const containerScale = isBeforeRise
-          ? initial_scale
-          : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
-
-        let animatedTextOpacity;
-        const fadeInProgress = clamp(
-          (currentProgress - assemblyStart) / (assemblyDuration / 2),
-          0,
-          1
-        );
-        if (currentProgress < assemblyStart) {
-          animatedTextOpacity = 0;
-        } else if (currentProgress < exitEnd) {
-          animatedTextOpacity = fadeInProgress;
-        } else {
-          animatedTextOpacity = 0;
-        }
-
-        textContainerRef.current.style.setProperty(
-          "--about-us-container-transform",
-          `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`
-        );
-        textContainerRef.current.style.setProperty(
-          "--animated-text-opacity",
-          `${animatedTextOpacity}`
-        );
-
-        if (textMaskContainerRef.current) {
-          (textMaskContainerRef.current.style as any).mixBlendMode =
-            textContainerMixBlendMode;
-          textMaskContainerRef.current.style.background =
-            textContainerBackground;
-          textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
-        }
-
-        textContainerRef.current.style.setProperty(
-          "--about-us-fill-color",
-          fillColor
-        );
-        textContainerRef.current.style.setProperty("--about-us-stroke", stroke);
-
-        if (videoRef.current)
-          videoRef.current.style.opacity = `${videoOpacity}`;
-        if (starfieldOverlayRef.current)
-          starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
-        if (whiteOverlayRef.current)
-          whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
-
-        const numLetters = aboutUsWord.replace(/ /g, "").length;
-        const numSpaces = aboutUsWord.split(" ").length - 1;
-        const spacePauseFactor = 2;
-        const totalAnimationUnits = numLetters + numSpaces * spacePauseFactor;
-        const unitDuration = 1.0 / totalAnimationUnits;
-        const animationWindow = unitDuration * 5;
-        const totalStaggerDuration =
-          (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
-        const compressionFactor =
-          totalStaggerDuration > 0
-            ? (1.0 - animationWindow) / totalStaggerDuration
-            : 1;
-        let timeCursor = 0;
-
-        lettersWithSpaces.forEach((char, index) => {
-          if (char === " ") {
-            timeCursor += unitDuration * spacePauseFactor;
-            return;
-          }
-          const start = isMobile ? 0 : timeCursor * compressionFactor;
-          const letterProgress = clamp(
-            (assemblyProgress - start) / animationWindow,
-            0,
-            1
-          );
-          const translateY = (1 - letterProgress) * 20;
-          const scale = 0.5 + letterProgress * 0.5;
-          if (textContainerRef.current) {
-            textContainerRef.current.style.setProperty(
-              `--about-us-letter-${index}-transform`,
-              `translateY(${translateY}vh) scale(${scale})`
+            if (assemblyProgress < 1) {
+            fillColor = "white";
+            stroke = "none";
+            } else if (videoFadeProgress < 1) {
+            fillColor = "white";
+            stroke = "none";
+            textContainerMixBlendMode = "multiply";
+            textContainerBackground = "black";
+            textContainerBoxShadow = "0 0 20px 20px black";
+            videoOpacity = 1;
+            whiteOverlayOpacity = 2 * Math.abs(videoFadeProgress - 0.5);
+            const starFadeStartPoint = 0.9;
+            const starFadeProgress = clamp(
+                (videoFadeProgress - starFadeStartPoint) /
+                (1.0 - starFadeStartPoint),
+                0,
+                1
             );
-          }
-          timeCursor += unitDuration;
-        });
+            starfieldOpacity = 1 - starFadeProgress;
+            } else {
+            fillColor = "white";
+            stroke = "none";
+            textContainerMixBlendMode = "normal";
+            textContainerBackground = "transparent";
+            textContainerBoxShadow = "none";
+            videoOpacity = 0;
+            whiteOverlayOpacity = 0;
+            starfieldOpacity = 0;
+            }
 
-        textContainerRef.current.style.setProperty(
-          "--persevex-opacity",
-          `${clamp(persevexOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--courses-opacity",
-          `${clamp(coursesOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--our-edge-opacity",
-          `${clamp(ourEdgeOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--partners-opacity",
-          `${clamp(partnersOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--trust-opacity",
-          `${clamp(trustOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--recognized-by-opacity",
-          `${clamp(recognizedByOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--about-us-opacity",
-          `${clamp(aboutUsOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--contact-us-opacity",
-          `${clamp(contactUsOpacity, 0, 0.4)}`
-        );
-        textContainerRef.current.style.setProperty(
-          "--policy-opacity",
-          `${clamp(policyOpacity, 0, 0.4)}`
-        );
+            const isBeforeRise = currentProgress < riseStart;
+            const centerProgress = isBeforeRise ? assemblyProgress : 1;
+            const initialY = 4;
+            const centerTargetVh = -35;
+            const topTargetVh = -68;
+            const centerTargetPx = (centerTargetVh * window.innerHeight) / 100;
+            const topTargetPx = (topTargetVh * window.innerHeight) / 100;
 
-        textContainerRef.current.style.setProperty(
-          "--footer-opacity",
-          `${clamp(footerOpacity, 0, 1.0)}`
-        );
+            const exitStart = riseStart + riseDuration;
+            const exitDuration = 0.1;
+            const exitEnd = exitStart + exitDuration;
+            const exitProgress = clamp(
+            (currentProgress - exitStart) / exitDuration,
+            0,
+            1
+            );
+
+            let containerTranslateY;
+            if (currentProgress < riseStart) {
+            containerTranslateY = THREE.MathUtils.lerp(
+                initialY * 16,
+                centerTargetPx,
+                centerProgress
+            );
+            } else if (currentProgress < exitStart) {
+            containerTranslateY = THREE.MathUtils.lerp(
+                centerTargetPx,
+                topTargetPx,
+                riseProgress
+            );
+            } else {
+            const exitTargetVh = -100;
+            const exitTargetPx = (exitTargetVh * window.innerHeight) / 100;
+            containerTranslateY = THREE.MathUtils.lerp(
+                topTargetPx,
+                exitTargetPx,
+                exitProgress
+            );
+            }
+
+            const initial_scale = 1.0;
+            const final_scale = 0.45;
+            const containerScale = isBeforeRise
+            ? initial_scale
+            : THREE.MathUtils.lerp(initial_scale, final_scale, riseProgress);
+
+            const fadeInProgress = clamp(
+            (currentProgress - assemblyStart) / (assemblyDuration / 2),
+            0,
+            1
+            );
+            let animatedTextOpacity;
+            if (currentProgress < assemblyStart) {
+                animatedTextOpacity = 0;
+            } else {
+                const fadeOutOpacity = (1 - clamp((currentProgress - 11.0) / 0.5, 0, 1));
+                animatedTextOpacity = Math.min(fadeInProgress, fadeOutOpacity);
+            }
+            
+            textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
+            textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
+            
+            if (textMaskContainerRef.current) {
+                (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
+                textMaskContainerRef.current.style.background = textContainerBackground;
+                textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
+            }
+            textContainerRef.current.style.setProperty("--about-us-fill-color", fillColor);
+            textContainerRef.current.style.setProperty("--about-us-stroke", stroke);
+            if (videoRef.current) videoRef.current.style.opacity = `${videoOpacity}`;
+            if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+            if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
+
+            const numLetters = aboutUsWord.replace(/ /g, "").length;
+            const numSpaces = aboutUsWord.split(" ").length - 1;
+            const spacePauseFactor = 2;
+            const totalAnimationUnits = numLetters + numSpaces * spacePauseFactor;
+            const unitDuration = 1.0 / totalAnimationUnits;
+            const animationWindow = unitDuration * 5;
+            const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
+            const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
+            let timeCursor = 0;
+
+            lettersWithSpaces.forEach((char, index) => {
+                if (char === " ") {
+                    timeCursor += unitDuration * spacePauseFactor;
+                    return;
+                }
+                const start = timeCursor * compressionFactor;
+                const letterProgress = clamp(
+                    (assemblyProgress - start) / animationWindow, 0, 1
+                );
+                const translateY = (1 - letterProgress) * 20;
+                const scale = 0.5 + letterProgress * 0.5;
+                if (textContainerRef.current) {
+                    textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
+                }
+                timeCursor += unitDuration;
+            });
+
+        } else {
+            // Mobile: Hide all animated elements
+            if (videoRef.current) videoRef.current.style.opacity = '0';
+            if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = '0';
+            if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = '0';
+            textContainerRef.current.style.setProperty("--animated-text-opacity", "0");
+            aboutUsOpacity = 0; // Hide watermark
+        }
+
+        textContainerRef.current.style.setProperty("--persevex-opacity", `${clamp(persevexOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--courses-opacity", `${clamp(coursesOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--our-edge-opacity", `${clamp(ourEdgeOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--partners-opacity", `${clamp(partnersOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--trust-opacity", `${clamp(trustOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--recognized-by-opacity", `${clamp(recognizedByOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--about-us-opacity", `${clamp(aboutUsOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--contact-us-opacity", `${clamp(contactUsOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--policy-opacity", `${clamp(policyOpacity, 0, 0.4)}`);
+        textContainerRef.current.style.setProperty("--footer-opacity", `${clamp(footerOpacity, 0, 1.0)}`);
 
         const inAboutUsContentSection = currentProgress >= 10.0 && currentProgress < 11.0;
-
+        
         if (contentWrapperRef.current) {
             if (isMobile && inAboutUsContentSection) {
                 contentWrapperRef.current.style.zIndex = '5';
@@ -583,8 +533,6 @@ const LandingPage: FC = () => {
             }
         }
         
-        // --- START OF CHANGE (2/3) ---
-        // Control the visibility of the fade overlay based on scroll progress and screen size.
         if (fadeOverlayRef.current) {
             if (isMobile && inAboutUsContentSection) {
                 fadeOverlayRef.current.style.opacity = '1';
@@ -592,7 +540,6 @@ const LandingPage: FC = () => {
                 fadeOverlayRef.current.style.opacity = '0';
             }
         }
-        // --- END OF CHANGE (2/3) ---
       }
       animationFrameId = requestAnimationFrame(animationLoop);
     };
@@ -661,10 +608,18 @@ const LandingPage: FC = () => {
       ) {
         const animStart =
           aboutUsWatermarkAnimStart + validationToStoryTransitionDuration;
-        const animDuration =
-          aboutUsWatermarkAnimDuration - validationToStoryTransitionDuration;
-        const progress = clamp((currentScroll - animStart) / animDuration, 0, 1);
-        newWatermarkProgress = 6.0 + progress * 5;
+
+        if (isMobile) {
+            const mobileAnimDuration = viewportHeight * 2.5;
+            const progress = clamp((currentScroll - animStart) / mobileAnimDuration, 0, 1);
+            newWatermarkProgress = 6.0 + progress * 5;
+        } else {
+            const animDuration =
+              aboutUsWatermarkAnimDuration - validationToStoryTransitionDuration;
+            const progress = clamp((currentScroll - animStart) / animDuration, 0, 1);
+            newWatermarkProgress = 6.0 + progress * 5;
+        }
+
       } else if (currentScroll >= aboutUsWatermarkAnimStart) {
         const animStart = aboutUsWatermarkAnimStart;
         const progress = clamp(
@@ -714,7 +669,7 @@ const LandingPage: FC = () => {
       }
 
       targetProgressRef.current = newWatermarkProgress;
-
+      
       if (heroWrapperRef.current) {
         const heroProgress = Math.min(
           1,
@@ -837,7 +792,7 @@ const LandingPage: FC = () => {
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
   const aboutUsSectionHeightVh = isMobile ? 500 : 545;
-  const cardStackingSectionHeightVh = isMobile ? 150 : 600; // FIXED: Increased from 150 to 350
+  const cardStackingSectionHeightVh = isMobile ? 150 : 600;
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (
@@ -850,9 +805,6 @@ const LandingPage: FC = () => {
         </Canvas>
       </div>
       <main>
-        {/* --- START OF CHANGE (3/3) --- */}
-        {/* This div creates the fade-out effect at the top of the screen for mobile. */}
-        {/* Its opacity is controlled by the animation loop. */}
         <div
           ref={fadeOverlayRef}
           className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"
@@ -862,8 +814,7 @@ const LandingPage: FC = () => {
             transition: 'opacity 0.4s ease-in-out',
           }}
         />
-        {/* --- END OF CHANGE (3/3) --- */}
-        <div
+        {/* <div
           ref={textContainerRef}
           className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
         >
@@ -1026,7 +977,7 @@ const LandingPage: FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         
         <div ref={contentWrapperRef} className="relative z-20">
           <div

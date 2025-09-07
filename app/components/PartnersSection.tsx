@@ -1,10 +1,9 @@
-"use client"; 
+"use client";
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image'; 
+import Image from 'next/image';
 
 // --- HELPER HOOK ---
-// To detect if we should use the mobile or desktop layout data.
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -25,7 +24,7 @@ const useIsMobile = (breakpoint = 768) => {
 };
 
 
-// --- DATA FOR DESKTOP (Unchanged) ---
+// --- DATA FOR DESKTOP ---
 const desktopPartners = [
   { name: 'Amazon', src: '/amazon.png', top: '30%', left: '80%', speed: 2.8 },
   { name: 'Accenture', src: '/accent.png', top: '45%', left: '15%', speed: 1.4 },
@@ -47,9 +46,7 @@ const desktopPartners = [
   { name: 'Wipo', src: '/wal.png', top: '40%', left: '85%', speed: 2.4 },
 ];
 
-// --- NEW DATA FOR MOBILE ---
-// A curated subset of logos with positions adjusted for a narrower, portrait screen.
-// Notice the 'left' values are less extreme to prevent horizontal overflow.
+// --- DATA FOR MOBILE ---
 const mobilePartners = [
   { name: 'Amazon', src: '/amazon.png', top: '10%', left: '80%', speed: 2.8 },
   { name: 'Accenture', src: '/accent.png', top: '65%', left: '25%', speed: 4.4 },
@@ -71,15 +68,11 @@ interface PartnersSectionProps {
 
 const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   const isMobile = useIsMobile();
-
-  // Select the appropriate data source based on screen size.
-  // The rest of the component will work identically with either data set.
   const partners = isMobile ? mobilePartners : desktopPartners;
 
-  // --- ALL ANIMATION LOGIC IS UNCHANGED ---
   const movementStartProgress = 0.45;
-  const movementEndProgress = 0.75; 
-  const opacityPeakProgress = 0.55; 
+  const movementEndProgress = 0.75;
+  const opacityPeakProgress = 0.55;
 
   const fadeInDuration = opacityPeakProgress - movementStartProgress;
   const fadeOutDuration = movementEndProgress - opacityPeakProgress;
@@ -92,60 +85,55 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
   }
   textOpacity = Math.max(0, textOpacity);
 
-  const movementAnimationDuration = movementEndProgress - movementStartProgress; 
+  const movementAnimationDuration = movementEndProgress - movementStartProgress;
   const movementProgress = Math.max(0, Math.min(1, (progress - movementStartProgress) / movementAnimationDuration));
-  
-  const textInitialOffset = 200; 
-  const textTravelDistance = 600; 
+
+  const textInitialOffset = 200;
+  const textTravelDistance = 600;
   const textTranslateY = textInitialOffset - (movementProgress * textTravelDistance);
 
   return (
     <div className="sticky top-0 flex text-white h-screen w-full items-center justify-center overflow-hidden">
       <div className="relative h-full w-full">
-        
+
         <div
-          // Added a smaller width constraint for mobile text to prevent wrapping issues.
           className="absolute left-1/2 top-1/2 z-10 w-[90%] md:w-4/5 max-w-2xl text-center"
           style={{
             opacity: textOpacity,
             transform: `translate(-50%, -50%) translateY(${textTranslateY}px)`,
-            willChange: 'transform, opacity', // Performance hint
+            willChange: 'transform, opacity',
           }}
         >
-          {/* RESPONSIVE TEXT SIZING */}
           <h2 className="mb-4 text-3xl font-semibold text-white md:text-5xl">
             Partnering with leading institutions and innovators.
           </h2>
-          {/* Made the second line smaller on mobile for better hierarchy */}
           <p className="text-lg font-medium text-gray-200 md:text-4xl md:font-semibold md:text-white">
             Together, we're shaping the future of learning.
           </p>
         </div>
 
         {partners.map((partner, index) => {
-          // --- LOGO ANIMATION LOGIC IS UNCHANGED ---
           const initialOffset = 500;
-          const totalTravel = 900; 
+          const totalTravel = 900;
           const translateY = initialOffset - (progress * totalTravel);
-          
+
           const logoFadeStart = 0.5;
           const logoFadeDuration = 1.0 - logoFadeStart;
           const logoFadeProgress = Math.max(0, (progress - logoFadeStart) / logoFadeDuration);
           const logoOpacity = 1 - logoFadeProgress;
-          
+
           return (
             <div
-              key={`${partner.name}-${index}`} 
+              key={`${partner.name}-${index}`}
               className="absolute transition-[transform,opacity] duration-100 ease-out"
               style={{
                 top: partner.top,
                 left: partner.left,
-                transform: `translate(-50%, -50%) translateY(${translateY * partner.speed}px)`,
+                transform: `translate3d(-50%, -50%, 0) translateY(${translateY * partner.speed}px)`,
                 opacity: logoOpacity,
-                willChange: 'transform, opacity', // Performance hint
+                willChange: 'transform, opacity',
               }}
             >
-              {/* RESPONSIVE LOGO SIZING */}
               <div className="relative h-12 w-24 md:h-16 md:w-32 transition-all">
                  <Image
                     src={partner.src}

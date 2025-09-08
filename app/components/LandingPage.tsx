@@ -834,7 +834,7 @@ const LandingPage: FC = () => {
         <img
           src="/sat.png"
           alt="Saturn with rings"
-          className="absolute lg:top-96  top-50 right-32 rotate-2 lg:right-40 transform -translate-y-1/2 translate-x-[28%] w-[90vw] md:w-[65vw] lg:w-[750px] max-w-[750px] pointer-events-none mix-blend-screen  opacity-60"
+          className="absolute lg:top-96  top-50 right-28 rotate-2 lg:right-40 transform -translate-y-1/2 translate-x-[28%] w-[90vw] md:w-[65vw] lg:w-[750px] max-w-[750px] pointer-events-none mix-blend-screen  opacity-60"
         />
       </div>
       

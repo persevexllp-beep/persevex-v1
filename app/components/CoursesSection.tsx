@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue, useSpring } from "framer-motion";
-import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant"; // Ensure this path is correct
+import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-// --- HELPER HOOK (Unchanged) ---
+// --- HELPER HOOK ---
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -20,6 +21,7 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
+// --- CARD COMPONENT (Updated for mobile scaling) ---
 // --- CARD COMPONENT (Corrected) ---
 const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, animatedProgress: MotionValue<number>, i: number, isMobile: boolean }) => {
   const router = useRouter();
@@ -54,8 +56,6 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
 
   const Icon = course.icon;
 
-  console.log('course bg image: ', course.cardBg_image)
-
   // --- THE FIX IS HERE ---
   // We combine the gradient overlay and the image in a single CSS property.
   // The first background listed is on top.
@@ -72,12 +72,15 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
         opacity: cardOpacity,
         zIndex: i,
         pointerEvents,
-        backgroundImage: cardBackgroundImage, // <-- Use the combined background
+       
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
-      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col items-center justify-end shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[400px] p-8'}`}
+      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[420px] p-'}`}
     >
+      <div className="w-full h-full ">
+        <Image src={course.cardBg_image} alt="image" height={1000} width={1000} />
+      </div>
       {/* 
         THE OVERLAY DIV IS NOW REMOVED. 
         The linear-gradient in the style prop handles the overlay. 
@@ -94,7 +97,7 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
 
       <button
         onClick={() => router.push(course.route)}
-        className="relative z-10  w-full py-2.5 px-5 cursor-pointer mt-4 font-medium text-white bg-gray-800 rounded-lg transition-colors hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="absolute z-10 w-44 py-2.5 mt-4 mb-4   px-5 cursor-pointer  font-medium text-white border  rounded-lg transition-colors focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>
@@ -107,7 +110,8 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
     </motion.div>
   );
 };
-// --- MAIN SECTION COMPONENT (Updated text) ---
+
+// --- MAIN SECTION COMPONENT (Updated) ---
 const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
@@ -183,7 +187,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   return (
     <div
       ref={sectionRef as React.RefObject<HTMLDivElement>}
-      className="relative w-full h-full  text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb- md:pb-0"
+      className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0"
     >
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
         <div className="relative flex w-fit items-center rounded-full bg-transparent px-1 lg:p-1 backdrop-blur-sm">
@@ -218,9 +222,9 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: managementTextY,
               }}
             >
-              {/* --- UPDATED TEXT: Heading removed, only subheading remains --- */}
-              <h2 className="text-2xl md:text-5xl font-extrabold leading-tight text-white/90">
-                {managementContent.subheading}
+              <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
+                {managementContent.heading}
+                <span className="block opacity-80">{managementContent.subheading}</span>
               </h2>
               <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-4">
                 {managementContent.paragraph}
@@ -234,9 +238,9 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: technicalTextY,
               }}
             >
-              {/* --- UPDATED TEXT: Heading removed, only subheading remains --- */}
-              <h2 className="text-2xl md:text-5xl font-extrabold leading-tight text-white/90">
-                {technicalContent.subheading}
+              <h2 className="text-2xl md:text-6xl font-extrabold leading-tight">
+                {technicalContent.heading}
+                <span className="block opacity-80">{technicalContent.subheading}</span>
               </h2>
               <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-2">
                 {technicalContent.paragraph}

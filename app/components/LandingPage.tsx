@@ -1,3 +1,5 @@
+// LandingPage.tsx
+
 "use client";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -51,9 +53,6 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-interface AnimationControllerProps {
-  watermarkProgressRef: MutableRefObject<number>;
-}
 interface Testimonial {
   quote: string;
   name: string;
@@ -91,12 +90,10 @@ interface DustMaterial extends THREE.ShaderMaterial {
   uniforms: { uOpacity: { value: number } };
 }
 
-const AnimationController: FC<AnimationControllerProps> = ({
-  watermarkProgressRef,
-}) => {
+const DustPlaneController: FC<{ watermarkProgressRef: MutableRefObject<number> }> = ({ watermarkProgressRef }) => {
   const animatedProgress = useRef<number>(0);
-  const dustPlaneRef =
-    useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
+  const dustPlaneRef = useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
+
   useFrame(() => {
     animatedProgress.current = THREE.MathUtils.lerp(
       animatedProgress.current,
@@ -106,32 +103,29 @@ const AnimationController: FC<AnimationControllerProps> = ({
     const currentProgress = animatedProgress.current;
 
     if (dustPlaneRef.current) {
+      // --- CORRECTED LOGIC START ---
       let dustOpacity = 0;
-
-      if (currentProgress <= 1.0) {
+      if (currentProgress <= 1.0) { // Fully visible during Hero and Courses
         dustOpacity = 1.0;
-      } else if (currentProgress > 1.0 && currentProgress < 2.0) {
+      } else if (currentProgress > 1.0 && currentProgress < 2.0) { // Fade out during the transition TO Our Edge
         dustOpacity = 1.0 - (currentProgress - 1.0);
-      } else if (currentProgress >= 12.0 && currentProgress < 13.0) {
+      } else if (currentProgress >= 12.0 && currentProgress < 13.0) { // Fade in for Policy
         dustOpacity = currentProgress - 12.0;
-      } else if (currentProgress >= 13.0) {
+      } else if (currentProgress >= 13.0) { // Visible for Policy/Footer
         dustOpacity = 1.0;
       }
+      // --- CORRECTED LOGIC END ---
 
-      const material = dustPlaneRef.current.material;
+      const material = dustPlaneRef.current.material as DustMaterial;
       if (material.uniforms.uOpacity) {
         material.uniforms.uOpacity.value = clamp(dustOpacity, 0, 1);
       }
     }
   });
-  return (
-    <>
-      <color attach="background" args={["black"]} />
-      <StarField hover={false} />
-      <DustPlane ref={dustPlaneRef} renderOrder={-2} />
-    </>
-  );
+
+  return <DustPlane ref={dustPlaneRef} renderOrder={-2} />;
 };
+
 
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
@@ -142,6 +136,7 @@ const LandingPage: FC = () => {
   const watermarkProgressRef = useRef<number>(0);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const saturnWrapperRef = useRef<HTMLDivElement>(null);
   const coursesSectionWrapperRef = useRef<HTMLDivElement>(
     null
   ) as React.RefObject<HTMLDivElement>;
@@ -686,16 +681,22 @@ const LandingPage: FC = () => {
 
       targetProgressRef.current = newWatermarkProgress;
       
+      const heroProgress = Math.min(
+        1,
+        currentScroll / (viewportHeight * 0.8)
+      );
+
       if (heroWrapperRef.current) {
-        const heroProgress = Math.min(
-          1,
-          currentScroll / (viewportHeight * 0.8)
-        );
         heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
         heroWrapperRef.current.style.transform = `translateY(${
           heroProgress * -250
         }px)`;
       }
+
+      if (saturnWrapperRef.current) {
+        saturnWrapperRef.current.style.opacity = `${1 - heroProgress}`;
+      }
+
 
       if (coursesSectionWrapperRef.current && coursesTop > 0) {
         const sectionEl = coursesSectionWrapperRef.current;
@@ -815,28 +816,43 @@ const LandingPage: FC = () => {
 
   return (
     <>
+      {/* Layer 1: Background Canvas (Stars only) */}
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <Suspense fallback={null}>
-            <AnimationController watermarkProgressRef={watermarkProgressRef} />
+            <color attach="background" args={["black"]} />
+            <StarField hover={false} />
           </Suspense>
         </Canvas>
       </div>
-      <main>
-        <div
-          ref={fadeOverlayRef}
-          className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, black 50%, transparent)',
-            opacity: 0,
-            transition: 'opacity 0.4s ease-in-out',
-          }}
+
+      {/* Layer 2: Saturn Image */}
+      <div
+        ref={saturnWrapperRef}
+        className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none"
+      >
+        <img
+          src="/exploresaturn.png"
+          alt="Saturn with rings"
+          className="absolute top-96 rotate-2 right-52 transform -translate-y-1/2 translate-x-[28%] w-[90vw] md:w-[65vw] lg:w-[750px] max-w-[750px] pointer-events-none mix-blend-screen opacity-90"
         />
-        <div
-          ref={textContainerRef}
-          className="fixed top-0 left-0 w-full h-full z-10 pointer-events-none overflow-hidden"
-        >
-          <div className="hidden md:block">
+      </div>
+      
+      {/* Layer 3: Foreground Canvas (Dust Plane only, transparent) */}
+      <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }} gl={{ alpha: true }}>
+          <Suspense fallback={null}>
+            <DustPlaneController watermarkProgressRef={watermarkProgressRef} />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      {/* Layer 5: Watermark Text Overlay */}
+      <div
+        ref={textContainerRef}
+        className="fixed top-0 left-0 w-full h-full z-40 pointer-events-none overflow-hidden"
+      >
+        <div className="hidden md:block">
             <h2
               className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
               style={{
@@ -942,7 +958,6 @@ const LandingPage: FC = () => {
               PERSEVEX
             </h2>
           </div>
-
           <div
             className="absolute left-1/2 z-[-4]"
             style={
@@ -995,14 +1010,26 @@ const LandingPage: FC = () => {
               </div>
             </div>
           </div>
-        </div>
-        
-        <div ref={contentWrapperRef} className="relative z-20">
+      </div>
+      
+      {/* Layer 4: Main HTML Content */}
+      <main className="relative z-30">
+        <div
+          ref={fadeOverlayRef}
+          className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, black 50%, transparent)',
+            opacity: 0,
+            transition: 'opacity 0.4s ease-in-out',
+          }}
+        />
+        <div ref={contentWrapperRef} className="relative">
           <div
             ref={heroWrapperRef}
             className="sticky top-0 flex items-center justify-center h-screen pointer-events-none"
           >
-            <div className="w-full md:mr-74 md:mb-36 pointer-events-none">
+            {/* Saturn Image is now in its own layer */}
+            <div className="relative w-full md:mr-74 md:mb-36 pointer-events-none">
               <Hero />
             </div>
           </div>
@@ -1033,12 +1060,11 @@ const LandingPage: FC = () => {
             </div>
           </div>
 
-          {/* --- MODIFIED SECTION --- */}
           <div
             ref={testimonialsSectionWrapperRef}
             style={{ 
               height: `${testimonialsSectionHeightVh}vh`,
-              marginTop: '-100vh' // This overlaps the sections, removing the dead scroll space
+              marginTop: '-100vh'
             }}
           >
             <div className="sticky top-0 flex h-screen items-center justify-center">
@@ -1048,7 +1074,6 @@ const LandingPage: FC = () => {
               />
             </div>
           </div>
-          {/* --- END MODIFIED SECTION --- */}
           
           <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
             <div className="sticky top-0 flex h-screen items-center justify-center">

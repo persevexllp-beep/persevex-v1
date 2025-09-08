@@ -75,17 +75,12 @@ export default function AboutUsExtendedComp({
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
   
-  // --- NEW ---
-  // Create a ref for the sentinel element
   const mobileSentinelRef = useRef<HTMLDivElement>(null);
 
-  // --- NEW ---
-  // Use an effect to pass the ref's current element up to the parent
   useEffect(() => {
     if (isMobile && setSentinelRef) {
       setSentinelRef(mobileSentinelRef.current);
     }
-    // Clean up when switching to desktop
     return () => {
         if(setSentinelRef) setSentinelRef(null);
     }
@@ -94,8 +89,22 @@ export default function AboutUsExtendedComp({
 
   if (isMobile) {
     return (
-      <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32  text-white gap-20">
+      <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32 text-white gap-20">
         
+        {/* --- NEW: About Us Heading for Mobile --- */}
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <h2 className="text-3xl font-bold mb-4">Our Story & Vision</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Discover the principles that drive us and the future we're building together.
+          </p>
+        </motion.div>
+
         {/* Story Cards Section */}
         <motion.div
           className="flex flex-col gap-4 w-full max-w-md"
@@ -199,26 +208,32 @@ export default function AboutUsExtendedComp({
           </div>
         </motion.div>
         
-        {/* --- NEW --- 
-            This is the invisible sentinel element. 
-            It's placed at the very end of all the mobile content. 
-        */}
         <div ref={mobileSentinelRef} style={{ height: '1px', width: '1px', pointerEvents: 'none' }} />
       </div>
     );
   }
 
-  // --- DESKTOP VERSION (Original Code - Unchanged) ---
+  // --- DESKTOP VERSION ---
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
+  
+  // Card Animations
   const isCard1Expanded = cascadingProgress >= 1.8 ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= 2.8 ? 1 : 0;
   const expansionProgress = easeOutCubic(Math.max(0, Math.min(cascadingProgress / 0.8, 1)));
   const cardFadeProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.0) / 0.5, 1)));
-  const faqRiseProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.5) / 0.5, 1)));
   const cardStackOpacity = 1 - cardFadeProgress;
+
+  // FAQ Animations
+  const faqRiseProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.5) / 0.5, 1)));
   const faqOpacity = faqRiseProgress;
   const faqTranslateY = (1 - faqRiseProgress) * 600;
+  
+  // --- NEW: Heading Animations ---
+  const headingRiseProgress = easeOutCubic(Math.max(0, Math.min(cascadingProgress / 0.8, 1)));
+  const headingFadeProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.2) / 0.5, 1)));
+  const headingOpacity = headingRiseProgress * (1 - headingFadeProgress);
+  const headingTranslateY = (1 - headingRiseProgress) * 100;
 
   const getCardStyle = (index: number): React.CSSProperties => {
     let transform = "", zIndex = 0, opacity = 1;
@@ -291,6 +306,8 @@ export default function AboutUsExtendedComp({
   return (
     <div className="flex flex-col items-center justify-start w-full pt-20 text-white">
       <div className="relative w-full max-w-7xl lg-w-full mx-auto px-4 sm-px-6 min-h-[30rem]">
+     
+
         <div className="absolute inset-0 flex items-center justify-center w-full" style={{ opacity: cardStackOpacity, pointerEvents: cardStackOpacity < 0.1 ? 'none' : 'auto' }}>
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
@@ -345,6 +362,7 @@ export default function AboutUsExtendedComp({
         </div>
         <div className="absolute inset-0 flex items-center justify-center w-full">
             <motion.div className="w-full max-w-3xl mx-auto flex flex-col gap-4" initial={false} animate={{ opacity: faqOpacity, translateY: faqTranslateY }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
+                <h2 className="text-4xl font-bold mb-4 text-center">Frequently Asked Questions</h2>
                 {faqData.map((item, index) => {
                     const isExpanded = expandedIndex === index;
                     return (

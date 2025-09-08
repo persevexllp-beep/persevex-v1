@@ -185,7 +185,7 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
   return (
     <div
       ref={sectionRef as React.RefObject<HTMLDivElement>}
-      className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0"
+      className="relative w-full h-full  text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb- md:pb-0"
     >
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
         <div className="relative flex w-fit items-center rounded-full bg-transparent px-1 lg:p-1 backdrop-blur-sm">

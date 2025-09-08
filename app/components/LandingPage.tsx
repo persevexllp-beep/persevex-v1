@@ -808,8 +808,8 @@ const LandingPage: FC = () => {
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
-  const aboutUsSectionHeightVh = isMobile ? 500 : 545;
-  const cardStackingSectionHeightVh = isMobile ? 150 : 600;
+  const aboutUsSectionHeightVh = isMobile ? 0 : 545;
+  const cardStackingSectionHeightVh = 600; // Only used for desktop now
   const contactUsSectionHeightVh = isMobile ? 100 : 250;
 
   return (
@@ -1049,20 +1049,35 @@ const LandingPage: FC = () => {
               <RecognizedBySection />
             </div>
           </div>
+          
           <div ref={aboutUsSectionWrapperRef} style={{ height: `${aboutUsSectionHeightVh}vh` }}></div>
-          <div ref={cardStackingWrapperRef} style={{ height: `${cardStackingSectionHeightVh}vh` }}>
-            <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-8 md:pt-24">
-              <div
-                className="w-full text-white"
-                style={{ opacity: extendedCompProgress }}
-              >
-                <AboutUsExtendedComp
-                  stackingProgress={stackingProgress}
-                  cascadingProgress={cascadingProgress}
-                />
+          
+          {/* --- CORRECTED SECTION --- */}
+          {isMobile ? (
+            // Simple static container for mobile, no complex styling or opacity logic
+            <div ref={cardStackingWrapperRef} className="w-full text-white">
+              <AboutUsExtendedComp
+                stackingProgress={0} // Not used on mobile
+                cascadingProgress={0} // Not used on mobile
+              />
+            </div>
+          ) : (
+            // Original complex structure for desktop animations
+            <div ref={cardStackingWrapperRef} style={{ height: `${cardStackingSectionHeightVh}vh` }}>
+              <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-8 md:pt-24">
+                <div
+                  className="w-full text-white"
+                  style={{ opacity: extendedCompProgress }}
+                >
+                  <AboutUsExtendedComp
+                    stackingProgress={stackingProgress}
+                    cascadingProgress={cascadingProgress}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+          {/* --- END CORRECTED SECTION --- */}
 
           <div ref={contactUsSectionWrapperRef} style={{ height: `${contactUsSectionHeightVh}vh` }}>
             <div className="sticky top-0  h-screen w-full overflow-hidden">

@@ -272,3 +272,72 @@ div[style*="--about-us-container-transform"] h2 video {
 .sticky-section-wrapper > .sticky {
   will-change: transform;
 }
+
+
+@keyframes float1 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  25% { transform: translateY(-15px) translateX(10px) rotate(3deg); }
+  50% { transform: translateY(10px) translateX(-10px) rotate(-2deg); }
+  75% { transform: translateY(-5px) translateX(15px) rotate(2deg); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  25% { transform: translateY(10px) translateX(-15px) rotate(-3deg); }
+  50% { transform: translateY(-15px) translateX(5px) rotate(2deg); }
+  75% { transform: translateY(5px) translateX(10px) rotate(-1deg); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  25% { transform: translateY(-20px) translateX(-10px) rotate(2deg); }
+  50% { transform: translateY(15px) translateX(10px) rotate(-3deg); }
+  75% { transform: translateY(-10px) translateX(-15px) rotate(1deg); }
+}
+.animate-float-1 { animation: float1 25s infinite ease-in-out; }
+.animate-float-2 { animation: float2 30s infinite ease-in-out; }
+.animate-float-3 { animation: float3 35s infinite ease-in-out; }
+
+/* --- NEW: Dropmorphism Effect CSS from CodePen --- */
+.dropmorphism {
+  /* This creates the unique, organic drop shape */
+  border-radius: 64% 36% 54% 46% / 44% 53% 47% 56%;
+  
+  /* Background and glass effect */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  
+  /* The key to the 3D effect: multiple layered shadows */
+  box-shadow:
+    inset 10px 10px 10px rgba(255, 255, 255, 0.1), /* Inner highlight */
+    15px 25px 20px rgba(0, 0, 0, 0.1),            /* Outer shadow 1 */
+    15px 20px 20px rgba(0, 0, 0, 0.05);           /* Outer shadow 2 */
+  
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Top-left glossy highlight */
+.dropmorphism::before {
+  content: '';
+  position: absolute;
+  top: 15%;      /* Adjusted for better placement in various sizes */
+  left: 20%;     /* Adjusted */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 1);
+  filter: blur(1px);
+}
+
+/* Bottom-right subtle highlight */
+.dropmorphism::after {
+  content: '';
+  position: absolute;
+  bottom: 15%;   /* Adjusted */
+  right: 20%;    /* Adjusted */
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  filter: blur(1px);
+}

@@ -201,6 +201,7 @@ const LandingPage: FC = () => {
       src: t.image,
       bgImage: t.bgImage,
       bgPosition: t.bgPosition
+      
     })),
   []
 );

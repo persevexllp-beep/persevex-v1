@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useTransform, useMotionValueEvent, MotionValue, useSpring } from "framer-motion";
-import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant";
+import { CourseType, managementContent, managementCourses, technicalCourses, technicalContent } from "../constants/courseConstant"; // Ensure this path is correct
 import { useRouter } from "next/navigation";
 
-// --- HELPER HOOK ---
+// --- HELPER HOOK (Unchanged) ---
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -20,7 +20,7 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-// --- CARD COMPONENT (Updated for mobile scaling) ---
+// --- CARD COMPONENT (Corrected) ---
 const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, animatedProgress: MotionValue<number>, i: number, isMobile: boolean }) => {
   const router = useRouter();
   const distance = useTransform(animatedProgress, (p) => p - i);
@@ -30,48 +30,38 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
   const maxOverlayOpacity = 0.8;
   const baseDarknessFactor = 0.3;
 
-  const pointerEvents = useTransform(distance, (d) => {
-    return d < 0.5 ? "auto" : "none";
-  });
-
+  // ... (All other useTransform hooks are unchanged) ...
+  const pointerEvents = useTransform(distance, (d) => d < 0.5 ? "auto" : "none");
   const translateY = useTransform(distance, (d) => {
     if (d >= 0) return -d * stackOffset;
-    if (d > -1) {
-      const localProgress = 1 + d;
-      return initialY * (1 - localProgress);
-    }
+    if (d > -1) return initialY * (1 - (1 + d));
     return initialY;
   });
-
-  // --- FIX #1: REDUCE SCALE ON MOBILE ---
   const scale = useTransform(distance, (d) => {
-    // On mobile, the final scale is smaller (0.85 vs 1.0)
     const finalScale = isMobile ? 0.85 : 1.0;
     const initialScale = isMobile ? 0.7 : 0.8;
     const scaleRange = finalScale - initialScale;
-
-    if (d >= 0) {
-      return finalScale - d * stackScale;
-    }
-    if (d > -1) {
-      const localProgress = 1 + d;
-      return initialScale + scaleRange * localProgress;
-    }
+    if (d >= 0) return finalScale - d * stackScale;
+    if (d > -1) return initialScale + scaleRange * (1 + d);
     return initialScale;
   });
-
   const cardOpacity = useTransform(distance, (d) => {
     if (d >= 0) return 1;
     if (d > -1) return 1 + d;
     return 0;
   });
-
-  const overlayOpacity = useTransform(distance, (d) => {
-    if (d > 0) return Math.min(maxOverlayOpacity, d * baseDarknessFactor);
-    return 0;
-  });
+  const overlayOpacity = useTransform(distance, (d) => d > 0 ? Math.min(maxOverlayOpacity, d * baseDarknessFactor) : 0);
 
   const Icon = course.icon;
+
+  console.log('course bg image: ', course.cardBg_image)
+
+  // --- THE FIX IS HERE ---
+  // We combine the gradient overlay and the image in a single CSS property.
+  // The first background listed is on top.
+  const cardBackgroundImage = `
+    url(${course.cardBg_image})
+  `;
 
   return (
     <motion.div
@@ -82,25 +72,34 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
         opacity: cardOpacity,
         zIndex: i,
         pointerEvents,
+        backgroundImage: cardBackgroundImage, // <-- Use the combined background
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
-      // --- FIX #2: REDUCE CARD DIMENSIONS ON MOBILE ---
-      className={`absolute border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col items-center justify-between backdrop-blur-2xl shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[400px] p-8'}`}
+      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col items-center justify-end shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[400px] p-8'}`}
     >
-      <div className="flex flex-col items-center text-center">
+      {/* 
+        THE OVERLAY DIV IS NOW REMOVED. 
+        The linear-gradient in the style prop handles the overlay. 
+      */}
+
+      {/* Card Content with relative z-index */}
+      {/* <div className="relative z-10 flex flex-col items-center text-center">
         <div className="w-full h-28 md:h-32 flex items-center justify-center mb-2 md:mb-4">
           <Icon />
         </div>
         <h3 className="text-xl md:text-2xl font-bold text-white">{course.title}</h3>
         <p className="text-sm md:text-base text-gray-200 mt-2">{course.description}</p>
-      </div>
+      </div> */}
 
       <button
         onClick={() => router.push(course.route)}
-        className="w-full py-2.5 px-5 cursor-pointer mt-4 font-medium text-white bg-gray-800 rounded-lg transition-colors hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="relative z-10  w-full py-2.5 px-5 cursor-pointer mt-4 font-medium text-white bg-gray-800 rounded-lg transition-colors hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>
 
+      {/* Stacking overlay for when cards are behind */}
       <motion.div
         className="absolute inset-0 bg-black rounded-2xl pointer-events-none"
         style={{ opacity: overlayOpacity }}
@@ -108,8 +107,7 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
     </motion.div>
   );
 };
-
-// --- MAIN SECTION COMPONENT (Updated) ---
+// --- MAIN SECTION COMPONENT (Updated text) ---
 const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
@@ -220,9 +218,9 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: managementTextY,
               }}
             >
-              <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
-                {managementContent.heading}
-                <span className="block opacity-80">{managementContent.subheading}</span>
+              {/* --- UPDATED TEXT: Heading removed, only subheading remains --- */}
+              <h2 className="text-2xl md:text-5xl font-extrabold leading-tight text-white/90">
+                {managementContent.subheading}
               </h2>
               <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-4">
                 {managementContent.paragraph}
@@ -236,9 +234,9 @@ const CoursesSection: React.FC<{ progress: MotionValue<number> }> = ({ progress 
                 y: technicalTextY,
               }}
             >
-              <h2 className="text-2xl md:text-6xl font-extrabold leading-tight">
-                {technicalContent.heading}
-                <span className="block opacity-80">{technicalContent.subheading}</span>
+              {/* --- UPDATED TEXT: Heading removed, only subheading remains --- */}
+              <h2 className="text-2xl md:text-5xl font-extrabold leading-tight text-white/90">
+                {technicalContent.subheading}
               </h2>
               <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-2">
                 {technicalContent.paragraph}

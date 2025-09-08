@@ -302,7 +302,7 @@ export const managementCourses: CourseType[] = [
     icon: FinanceIcon,
     route: "/courses/finance",
     slug: "finance",
-    image: "/dog1.jpeg",
+    image: "/financecourse.png",
     cardBg_image: "/finance1.png",
     large_description: "This course provides a comprehensive overview of financial principles essential for effective management. Topics include financial statement analysis, budgeting, forecasting, and investment decision-making. By the end of the course, you'll be equipped to interpret financial data and make informed decisions that drive business success."
   },
@@ -313,7 +313,7 @@ export const managementCourses: CourseType[] = [
     icon: MarketingIcon,
     route: "/courses/digital-marketing",
     slug: "digital-marketing",
-    image: '/dog2.jpg',
+    image: '/digitalmarketing.png',
     cardBg_image: "/digital-marketing1.png",
     large_description: "Dive into the world of digital marketing with this strategic course designed for modern managers. Learn how to create and implement effective marketing campaigns using SEO, SEM, content marketing, and social media platforms. The course also covers analytics and performance measurement to help you optimize your marketing efforts for maximum ROI."
   },
@@ -324,7 +324,7 @@ export const managementCourses: CourseType[] = [
     icon: HRIcon,
     route: "/courses/human-resourse",
     slug: "human-resourse",
-    image: '/dog3.jpg',
+    image: '/humanresource.png',
     cardBg_image: "/human-resource1.png",
     large_description: "This course explores contemporary human resource management practices essential for building and maintaining a productive workforce. Topics include talent acquisition, employee engagement, performance management, and legal considerations in HR. You'll gain practical skills to create a positive work environment that attracts and retains top talent."
   },
@@ -338,7 +338,7 @@ export const technicalCourses: CourseType[] = [
     icon: WebDevIcon,
     route: "/courses/web-development",
     slug: "web-development",
-    image: '/dog4.avif',
+    image: '/webdevelopment.png',
     cardBg_image: "/web-development1.png",
     large_description: "This comprehensive course takes you from the basics of web development to advanced full-stack techniques. You'll learn HTML, CSS, and JavaScript fundamentals before diving into popular frameworks like React for front-end development and Node.js for back-end development. By the end of the course, you'll be able to build and deploy dynamic web applications."
   },
@@ -349,7 +349,7 @@ export const technicalCourses: CourseType[] = [
     icon: AIIcon,
     route: "/courses/artificial-intelligence",
     slug: "artificial-intelligence",
-    image: '/dog5.jpeg',
+    image: '/artificialintelligence.png',
     cardBg_image: "/artificial-intelligence1.png",
     large_description: "This course provides a solid foundation in artificial intelligence concepts and techniques. You'll explore topics such as machine learning, neural networks, natural language processing, and computer vision. Through hands-on projects, you'll learn how to build intelligent agents that can perform tasks such as classification, prediction, and decision-making."
   },
@@ -360,7 +360,7 @@ export const technicalCourses: CourseType[] = [
     icon: MLIcon,
     route: "/courses/machine-learning",
     slug: "machine-learning",
-    image: '/cat1.jpg',
+    image: '/machinelearning.png',
     cardBg_image: "/machine-learning1.png",
     large_description: "This course focuses on the practical aspects of machine learning, including data analysis, model training, and deployment. You'll learn how to preprocess data, select appropriate algorithms, and evaluate model performance. Additionally, the course covers MLOps practices for deploying and maintaining machine learning models in production environments."
   },
@@ -371,7 +371,7 @@ export const technicalCourses: CourseType[] = [
     icon: CloudIcon,
     route: "/courses/cloud-computing",
     slug: "cloud-computing",
-    image: '/cat2.jpeg',
+    image: '/cloudcomputing.png',
     cardBg_image: "/cloud-computing1.png",
     large_description: "This course introduces you to cloud computing concepts and the Amazon Web Services (AWS) platform. You'll learn how to design and deploy scalable, fault-tolerant applications using AWS services such as EC2, S3, Lambda, and RDS. The course also covers best practices for security, cost management, and performance optimization in the cloud."
   },
@@ -382,10 +382,22 @@ export const technicalCourses: CourseType[] = [
     icon: CybersecurityIcon,
     route: "/courses/cybersecurity",
     slug: "cybersecurity",
-    image: '/cat3.webp',
+    image: '/cybersecurity.png',
     cardBg_image: "/cybersecurity1.png",
     large_description: "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities."
   },
+  {
+    id: "t6",
+    title: "Data Science",
+    description: "Learn the art of data manipulation with our well designed data science course.",
+    icon: CybersecurityIcon,
+    route: "/courses/datascience",
+    slug: "datascience",
+    image: '/datasciencecourse.png',
+    cardBg_image: "/data-science.png",
+    large_description: "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities."
+  },
+
 ];
 
 export const managementContent: ContentType = {

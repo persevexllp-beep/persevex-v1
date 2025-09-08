@@ -45,17 +45,12 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
           
           {/* Right Column (on desktop) / First element (on mobile) */}
           {/* Reordered for mobile-first visual hierarchy */}
-          <div className="flex justify-center items-center order-1 md:order-2">
+          <div className="flex justify-center  items-center order-1 md:order-2">
              <Image
                 src={course.image}
                 alt={course.title}
                 width={500}
                 height={500}
-                // Responsive image classes:
-                // - w-full: Takes up container width
-                // - h-auto: Maintains aspect ratio
-                // - max-w-sm: Prevents it from being too big on small screens
-                // - md:max-w-none: Allows it to fill its grid column on larger screens
                 className="rounded-lg object-contain w-full h-auto max-w-sm md:max-w-none"
                 priority // Good for LCP (Largest Contentful Paint)
              />

@@ -6,26 +6,26 @@ import React from "react";
 import { useInView } from "../hooks/useInView"; // Adjust path if needed
 import Image, { StaticImageData } from "next/image";
 
-// Import your logo images
+// It's best practice to import images directly for Next.js optimization
 import startupImg from "/public/startup.png";
 import skillImg from "/public/skill.png";
 import msmeImg from "/public/msme.png";
 import isoImg from "/public/iso.png";
 import aicteImg from "/public/aicte.png";
 
-// Data structure remains the same
-interface DropLogoData {
+// --- ENHANCED LOGO DATA FOR BUBBLE DESIGN ---
+interface BubbleLogoData {
   src: StaticImageData;
   alt: string;
   size: string; // Tailwind width/height class e.g., 'w-32 h-32'
   position: { top: string; left: string };
   animation: {
-    name: string;
-    delay: string;
+    name: string;   // Our custom class from globals.css
+    delay: string;  // A string like '-5s' for inline style
   };
 }
 
-const logos: DropLogoData[] = [
+const logos: BubbleLogoData[] = [
   {
     src: startupImg,
     alt: "Startup India",
@@ -63,19 +63,18 @@ const logos: DropLogoData[] = [
   },
 ];
 
-// --- DROP LOGO COMPONENT (Refactored for Dropmorphism) ---
-const DropLogo = ({ logo }: { logo: DropLogoData }) => {
+// --- BUBBLE LOGO COMPONENT ---
+const BubbleLogo = ({ logo }: { logo: BubbleLogoData }) => {
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
 
   return (
-    // This outer container handles positioning and animation
     <div
       ref={ref}
       className={`
-        absolute group cursor-pointer
+        absolute flex items-center justify-center rounded-full
+        transform-gpu transition-all duration-1000 ease-out
         ${logo.size}
         ${logo.animation.name}
-        transition-all duration-1000 ease-out
         ${inView ? "scale-100 opacity-100" : "scale-50 opacity-0"}
       `}
       style={{
@@ -84,41 +83,61 @@ const DropLogo = ({ logo }: { logo: DropLogoData }) => {
         animationDelay: logo.animation.delay,
       }}
     >
-      {/* This inner container IS the dropmorphism effect */}
-      <div className="dropmorphism w-full h-full flex items-center justify-center p-6 md:p-8 group-hover:scale-110">
-        <Image
-          src={logo.src}
-          alt={logo.alt}
-          width={200}
-          height={200}
-          className="
-            object-contain w-full h-full
-            filter brightness-125 contrast-110 group-hover:brightness-150
-            transition-all duration-300
-          "
-        />
-      </div>
-      
-      {/* Hover Label */}
-      <div className="
-        absolute -bottom-4 left-1/2 -translate-x-1/2
-        opacity-0 group-hover:opacity-100
-        transition-all duration-300 ease-out
-        translate-y-2 group-hover:translate-y-0
-      ">
+      <div className="relative w-full h-full group cursor-pointer">
+        {/* Layer 1: Main Bubble Body (3D effect) */}
         <div className="
-          px-3 py-1 rounded-full text-xs font-medium
-          bg-black/50 backdrop-blur-sm border border-white/20
-          text-white whitespace-nowrap
+          absolute inset-0 rounded-full
+          bg-gradient-to-br from-white/20 to-transparent
+          shadow-inner shadow-white/20
+          border border-white/10
+          backdrop-blur-sm
+        " />
+        
+        {/* Layer 2: The Logo */}
+        <div className="relative z-10 w-full h-full flex items-center justify-center p-4 md:p-6">
+          <Image
+            src={logo.src}
+            alt={logo.alt}
+            width={200}
+            height={200}
+            className="
+              object-contain w-full h-full
+              filter brightness-125 contrast-110 group-hover:brightness-150
+              transition-all duration-300 scale-90 group-hover:scale-100
+            "
+          />
+        </div>
+
+        {/* Layer 3: Glossy Highlight (on top of logo) */}
+        <div className="
+          absolute top-[10%] left-[10%] w-2/5 h-2/5
+          bg-gradient-to-br from-white/50 to-transparent
+          rounded-full transform -rotate-45
+          opacity-70 group-hover:opacity-90 transition-opacity
+          z-20 pointer-events-none
+        " />
+
+        {/* Hover Label */}
+        <div className="
+          absolute -bottom-4 left-1/2 -translate-x-1/2
+          opacity-0 group-hover:opacity-100
+          transition-all duration-300 ease-out
+          translate-y-2 group-hover:translate-y-0
         ">
-          {logo.alt}
+          <div className="
+            px-3 py-1 rounded-full text-xs font-medium
+            bg-black/50 backdrop-blur-sm border border-white/20
+            text-white whitespace-nowrap
+          ">
+            {logo.alt}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// --- MAIN SECTION COMPONENT (Mostly unchanged) ---
+// --- MAIN SECTION COMPONENT ---
 const RecognizedBySection = () => {
   const [titleRef, titleInView] = useInView({ threshold: 0.5, triggerOnce: true });
 
@@ -127,8 +146,9 @@ const RecognizedBySection = () => {
       relative w-full min-h-screen 
       flex flex-col justify-center items-center 
       px-4 py-20 overflow-hidden
+     
     ">
-    
+
       <div
         ref={titleRef}
         className={`
@@ -158,10 +178,10 @@ const RecognizedBySection = () => {
         </p>
       </div>
 
-      {/* Container for the floating drops */}
+      {/* Bubble Container - Spans the entire section */}
       <div className="absolute inset-0 w-full h-full z-0">
         {logos.map((logo) => (
-          <DropLogo key={logo.alt} logo={logo} />
+          <BubbleLogo key={logo.alt} logo={logo} />
         ))}
       </div>
     </section>

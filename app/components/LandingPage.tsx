@@ -1032,10 +1032,13 @@ const LandingPage: FC = () => {
             </div>
           </div>
 
-          <div style={{ height: "10vh" }} />
+          {/* --- MODIFIED SECTION --- */}
           <div
             ref={testimonialsSectionWrapperRef}
-            style={{ height: `${testimonialsSectionHeightVh}vh` }}
+            style={{ 
+              height: `${testimonialsSectionHeightVh}vh`,
+              marginTop: '-100vh' // This overlaps the sections, removing the dead scroll space
+            }}
           >
             <div className="sticky top-0 flex h-screen items-center justify-center">
               <AnimatedTestimonials
@@ -1044,6 +1047,8 @@ const LandingPage: FC = () => {
               />
             </div>
           </div>
+          {/* --- END MODIFIED SECTION --- */}
+          
           <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
             <div className="sticky top-0 flex h-screen items-center justify-center">
               <RecognizedBySection />
@@ -1052,17 +1057,14 @@ const LandingPage: FC = () => {
           
           <div ref={aboutUsSectionWrapperRef} style={{ height: `${aboutUsSectionHeightVh}vh` }}></div>
           
-          {/* --- CORRECTED SECTION --- */}
           {isMobile ? (
-            // Simple static container for mobile, no complex styling or opacity logic
             <div ref={cardStackingWrapperRef} className="w-full text-white">
               <AboutUsExtendedComp
-                stackingProgress={0} // Not used on mobile
-                cascadingProgress={0} // Not used on mobile
+                stackingProgress={0} 
+                cascadingProgress={0} 
               />
             </div>
           ) : (
-            // Original complex structure for desktop animations
             <div ref={cardStackingWrapperRef} style={{ height: `${cardStackingSectionHeightVh}vh` }}>
               <div className="sticky top-0 min-h-screen flex flex-col items-center justify-start pt-8 md:pt-24">
                 <div
@@ -1077,7 +1079,6 @@ const LandingPage: FC = () => {
               </div>
             </div>
           )}
-          {/* --- END CORRECTED SECTION --- */}
 
           <div ref={contactUsSectionWrapperRef} style={{ height: `${contactUsSectionHeightVh}vh` }}>
             <div className="sticky top-0  h-screen w-full overflow-hidden">

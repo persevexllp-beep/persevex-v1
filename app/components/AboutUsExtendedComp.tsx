@@ -362,7 +362,7 @@ export default function AboutUsExtendedComp({
         </div>
         <div className="absolute inset-0 flex items-center justify-center w-full">
             <motion.div className="w-full max-w-3xl mx-auto flex flex-col gap-4" initial={false} animate={{ opacity: faqOpacity, translateY: faqTranslateY }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-                <h2 className="text-4xl font-bold mb-4 text-center">Frequently Asked Questions</h2>
+            
                 {faqData.map((item, index) => {
                     const isExpanded = expandedIndex === index;
                     return (

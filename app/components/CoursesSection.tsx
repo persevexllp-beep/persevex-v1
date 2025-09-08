@@ -97,7 +97,7 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
 
       <button
         onClick={() => router.push(course.route)}
-        className="absolute z-10 w-44 py-2.5 mt-4 mb-4   px-5 cursor-pointer  font-medium text-white border  rounded-lg transition-colors focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="absolute z-10 w-44 py-2.5 mt-   px-5 cursor-pointer  font-medium text-white border  rounded-lg transition-colors focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>

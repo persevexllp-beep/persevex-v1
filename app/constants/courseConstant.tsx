@@ -10,7 +10,6 @@ export interface ModuleType {
   topics: string[];
 }
 
-// 2. Update CourseType to include an optional array of modules
 export interface CourseType {
   id: string;
   title: string;
@@ -22,7 +21,7 @@ export interface CourseType {
   large_description: string;
   cardBg_image: string;
   programCardsHeading?: string[];
-  modules?: ModuleType[]; // <-- ADD THIS NEW PROPERTY
+  modules?: ModuleType[]; 
 }
 
 
@@ -472,7 +471,7 @@ export const managementCourses: CourseType[] = [
     description: "Learn to attract, manage, and retain top talent in today's workplace.",
     icon: HRIcon,
     route: "/courses/human-resource",
-    slug: "human-resourse",
+    slug: "human-resource", 
     image: '/humanresource.png',
     cardBg_image: "/human-resource1.png",
     modules: [
@@ -556,6 +555,74 @@ export const technicalCourses: CourseType[] = [
     slug: "web-development",
     image: '/webdevelopment.png',
     cardBg_image: "/web-development1.png",
+    modules: [
+  {
+    "title": "Introduction to Web Development",
+    "duration": "2 weeks",
+    "lessons": 4,
+    "description": "Understand how the web works and the fundamentals of frontend and backend development.",
+    "topics": [
+      "Web Architecture Overview",
+      "Frontend vs Backend Development",
+      "Tools and Environments",
+      "Web Development Roadmap"
+    ]
+  },
+  {
+    "title": "HTML & CSS Essentials",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Learn how to create the structure and style of web pages using HTML5 and CSS3.",
+    "topics": [
+      "HTML Elements and Structure",
+      "CSS Box Model and Positioning",
+      "Responsive Design with Flexbox & Grid",
+      "Media Queries and Mobile-First Design",
+      "CSS Transitions and Animations"
+    ]
+  },
+  {
+    "title": "JavaScript Programming",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Gain strong fundamentals in JavaScript to build dynamic and interactive web applications.",
+    "topics": [
+      "Variables, Functions, and Scope",
+      "DOM Manipulation",
+      "Events and Event Listeners",
+      "ES6+ Features",
+      "Asynchronous JavaScript: Promises & Fetch",
+      "Error Handling and Debugging"
+    ]
+  },
+  {
+    "title": "Frontend Frameworks with React.js",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Build scalable user interfaces with component-based architecture using React.",
+    "topics": [
+      "JSX and Component Structure",
+      "State and Props",
+      "React Hooks (useState, useEffect)",
+      "Routing with React Router",
+      "Project: React Todo App"
+    ]
+  },
+  {
+    "title": "Backend Development with Node.js & MongoDB",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Learn to create RESTful APIs and connect with a database to build full-stack applications.",
+    "topics": [
+      "Node.js and Express Framework",
+      "Creating RESTful APIs",
+      "MongoDB and Mongoose",
+      "User Authentication with JWT",
+      "CRUD Operations",
+      "Deploying MERN Stack Applications"
+    ]
+  }
+],
     programCardsHeading: ['Intoduction to Web Development', 'HTML & CSS Essentials', 'Javascript Programming', 'Frontend Frameworks with React.js', 'Backend Development with NodeJS & MongoDB'],
     large_description: "This comprehensive course takes you from the basics of web development to advanced full-stack techniques. You'll learn HTML, CSS, and JavaScript fundamentals before diving into popular frameworks like React for front-end development and Node.js for back-end development. By the end of the course, you'll be able to build and deploy dynamic web applications."
   },
@@ -570,7 +637,7 @@ export const technicalCourses: CourseType[] = [
     cardBg_image: "/artificial-intelligence1.png",
     programCardsHeading: ['Foundation of AI', 'Machine Learning Fundamentals', 'Neural Networks and Deep Learning', 'Natural Language Processing', 'AI applications and deployment'],
     large_description: "This course provides a solid foundation in artificial intelligence concepts and techniques. You'll explore topics such as machine learning, neural networks, natural language processing, and computer vision. Through hands-on projects, you'll learn how to build intelligent agents that can perform tasks such as classification, prediction, and decision-making.",
-    // ADD THE MODULES DATA HERE
+   
     modules: [
       {
         title: "Foundations of AI",
@@ -655,6 +722,77 @@ export const technicalCourses: CourseType[] = [
     slug: "machine-learning",
     image: '/machinelearning.png',
     cardBg_image: "/machine-learning1.png",
+    modules:[
+  {
+    "title": "Introduction to Machine Learning",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Understand the fundamentals of machine learning and its applications.",
+    "topics": [
+      "Machine Learning Concepts and Terminology",
+      "Types of Machine Learning: Supervised, Unsupervised, and Reinforcement",
+      "The Machine Learning Pipeline",
+      "Python Libraries for Machine Learning",
+      "Data Preprocessing for Machine Learning"
+    ]
+  },
+  {
+    "title": "Supervised Learning Algorithms",
+    "duration": "3 weeks",
+    "lessons": 7,
+    "description": "Master key supervised learning algorithms for classification and regression tasks.",
+    "topics": [
+      "Linear and Logistic Regression",
+      "Decision Trees and Random Forests",
+      "Support Vector Machines",
+      "K-Nearest Neighbors",
+      "Naive Bayes Classifiers",
+      "Ensemble Methods: Bagging and Boosting",
+      "Model Evaluation and Selection"
+    ]
+  },
+  {
+    "title": "Unsupervised Learning",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Learn techniques for finding patterns and structure in unlabeled data.",
+    "topics": [
+      "Clustering Algorithms: K-Means, DBSCAN, Hierarchical",
+      "Dimensionality Reduction: PCA, t-SNE",
+      "Association Rule Learning",
+      "Anomaly Detection",
+      "Evaluating Unsupervised Learning Models"
+    ]
+  },
+  {
+    "title": "Deep Learning Fundamentals",
+    "duration": "3 weeks",
+    "lessons": 6,
+    "description": "Understand neural networks and implement deep learning models for complex tasks.",
+    "topics": [
+      "Neural Network Architecture and Training",
+      "Deep Learning Frameworks: TensorFlow and Keras",
+      "Convolutional Neural Networks for Image Processing",
+      "Recurrent Neural Networks for Sequence Data",
+      "Generative Adversarial Networks",
+      "Transfer Learning and Fine-tuning"
+    ]
+  },
+  {
+    "title": "Advanced Machine Learning Topics",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Explore advanced techniques and applications of machine learning.",
+    "topics": [
+      "Reinforcement Learning",
+      "Natural Language Processing with Machine Learning",
+      "Computer Vision Applications",
+      "Time Series Forecasting",
+      "Model Deployment and MLOps",
+      "Ethical Considerations in Machine Learning"
+    ]
+  }
+],
     programCardsHeading: ['Introduction to Machine Learning', 'Supervised Learnign Algorithms', 'Unsupervised Learning', 'Deep Learning Fundamentals', 'Advanced Machine Learning Topics'],
     large_description: "This course focuses on the practical aspects of machine learning, including data analysis, model training, and deployment. You'll learn how to preprocess data, select appropriate algorithms, and evaluate model performance. Additionally, the course covers MLOps practices for deploying and maintaining machine learning models in production environments."
   },
@@ -667,6 +805,73 @@ export const technicalCourses: CourseType[] = [
     slug: "cloud-computing",
     image: '/cloudcomputing.png',
     cardBg_image: "/cloud-computing1.png",
+    modules:[
+  {
+    "title": "Introduction to Cloud Computing",
+    "duration": "2 weeks",
+    "lessons": 4,
+    "description": "Understand cloud fundamentals, benefits, and service models.",
+    "topics": [
+      "What is Cloud Computing?",
+      "Cloud Deployment Models (Public, Private, Hybrid)",
+      "Cloud Service Models (IaaS, PaaS, SaaS)",
+      "Shared Responsibility Model"
+    ]
+  },
+  {
+    "title": "Core Cloud Services",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Learn about essential services across major providers like AWS, Azure, and Google Cloud.",
+    "topics": [
+      "Compute Services (EC2, VM, App Engine)",
+      "Storage Solutions (S3, Blob Storage, Cloud Storage)",
+      "Networking & VPC Basics",
+      "Databases in the Cloud",
+      "Monitoring & Logging"
+    ]
+  },
+  {
+    "title": "Cloud Security & Identity",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Explore how to secure resources and manage identities in the cloud.",
+    "topics": [
+      "Identity & Access Management (IAM)",
+      "Encryption & Key Management",
+      "Network Security Groups & Firewalls",
+      "Compliance and Governance",
+      "Best Practices for Cloud Security"
+    ]
+  },
+  {
+    "title": "Cloud Deployment & Automation",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Learn how to automate cloud deployments and manage infrastructure as code.",
+    "topics": [
+      "Infrastructure as Code (Terraform, CloudFormation)",
+      "CI/CD Pipelines in the Cloud",
+      "Serverless Computing (AWS Lambda, Cloud Functions)",
+      "Containers & Kubernetes",
+      "Load Balancing & Auto Scaling",
+      "Hands-on: Deploy a Web App in the Cloud"
+    ]
+  },
+  {
+    "title": "Advanced Cloud Concepts",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Dive into advanced topics and prepare for real-world cloud architecture.",
+    "topics": [
+      "Multi-Cloud & Hybrid Strategies",
+      "Disaster Recovery & High Availability",
+      "Big Data & Machine Learning in the Cloud",
+      "Cost Optimization Techniques",
+      "Capstone Project: End-to-End Cloud Application"
+    ]
+  }
+],
     programCardsHeading: ['Introduction to Cloud Computing', 'Core Cloud Services', 'Cloud Security & Identity', 'Cloud Deployment & Automation', 'Advanced Cloud Concepts'],
     large_description: "This course introduces you to cloud computing concepts and the Amazon Web Services (AWS) platform. You'll learn how to design and deploy scalable, fault-tolerant applications using AWS services such as EC2, S3, Lambda, and RDS. The course also covers best practices for security, cost management, and performance optimization in the cloud."
   },
@@ -675,10 +880,80 @@ export const technicalCourses: CourseType[] = [
     title: "Cybersecurity Essentials",
     description: "Protect networks, systems, and data from cyber threats.",
     icon: CybersecurityIcon,
-    route: "/courses/cybersecurity",
-    slug: "cybersecurity",
+    route: "/courses/cyber-security",
+    slug: "cyber-security",
     image: '/cybersecurity.png',
     cardBg_image: "/cybersecurity1.png",
+    modules:[
+  {
+    "title": "Cybersecurity Fundamentals",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Understand the core concepts, principles, and frameworks of cybersecurity.",
+    "topics": [
+      "Introduction to Cybersecurity Landscape",
+      "Security Principles: CIA Triad and Defense in Depth",
+      "Types of Cyber Threats and Attack Vectors",
+      "Security Frameworks and Compliance Standards",
+      "Risk Assessment and Management",
+      "Cybersecurity Ethics and Legal Considerations"
+    ]
+  },
+  {
+    "title": "Network Security",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Learn to secure network infrastructure and protect against network-based attacks.",
+    "topics": [
+      "Network Architecture and Security Design",
+      "Firewalls, IDS/IPS, and Network Monitoring",
+      "VPNs and Secure Remote Access",
+      "Wireless Network Security",
+      "Network Vulnerability Assessment and Penetration Testing"
+    ]
+  },
+  {
+    "title": "Application and Web Security",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Master techniques for securing applications and web services against common vulnerabilities.",
+    "topics": [
+      "OWASP Top 10 Vulnerabilities",
+      "Secure Coding Practices",
+      "Authentication and Authorization Mechanisms",
+      "API Security",
+      "Web Application Firewalls",
+      "Security Testing and Code Review"
+    ]
+  },
+  {
+    "title": "Cryptography and Data Protection",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Understand cryptographic principles and implement data protection strategies.",
+    "topics": [
+      "Cryptographic Algorithms and Protocols",
+      "Public Key Infrastructure (PKI)",
+      "Data Encryption and Hashing",
+      "Digital Signatures and Certificates",
+      "Data Loss Prevention Strategies"
+    ]
+  },
+  {
+    "title": "Incident Response and Forensics",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Learn to respond to security incidents and conduct digital forensic investigations.",
+    "topics": [
+      "Incident Response Planning and Procedures",
+      "Digital Forensics Methodology",
+      "Evidence Collection and Handling",
+      "Malware Analysis",
+      "Log Analysis and Security Information Event Management (SIEM)",
+      "Disaster Recovery and Business Continuity"
+    ]
+  }
+],
     programCardsHeading: ['Cybersecurity Fundamentals', 'Network Security', 'Application & Web Security' , 'Cryptography & Data Protection', 'Incident Response & Forensics'],
     large_description: "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities."
   },
@@ -687,10 +962,81 @@ export const technicalCourses: CourseType[] = [
     title: "Data Science",
     description: "Learn the art of data manipulation with our well designed data science course.",
     icon: CybersecurityIcon,
-    route: "/courses/datascience",
-    slug: "datascience",
+    route: "/courses/data-science",
+    slug: "data-science",
     image: '/datasciencecourse.png',
     cardBg_image: "/data-science.png",
+    modules: [
+  {
+    "title": "Data Science Fundamentals",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Understand the data science lifecycle and essential tools for data analysis.",
+    "topics": [
+      "Introduction to Data Science and Its Applications",
+      "Data Science Workflow and Methodology",
+      "Python for Data Science: NumPy and Pandas",
+      "Data Collection and Data Wrangling",
+      "Exploratory Data Analysis (EDA)"
+    ]
+  },
+  {
+    "title": "Statistical Analysis and Visualization",
+    "duration": "2 weeks",
+    "lessons": 6,
+    "description": "Master statistical methods and data visualization techniques for effective data storytelling.",
+    "topics": [
+      "Descriptive and Inferential Statistics",
+      "Probability Distributions and Hypothesis Testing",
+      "Correlation and Regression Analysis",
+      "Data Visualization Principles",
+      "Visualization Tools: Matplotlib, Seaborn, and Plotly",
+      "Interactive Dashboards with Tableau"
+    ]
+  },
+  {
+    "title": "Machine Learning for Data Science",
+    "duration": "3 weeks",
+    "lessons": 7,
+    "description": "Apply machine learning algorithms to solve data science problems and make predictions.",
+    "topics": [
+      "Supervised Learning Algorithms",
+      "Unsupervised Learning and Clustering",
+      "Dimensionality Reduction Techniques",
+      "Ensemble Methods",
+      "Time Series Analysis and Forecasting",
+      "Model Selection and Hyperparameter Tuning",
+      "Cross-Validation and Performance Metrics"
+    ]
+  },
+  {
+    "title": "Big Data Analytics",
+    "duration": "2 weeks",
+    "lessons": 5,
+    "description": "Learn techniques for processing and analyzing large-scale datasets.",
+    "topics": [
+      "Introduction to Big Data Ecosystems",
+      "Distributed Computing with Spark",
+      "SQL for Data Analysis",
+      "NoSQL Databases",
+      "Cloud Computing for Data Science"
+    ]
+  },
+  {
+    "title": "Data Science in Practice",
+    "duration": "3 weeks",
+    "lessons": 6,
+    "description": "Apply data science techniques to real-world problems and learn best practices for deployment.",
+    "topics": [
+      "End-to-End Data Science Projects",
+      "Feature Engineering in Practice",
+      "Model Deployment and API Development",
+      "Data Ethics and Privacy",
+      "Communicating Data Science Results",
+      "Data Science Project Management"
+    ]
+  }
+],
     programCardsHeading: ['Data Science Fundamentals', 'Stasticial Analysis and Visualization','Machine learning for Data Science', 'Big Data Analytics', 'Data Science in Practice'],
     large_description: "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities."
   },

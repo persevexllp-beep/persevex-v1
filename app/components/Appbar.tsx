@@ -30,7 +30,7 @@ export default function Navbar() {
       title: 'Technology',
       items: [
         { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
-        { name: 'Web Development', href: '/courses/full-stack' },
+        { name: 'Web Development', href: '/courses/web-development' },
         { name: 'Data Science', href: '/courses/data-science' },
         { name: 'Cyber Security', href: '/courses/cyber-security' },
         {name: 'Cloud Computing', href: '/courses/cloud-computing' },

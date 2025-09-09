@@ -2,32 +2,35 @@
 "use client";
 
 import { motion, useTransform, useMotionValue, useSpring } from "framer-motion";
-import Image from "next/image"; // Import the Next.js Image component
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-// 1. Update the Testimonial type to include a background image property
+// 1. Update the Testimonial type to include the new planetImage property
 type Testimonial = {
   quote: string;
   name: string;
   designation: string;
   src: string;
-  bgImage: string; // <-- New property for the card's background
-  bgPosition: string
+  bgImage: string;
+  bgPosition: string;
+  planetImage: string; // <-- New property for the planet image
 };
 
-// Component: TestimonialCard (Updated with a background image)
-// Alternative Component: TestimonialCard (Using CSS background)
+// Component: TestimonialCard (Updated with a planet Image component)
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
     <div 
       className="relative flex flex-col w-[90vw] max-w-md flex-shrink-0 rounded-2xl border border-neutral-800 p-8 shadow-2xl overflow-hidden"
-      style={{
-        backgroundImage: `url(${testimonial.bgImage})`,
-        backgroundSize: '150%',
-        backgroundPosition: testimonial.bgPosition,
-        backgroundRepeat: 'no-repeat'
-      }}
     >
+      {/* Planet Image in the background */}
+      <Image
+        src={testimonial.planetImage}
+        alt={`Planet for ${testimonial.name}'s testimonial`}
+        width={200}
+        height={200}
+        className="absolute top-35 right-6 w-[400px] h-auto opacity-80 pointer-events-none"
+      />
+      
       {/* Dark overlay for better text readability */}
       <div className="absolute inset-0 bg-black/50 rounded-2xl"></div>
 
@@ -85,11 +88,12 @@ export const AnimatedTestimonials = ({
         const firstCard = trackRef.current.firstChild as HTMLElement;
         if (firstCard) {
             const cardWidth = firstCard.offsetWidth;
-            const offset = (containerWidth - cardWidth) / 2.5; 
+            // Adjusted offset slightly to better center the first card
+            const offset = (containerWidth - cardWidth) / 2; 
             setInitialXOffset(offset);
         }
 
-        const endTranslate = -(trackWidth - containerWidth);
+        const endTranslate = -(trackWidth - containerWidth - initialXOffset); // Adjust end position too
         setTrackEndTranslate(endTranslate);
       }
     };
@@ -98,7 +102,7 @@ export const AnimatedTestimonials = ({
     const handleResize = () => calculateTranslation();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [testimonials]);
+  }, [testimonials, initialXOffset]); // Added initialXOffset to dependency array
 
   const x = useTransform(
     smoothedProgress,

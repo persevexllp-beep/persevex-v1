@@ -60,6 +60,7 @@ interface Testimonial {
   src: string;
   bgImage: string;
   bgPosition: string
+   planetImage: string; 
 }
 
 const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
@@ -195,8 +196,8 @@ const LandingPage: FC = () => {
       designation: t.title,
       src: t.image,
       bgImage: t.bgImage,
-      bgPosition: t.bgPosition
-      
+      bgPosition: t.bgPosition,
+      planetImage: t.planetImage
     })),
   []
 );

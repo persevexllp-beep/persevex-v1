@@ -1,11 +1,14 @@
+// Filename: constants/testimonialsData.ts (example path)
+
 export interface Testimonial {
   headline: string;
   quote: string;
   name: string;
   title: string;
   image: string;
-  bgImage: string;
-  bgPosition: string; // <-- Add this new property
+  bgImage: string; // Kept for reference, but we won't use it on the card
+  bgPosition: string;
+  planetImage: string; // <-- This is the new property for the planet
 }
 
 export const testimonialsData: Testimonial[] = [
@@ -16,7 +19,8 @@ export const testimonialsData: Testimonial[] = [
     title: "Goldman Sachs",
     image: "/dog6.jpg",
     bgImage: '/hat.png',
-    bgPosition: 'top 40% right 50%' // Example: Top right
+    bgPosition: 'top 40% right 50%',
+    planetImage: '/artificialintelligence.png' // New
   },
   {
     headline: "Choosing Brandby was one of the best decisions",
@@ -25,7 +29,8 @@ export const testimonialsData: Testimonial[] = [
     title: "Xaviers",
     image: "/dog5.jpeg",
     bgImage: '/hat.png',
-    bgPosition: 'bottom 40% left 10%' // Example: Bottom left
+    bgPosition: 'bottom 40% left 10%',
+    planetImage: '/machinelearning.png' // New
   },
   {
     headline: "Right balance of beautiful design",
@@ -34,7 +39,8 @@ export const testimonialsData: Testimonial[] = [
     title: "PurpleMerit",
     image: "/cat2.jpeg",
     bgImage: '/hat.png',
-    bgPosition: 'bottom 50% left 80%' // Example: Bottom right
+    bgPosition: 'bottom 50% left 80%',
+    planetImage: '/cybersecurity.png' // New
   },
   {
     headline: "One of the most talented design teams",
@@ -43,9 +49,9 @@ export const testimonialsData: Testimonial[] = [
     title: "Infosys",
     image: "/bear1.jpg",
     bgImage: '/hat.png',
-    bgPosition: 'top 15% left 15%' // Example: Top left
+    bgPosition: 'top 15% left 15%',
+    planetImage: '/financecourse.png' // New
   },
-  // ... continue adding unique positions for the rest of your testimonials
   {
     headline: "Amazing to work with",
     quote: "Persevex's internship and training in data science gave me hands-on experience and the technical skills needed to succeed in the field. If you're aiming to upskill and gain real-world exposure, this is the place to start.",
@@ -53,7 +59,8 @@ export const testimonialsData: Testimonial[] = [
     title: "Cognizant",
     image: "/dog3.jpg",
     bgImage: '/hat.png',
-    bgPosition: 'center right 10%'
+    bgPosition: 'center right 10%',
+    planetImage: '/digitalmarketing.png' // New
   },
   {
     headline: "Outstanding product design",
@@ -62,7 +69,8 @@ export const testimonialsData: Testimonial[] = [
     title: "EY",
     image: "/cat1.jpg",
     bgImage: '/hat.png',
-    bgPosition: 'bottom center'
+    bgPosition: 'bottom center',
+    planetImage: '/webdevelopment.png' // New
   },
     {
     headline: "Reliable, Fast, Easy",
@@ -71,6 +79,7 @@ export const testimonialsData: Testimonial[] = [
     title: "Accenture",
     image: "/dog1.jpeg",
     bgImage: '/hat.png',
-    bgPosition: 'top left'
+    bgPosition: 'top left',
+    planetImage: '/datasciencecourse.png' // Re-using planet1 for the 7th card
   },
 ];

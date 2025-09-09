@@ -1,6 +1,7 @@
 "use client";
 import React, { FC, FormEvent, useMemo, useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -108,29 +109,36 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
 
         <motion.div
           variants={itemVariants}
-          className="w-full max-w-lg bg-black/40  border-white border rounded-2xl p-6 backdrop-blur-sm"
+          className="w-full max-w-lg bg-black/40 border-white border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden"
         >
+          <Image
+            src="/machinelearning.png"
+            alt="Machine Learning Planet"
+            width={300}
+            height={300}
+            className="absolute -bottom-0 right-2 w-100 h-100 -z-10 opacity-70 pointer-events-none"
+          />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-6">
               <div className="w-full">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                <input type="text" name="name" id="name" required placeholder="John Doe" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
+                <label htmlFor="name-mobile" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                <input type="text" name="name" id="name-mobile" required placeholder="John Doe" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
               </div>
               <div className="w-full">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                <input type="email" name="email" id="email" required placeholder="you@example.com" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
+                <label htmlFor="email-mobile" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                <input type="email" name="email" id="email-mobile" required placeholder="you@example.com" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
               </div>
             </div>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
-              <input type="tel" name="phone" id="phone" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
+              <label htmlFor="phone-mobile" className="block text-sm font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
+              <input type="tel" name="phone" id="phone-mobile" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50"/>
             </div>
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Your Message</label>
-              <textarea name="message" id="message" rows={3} required placeholder="How can we help you?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 resize-none"/>
+              <label htmlFor="message-mobile" className="block text-sm font-medium text-gray-300 mb-2">Your Message</label>
+              <textarea name="message" id="message-mobile" rows={3} required placeholder="How can we help you?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 resize-none"/>
             </div>
             <div>
-              <button type="submit" className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">
+              <button type="submit" className="w-full pb-12 cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">
                 Send Message
               </button>
             </div>
@@ -140,6 +148,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
     );
   }
 
+  
   return (
     <div className="relative flex items-center justify-center h-screen px-4 sm:px-6 lg:px-8 text-white">
       <div style={textStyle} className="absolute top-1/2 left-1/2  w-full max-w-lg flex flex-col gap-4 text-center md:text-left">
@@ -149,25 +158,33 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           the form below and our team will get back to you shortly.
         </p>
       </div>
-      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white rounded-2xl p-8 backdrop-blur-sm">
+     
+      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-transparent border border-white rounded-2xl p-8   overflow-hidden">
+        <Image
+          src="/machinelearning.png"
+          alt="Machine Learning Planet"
+          width={500}
+          height={500}
+          className="absolute -bottom-66 -right-46 w-200 h-200 -z-10 opacity-80 pointer-events-none"
+        />
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
             <div className="w-full">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-              <input type="text" name="name" id="name" autoComplete="name" required placeholder="John Doe" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+              <label htmlFor="name-desktop" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+              <input type="text" name="name" id="name-desktop" autoComplete="name" required placeholder="John Doe" className="block w-full px-4 py-3 backdrop-blur-sm rounded-lg bg-black border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
             </div>
             <div className="w-full">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-              <input type="email" name="email" id="email" autoComplete="email" required placeholder="you@example.com" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+              <label htmlFor="email-desktop" className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+              <input type="email" name="email" id="email-desktop" autoComplete="email" required placeholder="you@example.com" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
             </div>
           </div>
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
-            <input type="tel" name="phone" id="phone" autoComplete="tel" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+            <label htmlFor="phone-desktop" className="block text-sm font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
+            <input type="tel" name="phone" id="phone-desktop" autoComplete="tel" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 backdrop-blur-sm rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
           </div>
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Your Message</label>
-            <textarea name="message" id="message" rows={5} required placeholder="How can we help you achieve your goals?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300 resize-none"/>
+            <label htmlFor="message-desktop" className="block text-sm font-medium text-gray-300 mb-2">Your Message</label>
+            <textarea name="message" id="message-desktop" rows={5} required placeholder="How can we help you achieve your goals?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300 resize-none"/>
           </div>
           <div>
             <button type="submit" className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">

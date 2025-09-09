@@ -28,7 +28,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
         alt={`Planet for ${testimonial.name}'s testimonial`}
         width={200}
         height={200}
-        className="absolute top-35 right-6 w-[400px] h-auto opacity-80 pointer-events-none"
+        className="absolute top-35 lg:top-30 right-0.5 left-30 lg:left-40 w-[400px] h-auto opacity-80 pointer-events-none"
       />
       
       {/* Dark overlay for better text readability */}

@@ -40,8 +40,8 @@ export default function Navbar() {
       title: 'Finance',
       items: [
         { name: 'Finance', href: '/courses/finance' },
-        {name: 'Digital Marketing', href: 'courses/digital-marketing' },
-        {name: 'Modern Human Resourse', href: 'courses/human-resource' },
+        {name: 'Digital Marketing', href: '/courses/digital-marketing' },
+        {name: 'Modern Human Resourse', href: '/courses/human-resource' },
       ],
     },
   ];

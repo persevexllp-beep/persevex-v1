@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrainCircuit, Zap, Users, Code, ShieldCheck, Rocket } from 'lucide-react';
 import { useMemo } from 'react';
-import { motion } from 'framer-motion'; // Import motion for the animation
+import { motion, Variants } from 'framer-motion'; // Import Variants type
+import Image from 'next/image';
 
 // --- HELPER HOOK ---
 const useIsMobile = (breakpoint = 768) => {
@@ -20,14 +21,44 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-// --- DATA (Unchanged) ---
+// --- DATA (Updated with planet images) ---
 const edgeData = [
-  { icon: <BrainCircuit size={48} className="text-orange-500 flex-shrink-0" />, title: 'Expert-Led Curriculum', description: 'Our courses are designed and taught by industry veterans with years of real-world experience.' },
-  { icon: <Zap size={48} className="text-orange-500 flex-shrink-0" />, title: 'Hands-On Projects', description: 'Learn by doing. Build a portfolio of impressive projects that showcase your skills to employers.' },
-  { icon: <Users size={48} className="text-orange-500 flex-shrink-0" />, title: 'Community & Support', description: 'Join a thriving community of learners and mentors. Get help when you need it, 24/7.' },
-  { icon: <Code size={48} className="text-orange-500 flex-shrink-0" />, title: 'Cutting-Edge Tech', description: 'Stay ahead of the curve with courses on the latest technologies and industry best practices.' },
-  { icon: <ShieldCheck size={48} className="text-orange-500 flex-shrink-0" />, title: 'Career Focused', description: 'We focus on the skills that matter, providing career services to help you land your dream job.' },
-  { icon: <Rocket size={48} className="text-orange-500 flex-shrink-0" />, title: 'Flexible Learning', description: 'Learn at your own pace with lifetime access to course materials and a flexible schedule.' },
+  { 
+    icon: <BrainCircuit size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Expert-Led Curriculum', 
+    description: 'Our courses are designed and taught by industry veterans with years of real-world experience.',
+    planetImage: '/machinelearning.png' // Added image path
+  },
+  { 
+    icon: <Zap size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Hands-On Projects', 
+    description: 'Learn by doing. Build a portfolio of impressive projects that showcase your skills to employers.',
+    planetImage: '/artificialintelligence.png' // Added image path
+  },
+  { 
+    icon: <Users size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Community & Support', 
+    description: 'Join a thriving community of learners and mentors. Get help when you need it, 24/7.',
+    planetImage: '/webdevelopment.png' // Added image path
+  },
+  { 
+    icon: <Code size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Cutting-Edge Tech', 
+    description: 'Stay ahead of the curve with courses on the latest technologies and industry best practices.',
+    planetImage: '/financecourse.png' // Added image path
+  },
+  { 
+    icon: <ShieldCheck size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Career Focused', 
+    description: 'We focus on the skills that matter, providing career services to help you land your dream job.',
+    planetImage: '/datasciencecourse.png' // Added image path
+  },
+  { 
+    icon: <Rocket size={48} className="text-orange-500 flex-shrink-0" />, 
+    title: 'Flexible Learning', 
+    description: 'Learn at your own pace with lifetime access to course materials and a flexible schedule.',
+    planetImage: '/cybersecurity.png' // Added image path
+  },
 ];
 
 const finalPositions = [
@@ -86,8 +117,8 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
     });
   }, [progress, isMobile, NUM_CARDS]);
   
-  // --- Animation Variants for Mobile Cards ---
-  const mobileCardVariants = {
+  // --- Animation Variants for Mobile Cards (Error Fixed) ---
+  const mobileCardVariants: Variants = { // Explicitly typed with Variants
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
@@ -109,12 +140,19 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
             {edgeData.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-transparent border border-white/20 w-full p-6 rounded-2xl flex items-center gap-4 shadow-lg"
-               
+                className="bg-transparent border border-white/20 w-full p-6 rounded-2xl flex items-center gap-4 shadow-lg relative overflow-hidden"
+                variants={mobileCardVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }} // Animate when 30% of the card is visible
+                viewport={{ once: true, amount: 0.3 }}
               >
+                <Image
+                  src={item.planetImage} // Use dynamic image source
+                  alt={`Planet for ${item.title}`} // Use dynamic alt text
+                  width={150}
+                  height={150}
+                  className="absolute -bottom-8 -right-8 w-[120px] h-auto -z-10 opacity-100 pointer-events-none"
+                />
                 <div className='text-base text-orange-500'>{item.icon}</div>
                 <div>
                   <h3 className="text-xl font-semibold">{item.title}</h3>
@@ -123,7 +161,7 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
             ))}
           </div>
         ) : (
-          // --- DESKTOP LAYOUT (Original Animated Version - Unchanged) ---
+          // --- DESKTOP LAYOUT ---
           <div className="relative w-full max-w-xs md:max-w-4xl lg:max-w-6xl h-[34rem]">
             {edgeData.map((item, index) => (
               <div
@@ -132,9 +170,16 @@ const OurEdgeSection = ({ progress }: { progress: number }) => {
                 style={{ transform: `translateX(-50%) translateY(-50%)`, willChange: 'transform, opacity, filter' }}
               >
                 <div
-                  className="bg-white/30 border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56 transition-transform duration-100 ease-linear"
+                  className="bg-transparent border border-white/20 w-full p-6 rounded-2xl flex flex-col items-start gap-4 shadow-lg h-56 transition-transform duration-100 ease-linear relative overflow-hidden"
                   style={desktopCardStyles[index]}
                 >
+                  <Image
+                    src={item.planetImage} // Use dynamic image source
+                    alt={`Planet for ${item.title}`} // Use dynamic alt text
+                    width={200}
+                    height={200}
+                    className="absolute top-20 right-0 w-[400px] h-auto -z-10 opacity-50 pointer-events-none"
+                  />
                   <div className='text-base'>{item.icon}</div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">{item.title}</h3>

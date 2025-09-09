@@ -43,7 +43,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
           <p className="text-sm text-neutral-400">{testimonial.designation}</p>
         </div>
       </div>
-      <blockquote className="relative z-10 mt-6 flex-grow text-sm italic text-neutral-300">
+      <blockquote className="relative z-10 mt-6 flex-grow text-base italic text-neutral-300">
         <p>&ldquo;{testimonial.quote}&rdquo;</p>
       </blockquote>
     </div>

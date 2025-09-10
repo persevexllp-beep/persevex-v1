@@ -26,6 +26,7 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
       
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 0, 5] }}>
+          <color attach="background" args={['#000000']} />
           <Suspense fallback={null}>
             <StarField hover={false} />
           </Suspense>

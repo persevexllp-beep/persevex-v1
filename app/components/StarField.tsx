@@ -87,6 +87,7 @@ export default function StarField({ hover, ...props }: Props) {
         transparent={true}
         opacity={0.9}
         depthWrite={false}
+      
       />
     </points>
   );

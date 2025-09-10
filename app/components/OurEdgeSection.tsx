@@ -27,37 +27,37 @@ const edgeData = [
     icon: <BrainCircuit size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Expert-Led Curriculum', 
     description: 'Our courses are designed and taught by industry veterans with years of real-world experience.',
-    planetImage: '/machinelearning.png' // Added image path
+    planetImage: '/machine.png' // Added image path
   },
   { 
     icon: <Zap size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Hands-On Projects', 
     description: 'Learn by doing. Build a portfolio of impressive projects that showcase your skills to employers.',
-    planetImage: '/artificialintelligence.png' // Added image path
+    planetImage: '/artifi.png' // Added image path
   },
   { 
     icon: <Users size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Community & Support', 
     description: 'Join a thriving community of learners and mentors. Get help when you need it, 24/7.',
-    planetImage: '/webdevelopment.png' // Added image path
+    planetImage: '/web.png' // Added image path
   },
   { 
     icon: <Code size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Cutting-Edge Tech', 
     description: 'Stay ahead of the curve with courses on the latest technologies and industry best practices.',
-    planetImage: '/financecourse.png' // Added image path
+    planetImage: '/financepng.png' // Added image path
   },
   { 
     icon: <ShieldCheck size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Career Focused', 
     description: 'We focus on the skills that matter, providing career services to help you land your dream job.',
-    planetImage: '/datasciencecourse.png' // Added image path
+    planetImage: '/data.png' // Added image path
   },
   { 
     icon: <Rocket size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Flexible Learning', 
     description: 'Learn at your own pace with lifetime access to course materials and a flexible schedule.',
-    planetImage: '/cybersecurity.png' // Added image path
+    planetImage: '/cyber.png' // Added image path
   },
 ];
 

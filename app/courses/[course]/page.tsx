@@ -1,5 +1,3 @@
-// Filename: app/courses/[course]/page.tsx
-
 "use client";
 
 import React, { use } from 'react';
@@ -11,9 +9,7 @@ import { Canvas } from '@react-three/fiber';
 import StarField from '@/app/components/StarField';
 import AboutProgramSection from '@/app/components/AboutProgramSection';
 import CurriculumSection from '@/app/components/CurriculumSection';
-
-// ProgramCoverContent is not used, can be removed
-// const ProgramCoverContent = []
+import ProjectsSection from '@/app/components/ProjectsSection';
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
@@ -69,16 +65,17 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
 
         </div>
 
-         <div>
+        <div>
           <AboutProgramSection course={course} />
         </div>
         
-        {/* --- ADD THE NEW CURRICULUM SECTION --- */}
-        {/* Conditionally render it only if the course has modules */}
         {course.modules && course.modules.length > 0 && (
           <CurriculumSection modules={course.modules} />
         )}
+
+     
       </div>
+         <ProjectsSection projects={course.projects} />
     </main>
   );
 }

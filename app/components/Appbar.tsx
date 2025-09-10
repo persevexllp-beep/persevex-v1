@@ -34,6 +34,7 @@ export default function Navbar() {
         { name: 'Data Science', href: '/courses/data-science' },
         { name: 'Cyber Security', href: '/courses/cyber-security' },
         {name: 'Cloud Computing', href: '/courses/cloud-computing' },
+        {name: 'Machine Learning', href: '/courses/machine-learning' },
       ],
     },
     {

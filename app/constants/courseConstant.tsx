@@ -61,7 +61,7 @@ export const managementCourses: CourseType[] = [
     icon: FinanceIcon,
     route: "/courses/finance",
     slug: "finance",
-    image: "/financepng.png",
+    image: "/finan.png",
     cardBg_image: "/financepng.png",
     projects: [
             {
@@ -184,7 +184,7 @@ export const managementCourses: CourseType[] = [
     icon: MarketingIcon,
     route: "/courses/digital-marketing",
     slug: "digital-marketing",
-    image: "/digital.png",
+    image: "/digitalmar.png",
     cardBg_image: "/digital.png",
     projects:  [
             {
@@ -310,7 +310,7 @@ export const managementCourses: CourseType[] = [
     icon: HRIcon,
     route: "/courses/human-resource",
     slug: "human-resource",
-    image: "/human.png",
+    image: "/humanres.png",
     cardBg_image: "/human.png",
     projects: [
             {
@@ -436,7 +436,7 @@ export const technicalCourses: CourseType[] = [
     icon: WebDevIcon,
     route: "/courses/web-development",
     slug: "web-development",
-    image: "/web.png",
+    image: "/webdevl.png",
     cardBg_image: "/web.png",
     projects: [
             {
@@ -540,7 +540,7 @@ export const technicalCourses: CourseType[] = [
     icon: AIIcon,
     route: "/courses/artificial-intelligence",
     slug: "artificial-intelligence",
-    image: "/artifi.png",
+    image: "/artificialint.png",
     cardBg_image: "/artifi.png",
     projects:[
             {
@@ -671,7 +671,7 @@ export const technicalCourses: CourseType[] = [
     icon: MLIcon,
     route: "/courses/machine-learning",
     slug: "machine-learning",
-    image: "/machine.png",
+    image: "/machinelearn.png",
     cardBg_image: "/machine.png",
     projects: [
             {
@@ -799,7 +799,7 @@ export const technicalCourses: CourseType[] = [
     icon: CloudIcon,
     route: "/courses/cloud-computing",
     slug: "cloud-computing",
-    image: "/cloud.png",
+    image: "/cloudcomp.png",
     cardBg_image: "/cloud.png",
     projects:[
             {
@@ -922,7 +922,7 @@ export const technicalCourses: CourseType[] = [
     icon: CybersecurityIcon,
     route: "/courses/cyber-security",
     slug: "cyber-security",
-    image: "/cyber.png",
+    image: "/cybersec.png",
     cardBg_image: "/cyber.png",
     projects: [
             {
@@ -1049,7 +1049,7 @@ export const technicalCourses: CourseType[] = [
     icon: CybersecurityIcon,
     route: "/courses/data-science",
     slug: "data-science",
-    image: "/data.png",
+    image: "/datasci.png",
     cardBg_image: "/data.png",
     projects:[
             {

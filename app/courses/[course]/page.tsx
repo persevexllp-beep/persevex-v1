@@ -1,4 +1,4 @@
-
+// app/courses/[course]/page.tsx
 
 "use client";
 
@@ -16,7 +16,40 @@ import ProjectsSection from '@/app/components/ProjectsSection';
 import CertificationSection from '@/app/components/CertificationSection';
 import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
-import FooterSection from '@/app/components/FooterSection';
+// Import the new footer component
+import CourseFooterSection from '@/app/components/CourseFooterSection';
+
+// Define the link data for each category
+const managementFooterLinks = [
+  {
+    title: "Quick Links",
+    links: ["Home", "Digital Marketing", "Finance", "Human Resource", "Contact Us"],
+  },
+  {
+    title: "Our Programs",
+    links: ["Digital Marketing", "Finance", "Human Resource"],
+  },
+  {
+    title: "About Us",
+    links: ["Who we are", "Founder ethos", "Work life balance"],
+  },
+];
+
+const technicalFooterLinks = [
+  {
+    title: "Quick Links",
+    links: ["Home", "Web Development", "Artificial Intelligence", "Machine Learning", "Contact Us"],
+  },
+  {
+    title: "Our Programs",
+    links: ["Web Development", "Artificial Intelligence", "Machine Learning", "Cloud Computing", "Cybersecurity"],
+  },
+  {
+    title: "About Us",
+    links: ["Who we are", "Founder ethos", "Work life balance"],
+  },
+];
+
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
@@ -28,11 +61,19 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
     notFound();
   }
 
+  // --- LOGIC TO DETERMINE COURSE CATEGORY ---
+  // Check if the current course's ID exists in the managementCourses array
+  const isManagementCourse = managementCourses.some(mc => mc.id === course.id);
+
+  // Select the appropriate set of links based on the category
+  const footerLinksToShow = isManagementCourse ? managementFooterLinks : technicalFooterLinks;
+
   const courseFaqs = faqsData[course.slug] || [];
 
   return (
     <main className="relative min-h-screen w-full text-white overflow-x-hidden">
       
+      {/* Background Starfield Canvas */}
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 0, 5] }}>
           <color attach="background" args={['#000000']} />
@@ -42,59 +83,55 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
         </Canvas>
       </div>
 
-      <div className="relative z-10 max-w-7xl min-h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 items-center">
-          <div className="flex justify-center items-center order-1 md:order-2">
-             <Image
-                src={course.image}
-                alt={course.title}
-                width={500}
-                height={500}
-                className="rounded-lg object-contain w-full h-auto max-w-sm md:max-w-none"
-                priority
-             />
-          </div>
-
-          <div className="flex flex-col gap-6 order-2 md:order-1 items-center text-center md:items-start md:text-left">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight">
-              {course.title}
-            </h1>
-            <div className="w-1/2 h-0.5 bg-white/80" />
-            <p className="text-sm lg:text-lg text-neutral-300 max-w-xl">
-              {course.large_description}
-            </p>
-            
-            <div className="mt-6">
-              <div className="relative w-fit">
-                <button className="relative z-10 px-10 py-3 bg-orange-500 rounded-full font-semibold text-lg shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-colors duration-300">
-                  Enroll Now
-                </button>
+      {/* Main Page Content */}
+      <div className="relative z-10">
+        <div className="max-w-7xl min-h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 items-center">
+            <div className="flex justify-center items-center order-1 md:order-2">
+              <Image
+                  src={course.image}
+                  alt={course.title}
+                  width={500}
+                  height={500}
+                  className="rounded-lg object-contain w-full h-auto max-w-sm md:max-w-none"
+                  priority
+              />
+            </div>
+            <div className="flex flex-col gap-6 order-2 md:order-1 items-center text-center md:items-start md:text-left">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight">
+                {course.title}
+              </h1>
+              <div className="w-1-2 h-0.5 bg-white/80" />
+              <p className="text-sm lg:text-lg text-neutral-300 max-w-xl">
+                {course.large_description}
+              </p>
+              <div className="mt-6">
+                <div className="relative w-fit">
+                  <button className="relative z-10 px-10 py-3 bg-orange-500 rounded-full font-semibold text-lg shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-colors duration-300">
+                    Enroll Now
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-
-        </div>
-
-        <div>
-          <AboutProgramSection course={course} />
+          <div>
+            <AboutProgramSection course={course} />
+          </div>
+          {course.modules && course.modules.length > 0 && (
+            <CurriculumSection modules={course.modules} />
+          )}
         </div>
         
-        {course.modules && course.modules.length > 0 && (
-          <CurriculumSection modules={course.modules} />
+        {course.projects && course.projects.length > 0 && (
+            <ProjectsSection projects={course.projects} />
         )}
+        <CertificationSection />
+        <TrainingPartners />
+        <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
 
+        {/* Use the new footer and pass the dynamic links as a prop */}
+        <CourseFooterSection links={footerLinksToShow} />
       </div>
-      
-      {course.projects && course.projects.length > 0 && (
-          <ProjectsSection projects={course.projects} />
-      )}
-
-      <CertificationSection />
-      <TrainingPartners />
-
-      <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
-
-      <FooterSection />
     </main>
   );
 }

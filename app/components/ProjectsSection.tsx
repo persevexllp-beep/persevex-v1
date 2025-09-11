@@ -54,11 +54,14 @@ export default function ProjectsSection({ projects }: { projects: ProjectsType[]
 
     return (
         <section className="py-20 min-h-screen flex flex-col items-center justify-center text-white">
+             <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <span className="text-orange-400 text-sm font-medium">Projects</span>
+        </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-center 
                            uppercase tracking-wide text-white">
                 Hands-On Projects
             </h2>
-            <p className='text-center mt-4'>Our Real-Time projects help you gain knowledge and enhance your skills.</p>
+            <p className='text-center bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent mt-4'>Our Real-Time projects help you gain knowledge and enhance your skills.</p>
 
             {/* 1. Name the group for the scroller */}
             <div className="group/scroller mt-12 relative w-full overflow-hidden whitespace-nowrap">

@@ -12,22 +12,37 @@ interface FooterLinkColumn {
 // The component now accepts a 'links' prop
 export default function CourseFooterSection({ links }: { links: FooterLinkColumn[] }) {
   return (
-    <footer className="relative mt-24 text-white overflow-hidden flex items-center justify-center py-20 md:py-12 ">
+    <footer className="relative mt-24 text-white overflow-hidden flex items-center justify-center py-20 md:py-12">
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8">
           {/* Left Column: Brand */}
-          <div className="md:col-span-1 flex flex-col w-full text-center md:text-left">
-            {/* <Image src='/ori.png' alt="logo" height={200} width={200} /> */}
-            <h2 className="text-3xl md:text-4xl w-full font-serif text-gray-200">
-              Persevex
-            </h2>
-            <p className="mt-4 text-gray-400 w-full">
-              Empowering careers through practical education.
-            </p>
+          <div className="flex items-start gap-6 w-full">
+            {/* Logo Container */}
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
+                <Image 
+                  className="w-full h-full object-contain" 
+                  src='/ori.png' 
+                  alt="Persevex logo" 
+                  height={80} 
+                  width={80} 
+                />
+              </div>
+            </div>
+            
+            {/* Brand Text */}
+            <div className="flex flex-col justify-center min-h-[4rem] md:min-h-[5rem]">
+              <h2 className="text-3xl md:text-4xl font-serif text-gray-200 leading-tight">
+                Persevex
+              </h2>
+              <p className="mt-2 text-gray-400 leading-relaxed">
+                Empowering careers through practical education.
+              </p>
+            </div>
           </div>
 
           {/* Right Columns: Dynamic Links */}
-          <div className="md:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-32 mt-12 md:mt-0 md:ml-auto text-center sm:text-left">
+          <div className="md:col-span-1 grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12 mt-12 md:mt-0 md:ml-auto text-center sm:text-left">
             {links.map((column) => (
               <div key={column.title}>
                 <h3 className="font-bold text-white mb-4 text-lg">
@@ -57,9 +72,9 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
             <p className="text-sm text-gray-400">© 2025 Persevex. All rights reserved.</p>
             <div className="flex gap-6">
               {/* Replace with actual icons later */}
-              <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
-              <a href="#" className="text-gray-400 hover:text-white">LinkedIn</a>
-              <a href="#" className="text-gray-400 hover:text-white">Instagram</a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Facebook</a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">LinkedIn</a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">Instagram</a>
             </div>
           </div>
         </div>

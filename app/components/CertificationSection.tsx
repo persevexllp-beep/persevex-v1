@@ -23,10 +23,13 @@ export default function CertificationSection() {
         <div className="min-h-screen  text-white flex flex-col items-center justify-center py-20 px-4">
             
             <div className="text-center mb-16">
+                 <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <span className="text-orange-400 text-sm font-medium">Certificates</span>
+        </div>
                 <h1 className="text-4xl md:text-5xl font-bold">
                     CERTIFICATIONS
                 </h1>
-                <p className="max-w-3xl mt-4 mx-auto text-md md:text-lg text-gray-300">
+                <p className="max-w-3xl mt-4 mx-auto text-md md:text-lg  bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
                     On completion of a program each participant gets a course completion, internship and outstanding performance certificates.
                 </p>
             </div>

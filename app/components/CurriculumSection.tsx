@@ -41,10 +41,14 @@ const CurriculumSection: React.FC<CurriculumSectionProps> = ({ modules }) => {
 
   return (
     <div className="py-24">
-      <div className="text-center max-w-4xl mx-auto">
-        <h2 className="text-4xl sm:text-5xl font-extrabold mb-12 bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
+      <div className="text-center flex flex-col items-center justify-center max-w-4xl mx-auto">
+        <div className="inline-flex mb-4 w-fit items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <span className="text-orange-400 text-sm font-medium">Curriculum</span>
+        </div>
+        <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
           Course Curriculum
         </h2>
+        <p className='mb-12 bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent md:text-lg'>Comprehensive learning path designed by industry experts</p>
       </div>
 
       <motion.div

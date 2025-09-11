@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useScroll, SectionKey } from '../contexts/scrollContext';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Navbar() {
   const { scrollToSection } = useScroll();
@@ -78,6 +79,8 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 left-0 right-0 z-50 h-16 flex items-center justify-between p-6 md:p-8 text-white ">
+       <div className='flex items-center justify-center gap-4'>
+       
         <Link 
           href="/" 
           className="text-2xl cursor-pointer md:text-3xl font-bold tracking-wider"
@@ -85,6 +88,7 @@ export default function Navbar() {
         >
           PERSEVEX
         </Link>
+       </div>
         <nav className="hidden md:flex items-center gap-8 lg:gap-12">
           <div 
             className="relative"

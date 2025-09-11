@@ -13,10 +13,13 @@ export default function AboutProgramSection({ course }: AboutProgramSectionProps
     // Added margin-top to create space from the section above
     <div className="mt-24 py-16">
       <div className="text-center max-w-4xl mx-auto">
+         <div className="inline-flex mb-4 w-fit items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <span className="text-orange-400 text-sm font-medium">Programs</span>
+        </div>
         <h2 className="text-4xl sm:text-5xl font-extrabold mb-4">
           About The Program
         </h2>
-        <p className="text-lg text-neutral-300">
+        <p className="text-lg bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent md:text-lg">
           {/* Using the shorter description from the course data */}
           {course.description}
         </p>

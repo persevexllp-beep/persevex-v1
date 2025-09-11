@@ -18,10 +18,13 @@ export default function TrainingPartners() {
       <div className="max-w-7xl flex flex-col items-center justify-center mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center mb-16">
+            <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <span className="text-orange-400 text-sm font-medium">Partners</span>
+        </div>
           <h2 className="text-5xl font-bold ">
             Training Partners
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto ">
+          <p className="mt-4 max-w-2xl bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent mx-auto ">
             We collaborate with leading organizations to provide you with the
             best learning experience.
           </p>

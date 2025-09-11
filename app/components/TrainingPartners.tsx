@@ -43,7 +43,7 @@ export default function TrainingPartners() {
                   alt={partner.alt}
                   width={160}
                   height={80}
-                  className="max-h-[100px] w-auto"
+                  className="max-h-[200px] w-auto"
                 />
               </div>
             ))}

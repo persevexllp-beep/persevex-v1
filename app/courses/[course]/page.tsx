@@ -1,9 +1,12 @@
+
+
 "use client";
 
 import React, { use } from 'react';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import Image from 'next/image';
+import { faqsData } from '../../constants/faqsData'; 
 import { managementCourses, technicalCourses } from '../../constants/courseConstant'; 
 import { Canvas } from '@react-three/fiber';
 import StarField from '@/app/components/StarField';
@@ -12,6 +15,7 @@ import CurriculumSection from '@/app/components/CurriculumSection';
 import ProjectsSection from '@/app/components/ProjectsSection';
 import CertificationSection from '@/app/components/CertificationSection';
 import TrainingPartners from '@/app/components/TrainingPartners';
+import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
@@ -22,6 +26,8 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
   if (!course) {
     notFound();
   }
+
+  const courseFaqs = faqsData[course.slug] || [];
 
   return (
     <main className="relative min-h-screen w-full text-white overflow-x-hidden">
@@ -76,12 +82,16 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
           <CurriculumSection modules={course.modules} />
         )}
 
-     
       </div>
-         <ProjectsSection projects={course.projects} />
+      
+      {course.projects && course.projects.length > 0 && (
+          <ProjectsSection projects={course.projects} />
+      )}
 
-         <CertificationSection />
-         <TrainingPartners />
+      <CertificationSection />
+      <TrainingPartners />
+
+      <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
     </main>
   );
 }

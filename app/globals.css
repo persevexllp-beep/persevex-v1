@@ -343,15 +343,17 @@ div[style*="--about-us-container-transform"] h2 video {
 }
 
 
-@keyframes infinite-scroll {
-  from {
-    transform: translateX(0);
+@layer utilities {
+  @keyframes infinite-scroll-partners {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
-  to {
-    transform: translateX(-50%);
-  }
-}
 
-.animate-infinite-scroll {
-  animation: infinite-scroll 20s linear infinite;
+  .animate-scroll-partners {
+    animation: infinite-scroll-partners 20s linear infinite;
+  }
 }

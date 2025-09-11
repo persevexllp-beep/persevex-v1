@@ -353,5 +353,5 @@ div[style*="--about-us-container-transform"] h2 video {
 }
 
 .animate-infinite-scroll {
-  animation: infinite-scroll 25s linear infinite;
+  animation: infinite-scroll 20s linear infinite;
 }

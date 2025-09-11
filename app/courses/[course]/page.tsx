@@ -10,6 +10,7 @@ import StarField from '@/app/components/StarField';
 import AboutProgramSection from '@/app/components/AboutProgramSection';
 import CurriculumSection from '@/app/components/CurriculumSection';
 import ProjectsSection from '@/app/components/ProjectsSection';
+import CertificationSection from '@/app/components/CertificationSection';
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
@@ -77,6 +78,8 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
      
       </div>
          <ProjectsSection projects={course.projects} />
+
+         <CertificationSection />
     </main>
   );
 }

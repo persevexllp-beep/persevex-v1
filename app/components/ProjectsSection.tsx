@@ -6,11 +6,10 @@ const ProjectCard = ({ name, description, image }: { name: string; description: 
         <div className="relative flex-shrink-0 w-80 h-96 mx-4 rounded-2xl overflow-hidden 
                        bg-white/5 backdrop-blur-sm border border-white/10
                        transition-all duration-500 ease-out
-                        hover:shadow-2xl hover:shadow-orange-500/10
+                       hover:shadow-2xl hover:shadow-orange-500/10
                        hover:border-orange-400/30 group
-                       whitespace-normal"> {/* <--- FIX: Added this class */}
+                       whitespace-normal">
             
-            {/* Image Container */}
             <div className="relative w-full h-48 overflow-hidden">
                 <Image 
                     src={image} 
@@ -22,7 +21,6 @@ const ProjectCard = ({ name, description, image }: { name: string; description: 
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
             </div>
             
-            {/* Content Container */}
             <div className="relative p-6 h-48 flex flex-col justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-3 
@@ -35,7 +33,6 @@ const ProjectCard = ({ name, description, image }: { name: string; description: 
                     </p>
                 </div>
                 
-                {/* Subtle bottom accent */}
                 <div className="flex items-center justify-between mt-4">
                     <div className="h-px bg-gradient-to-r from-orange-400/50 to-transparent flex-1" />
                     <div className="w-2 h-2 bg-orange-400/60 rounded-full ml-3" />
@@ -45,8 +42,6 @@ const ProjectCard = ({ name, description, image }: { name: string; description: 
     );
 };
 
-// ... (ProjectCard component remains the same)
-
 export default function ProjectsSection({ projects }: { projects: ProjectsType[] | undefined }) {
     if (!projects || projects.length === 0) {
         return null;
@@ -54,24 +49,23 @@ export default function ProjectsSection({ projects }: { projects: ProjectsType[]
 
     return (
         <section className="py-20 min-h-screen flex flex-col items-center justify-center text-white">
-             <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
-          <span className="text-orange-400 text-sm font-medium">Projects</span>
-        </div>
+            <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+                <span className="text-orange-400 text-sm font-medium">Projects</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-center 
                            uppercase tracking-wide text-white">
                 Hands-On Projects
             </h2>
             <p className='text-center bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent mt-4'>Our Real-Time projects help you gain knowledge and enhance your skills.</p>
 
-            {/* 1. Name the group for the scroller */}
-            <div className="group/scroller mt-12 relative w-full overflow-hidden whitespace-nowrap">
-                <div className="flex h-96 items-center animate-infinite-scroll 
-                                ">
+            <div className="w-full mt-12 inline-flex flex-nowrap overflow-hidden
+                            [mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)]">
+                <div className="flex items-center justify-center animate-scroll-projects">
                     {projects.map((project, index) => (
                         <ProjectCard key={`project1-${index}`} {...project} />
                     ))}
                     {projects.map((project, index) => (
-                        <ProjectCard key={`project2-${index}`} {...project} />
+                        <ProjectCard key={`project2-${index}`} {...project} aria-hidden="true" />
                     ))}
                 </div>
             </div>

@@ -20,7 +20,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/dog6.jpg",
     bgImage: '/hat.png',
     bgPosition: 'top 40% right 50%',
-    planetImage: '/artificialintelligence.png' // New
+    planetImage: '/artificialint.png' // New
   },
   {
     headline: "Choosing Brandby was one of the best decisions",
@@ -30,7 +30,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/dog5.jpeg",
     bgImage: '/hat.png',
     bgPosition: 'bottom 40% left 10%',
-    planetImage: '/machinelearning.png' // New
+    planetImage: '/machine.png' // New
   },
   {
     headline: "Right balance of beautiful design",
@@ -40,7 +40,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/cat2.jpeg",
     bgImage: '/hat.png',
     bgPosition: 'bottom 50% left 80%',
-    planetImage: '/cybersecurity.png' // New
+    planetImage: '/cybersec.png' // New
   },
   {
     headline: "One of the most talented design teams",
@@ -50,7 +50,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/bear1.jpg",
     bgImage: '/hat.png',
     bgPosition: 'top 15% left 15%',
-    planetImage: '/financecourse.png' // New
+    planetImage: '/finan.png' // New
   },
   {
     headline: "Amazing to work with",
@@ -60,7 +60,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/dog3.jpg",
     bgImage: '/hat.png',
     bgPosition: 'center right 10%',
-    planetImage: '/digitalmarketing.png' // New
+    planetImage: '/digitalmar.png' // New
   },
   {
     headline: "Outstanding product design",
@@ -70,7 +70,7 @@ export const testimonialsData: Testimonial[] = [
     image: "/cat1.jpg",
     bgImage: '/hat.png',
     bgPosition: 'bottom center',
-    planetImage: '/webdevelopment.png' // New
+    planetImage: '/webdevl.png' // New
   },
     {
     headline: "Reliable, Fast, Easy",
@@ -80,6 +80,6 @@ export const testimonialsData: Testimonial[] = [
     image: "/dog1.jpeg",
     bgImage: '/hat.png',
     bgPosition: 'top left',
-    planetImage: '/datasciencecourse.png' // Re-using planet1 for the 7th card
+    planetImage: '/datasci.png' // Re-using planet1 for the 7th card
   },
 ];

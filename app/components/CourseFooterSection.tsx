@@ -22,7 +22,7 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
               <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
                 <Image 
                   className="w-full h-full object-contain" 
-                  src='/ori.png' 
+                  src='/whitelogo.png' 
                   alt="Persevex logo" 
                   height={80} 
                   width={80} 

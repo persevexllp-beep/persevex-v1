@@ -16,6 +16,7 @@ import ProjectsSection from '@/app/components/ProjectsSection';
 import CertificationSection from '@/app/components/CertificationSection';
 import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
+import FooterSection from '@/app/components/FooterSection';
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
@@ -92,6 +93,8 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
       <TrainingPartners />
 
       <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
+
+      <FooterSection />
     </main>
   );
 }

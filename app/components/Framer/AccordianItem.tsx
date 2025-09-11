@@ -36,7 +36,7 @@ export default function AccordionItem({
         >
           <div className="flex items-start gap-4 flex-1">
             {/* Question number */}
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full  flex items-center justify-center text-orange-500 text-sm font-bold">
               {(index + 1).toString().padStart(2, '0')}
             </div>
             
@@ -52,7 +52,7 @@ export default function AccordionItem({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="flex-shrink-0 ml-4"
           >
-            <div className="w-10 h-10 rounded-full bg-gray-800/80 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors duration-300">
+            <div className="w-10 h-10 rounded-full  flex items-center justify-center  transition-colors duration-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"

@@ -39,18 +39,94 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
         ))}
       </div>
 
-      {/* Bottom CTA */}
-      <div className="mt-20 text-center">
-        <div className="inline-flex flex-col items-center gap-4 p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-700/50 backdrop-blur-sm">
-          <h3 className="text-2xl font-semibold text-white">
-            Still have questions?
-          </h3>
-          <p className="text-gray-400 max-w-md">
-            Our team is here to help you get started on your internship journey.
+      {/* Contact Form */}
+      <div className="mt-20">
+        <div className="max-w-5xl mx-auto p-8 rounded-2xl  border border-gray-700/50 backdrop-blur-xs">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-semibold text-white mb-2">
+              Still have questions?
+            </h3>
+            <p className="text-gray-400">
+              Our team is here to help you get started on your internship journey.
+            </p>
+          </div>
+
+          <form className="space-y-6">
+            {/* Name and Phone Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                placeholder="Enter your email address"
+              />
+            </div>
+
+            {/* Question Field */}
+            <div>
+              <label htmlFor="question" className="block text-sm font-medium text-gray-300 mb-2">
+                Your Question *
+              </label>
+              <textarea
+                id="question"
+                name="question"
+                required
+                rows={4}
+                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none"
+                placeholder="Please describe your question or concern..."
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-orange-500/25 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              >
+                Send Message
+              </button>
+            </div>
+          </form>
+
+          {/* Privacy Note */}
+          <p className="text-xs text-gray-500 text-center mt-6">
+            We respect your privacy. Your information will only be used to respond to your inquiry.
           </p>
-          <button className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-full hover:from-orange-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-orange-500/25">
-            Contact Support
-          </button>
         </div>
       </div>
     </div>

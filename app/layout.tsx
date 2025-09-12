@@ -1,10 +1,6 @@
-// app/layout.tsx
-
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Appbar";
-import { ScrollProvider } from "./contexts/scrollContext";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -25,11 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        {/* 2. Wrap Navbar and children with the provider */}
-        <ScrollProvider>
-          <Navbar />
-          {children}
-        </ScrollProvider>
+        {children} 
       </body>
     </html>
   );

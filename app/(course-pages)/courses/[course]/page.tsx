@@ -1,11 +1,11 @@
 "use client";
 
-import React, { use } from 'react';
+import React, { use, useEffect, useRef } from 'react';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import Image from 'next/image';
-import { faqsData } from '../../constants/faqsData'; 
-import { managementCourses, technicalCourses } from '../../constants/courseConstant'; 
+import { faqsData } from '@/app/constants/faqsData';
+import { managementCourses, technicalCourses } from '@/app/constants/courseConstant';
 import { Canvas } from '@react-three/fiber';
 import StarField from '@/app/components/StarField';
 import AboutProgramSection from '@/app/components/AboutProgramSection';
@@ -15,6 +15,7 @@ import CertificationSection from '@/app/components/CertificationSection';
 import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
 import CourseFooterSection from '@/app/components/CourseFooterSection';
+import { useCourseScroll } from '../../contexts/courseScrollContext';
   
 const managementFooterLinks = [
   {
@@ -46,26 +47,43 @@ const technicalFooterLinks = [
   },
 ];
 
-
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
+  const { setSectionRefs } = useCourseScroll(); 
   
   const allCourses = [...managementCourses, ...technicalCourses];
   const course = allCourses.find(c => c.slug === resolvedParams.course);
+
+  const aboutRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const curriculumRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const projectsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const certificationRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const partnersRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const faqsRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+  const footerRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
+
+  useEffect(() => {
+    setSectionRefs({
+      about: aboutRef,
+      curriculum: curriculumRef,
+      projects: projectsRef,
+      certification: certificationRef,
+      partners: partnersRef,
+      faqs: faqsRef,
+      footer: footerRef,
+    });
+  }, [setSectionRefs]);
 
   if (!course) {
     notFound();
   }
 
   const isManagementCourse = managementCourses.some(mc => mc.id === course.id);
-
   const footerLinksToShow = isManagementCourse ? managementFooterLinks : technicalFooterLinks;
-
   const courseFaqs = faqsData[course.slug] || [];
 
   return (
     <main className="relative min-h-screen w-full text-white overflow-x-hidden">
-      
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 0, 5] }}>
           <color attach="background" args={['#000000']} />
@@ -76,7 +94,7 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
       </div>
 
       <div className="relative z-10">
-        <div className="max-w-7xl min-h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 items-center">
             <div className="flex justify-center items-center order-1 md:order-2">
               <Image
@@ -92,7 +110,7 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight">
                 {course.title}
               </h1>
-              <div className="w-1-2 h-0.5 bg-white/80" />
+              <div className="w-1/2 h-0.5 bg-white/80" />
               <p className="text-sm lg:text-lg text-neutral-300 max-w-xl">
                 {course.large_description}
               </p>
@@ -105,22 +123,39 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
               </div>
             </div>
           </div>
-          <div>
-            <AboutProgramSection course={course} />
-          </div>
-          {course.modules && course.modules.length > 0 && (
-            <CurriculumSection modules={course.modules} />
-          )}
         </div>
         
-        {course.projects && course.projects.length > 0 && (
-            <ProjectsSection projects={course.projects} />
-        )}
-        <CertificationSection />
-        <TrainingPartners />
-        <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
+        <div ref={aboutRef}>
+          <AboutProgramSection course={course} />
+        </div>
 
-        <CourseFooterSection links={footerLinksToShow} />
+        {course.modules && course.modules.length > 0 && (
+          <div ref={curriculumRef}>
+            <CurriculumSection modules={course.modules} />
+          </div>
+        )}
+        
+        {course.projects && course.projects.length > 0 && (
+          <div ref={projectsRef}>
+            <ProjectsSection projects={course.projects} />
+          </div>
+        )}
+
+        <div ref={certificationRef}>
+          <CertificationSection />
+        </div>
+
+        <div ref={partnersRef}>
+          <TrainingPartners />
+        </div>
+
+        <div ref={faqsRef}>
+          <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
+        </div>
+
+        <div ref={footerRef}>
+          <CourseFooterSection links={footerLinksToShow} />
+        </div>
       </div>
     </main>
   );

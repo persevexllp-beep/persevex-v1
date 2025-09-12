@@ -37,7 +37,7 @@ const itemVariants: Variants = {
 const CurriculumSection: React.FC<CurriculumSectionProps> = ({ modules }) => {
   // State to track which accordion item is open. `null` means all are closed.
   // We default it to `0` to have the first module open initially.
-  const [expanded, setExpanded] = useState<number | null>(0);
+  const [expanded, setExpanded] = useState<number | null>();
 
   return (
     <div className="py-24">

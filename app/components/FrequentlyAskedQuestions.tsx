@@ -41,7 +41,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
 
       {/* Contact Form */}
       <div className="mt-20">
-        <div className="max-w-5xl mx-auto p-8 rounded-2xl  border border-gray-700/50 backdrop-blur-xs">
+        <div className="max-w-5xl mx-auto p-8 rounded-2xl  border border-gray-700/50 ">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-semibold text-white mb-2">
               Still have questions?

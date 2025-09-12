@@ -210,7 +210,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({ progress, onSwitchView 
 
       <div className="relative w-full md:w-1/2 h-[480px] lg:mt-0 flex items-center justify-center">
         <motion.div
-            className="absolute inset-0 flex justify-center mt-20 lg:mt-0 items-center"
+            className="absolute inset-0 flex justify-center mt-24 lg:mt-0 items-center"
             style={{ 
               opacity: managementStackOpacity,
               pointerEvents: managementPointerEvents 
@@ -222,7 +222,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({ progress, onSwitchView 
           </motion.div>
 
           <motion.div
-            className="absolute inset-0 flex justify-center mt-20 lg:mt-0 items-center"
+            className="absolute inset-0 flex justify-center mt-24 lg:mt-0 items-center"
             style={{ 
               opacity: technicalStackOpacity,
               pointerEvents: technicalPointerEvents 

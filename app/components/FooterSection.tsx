@@ -26,7 +26,7 @@ export default function FooterSection() {
           <div className="flex flex-col  items-start gap-4  w-full">
                      <div className='flex gap-6'>
                       <div className="flex-shrink-0 ">
-                       <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
+                       <div className="w-16 h-16 md:w-20 md:h-20 lg:mt-0 mt-4 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
                          <Image 
                            className="w-full h-full object-contain" 
                            src='/whitelogo.png' 

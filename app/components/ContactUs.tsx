@@ -111,13 +111,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           variants={itemVariants}
           className="w-full max-w-lg bg-black/40 border-white/20 border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden"
         >
-          <Image
-            src="/machinelearning.png"
-            alt="Machine Learning Planet"
-            width={500}
-            height={500}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-auto -z-10 opacity-50 pointer-events-none"
-          />
+       
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-6">
               <div className="w-full">

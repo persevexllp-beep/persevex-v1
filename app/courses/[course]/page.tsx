@@ -1,5 +1,3 @@
-// app/courses/[course]/page.tsx
-
 "use client";
 
 import React, { use } from 'react';
@@ -16,10 +14,8 @@ import ProjectsSection from '@/app/components/ProjectsSection';
 import CertificationSection from '@/app/components/CertificationSection';
 import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
-// Import the new footer component
 import CourseFooterSection from '@/app/components/CourseFooterSection';
-
-// Define the link data for each category
+  
 const managementFooterLinks = [
   {
     title: "Quick Links",
@@ -61,11 +57,8 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
     notFound();
   }
 
-  // --- LOGIC TO DETERMINE COURSE CATEGORY ---
-  // Check if the current course's ID exists in the managementCourses array
   const isManagementCourse = managementCourses.some(mc => mc.id === course.id);
 
-  // Select the appropriate set of links based on the category
   const footerLinksToShow = isManagementCourse ? managementFooterLinks : technicalFooterLinks;
 
   const courseFaqs = faqsData[course.slug] || [];
@@ -73,7 +66,6 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
   return (
     <main className="relative min-h-screen w-full text-white overflow-x-hidden">
       
-      {/* Background Starfield Canvas */}
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 0, 5] }}>
           <color attach="background" args={['#000000']} />
@@ -83,7 +75,6 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
         </Canvas>
       </div>
 
-      {/* Main Page Content */}
       <div className="relative z-10">
         <div className="max-w-7xl min-h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-12 items-center">
@@ -129,7 +120,6 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
         <TrainingPartners />
         <FrequentlyAskedQuestionsSection faqs={courseFaqs} />
 
-        {/* Use the new footer and pass the dynamic links as a prop */}
         <CourseFooterSection links={footerLinksToShow} />
       </div>
     </main>

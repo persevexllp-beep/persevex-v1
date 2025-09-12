@@ -1,9 +1,6 @@
-// Filename: components/PolicySection.tsx
-
 import React, { FC } from "react";
 import Link from "next/link";
 import AnimatedTitle from "./AnimatedTitle"; 
-// 1. Import the icons you want to use from lucide-react
 import { ShieldCheck, FileText, Undo2 } from 'lucide-react';
 
 const PolicySection: FC = () => {
@@ -21,10 +18,8 @@ const PolicySection: FC = () => {
           </div>
 
           <div className="flex flex-col mb- gap-4 lg:gap-12">
-            {/* Privacy Policy */}
             <div className="flex border rounded-4xl items-center justify-center px-8 py-12 flex-col gap-2">
-              <Link href="/privacy">
-                {/* 2. Pass the ShieldCheck icon to the `icon` prop */}
+              <Link href="/privacy-policy">
                 <AnimatedTitle 
                   as="h1" 
                   className="text-2xl text-start cursor-pointer"
@@ -36,10 +31,8 @@ const PolicySection: FC = () => {
              
             </div>
 
-            {/* Terms & Conditions */}
             <div className="flex items-center justify-center px-8 py-12 border rounded-4xl flex-col gap-2">
-              <Link href="/terms">
-                 {/* 2. Pass the FileText icon to the `icon` prop */}
+              <Link href="/terms-&-conditions">
                 <AnimatedTitle 
                   as="h1" 
                   className="text-2xl text-start cursor-pointer"
@@ -51,10 +44,8 @@ const PolicySection: FC = () => {
              
             </div>
 
-            {/* Return Policy */}
             <div className="flex items-center justify-center px-8 py-12 border rounded-4xl  flex-col gap-2">
-              <Link href="/returns">
-                 {/* 2. Pass the Undo2 icon to the `icon` prop */}
+              <Link href="/return-policy">
                 <AnimatedTitle 
                   as="h1" 
                   className="text-2xl text-start cursor-pointer"

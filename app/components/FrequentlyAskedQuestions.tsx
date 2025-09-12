@@ -1,4 +1,3 @@
-// app/components/FrequentlyAskedQuestions.tsx
 import { FAQType } from '../constants/faqsData';
 import AccordionItem from './Framer/AccordianItem';
 
@@ -9,7 +8,6 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
 
   return (
     <div className="w-full max-w-5xl mx-auto py-24 px-4 sm:px-6 lg:px-8">
-      {/* Header Section */}
       <div className="flex flex-col gap-6 items-center justify-center text-center mb-16">
         <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
           <span className="text-orange-400 text-sm font-medium">FAQ</span>
@@ -32,16 +30,14 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
         </p>
       </div>
 
-      {/* FAQ Grid */}
       <div className="grid gap-4 md:gap-6">
         {faqs.map((faq, index) => (
           <AccordionItem key={index} faq={faq} index={index} />
         ))}
       </div>
 
-      {/* Contact Form */}
       <div className="mt-20">
-        <div className="max-w-5xl mx-auto p-8 rounded-2xl  border border-gray-700/50 ">
+        <div className="max-w-5xl mx-auto p-8 rounded-2xl backdrop-blur-xs border border-gray-700/50 ">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-semibold text-white mb-2">
               Still have questions?
@@ -52,7 +48,6 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
           </div>
 
           <form className="space-y-6">
-            {/* Name and Phone Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -63,7 +58,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  className="w-full px-4 py-3 bg-black border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -76,13 +71,12 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
                   id="phone"
                   name="phone"
                   required
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                  className="w-full px-4 py-3 bg-black border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
                   placeholder="Enter your phone number"
                 />
               </div>
             </div>
 
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address *
@@ -92,12 +86,11 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
                 id="email"
                 name="email"
                 required
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
+                className="w-full px-4 py-3 bg-black border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
                 placeholder="Enter your email address"
               />
             </div>
 
-            {/* Question Field */}
             <div>
               <label htmlFor="question" className="block text-sm font-medium text-gray-300 mb-2">
                 Your Question *
@@ -107,23 +100,21 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
                 name="question"
                 required
                 rows={4}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none"
+                className="w-full px-4 py-3 bg-black border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300 resize-none"
                 placeholder="Please describe your question or concern..."
               />
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-4 flex items-center justify-center">
               <button
                 type="submit"
-                className="w-full px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-orange-500/25 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                className="w-fit px-8 py-2 bg-white text-black cursor-pointer font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-orange-500/25 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
               >
                 Send Message
               </button>
             </div>
           </form>
 
-          {/* Privacy Note */}
           <p className="text-xs text-gray-500 text-center mt-6">
             We respect your privacy. Your information will only be used to respond to your inquiry.
           </p>

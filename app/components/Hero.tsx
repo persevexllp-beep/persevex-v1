@@ -1,6 +1,8 @@
 
 "use client";
 
+import Link from "next/link";
+
 export default function Hero() {
   return (
     // The parent div in LandingPage now controls animation and positioning.
@@ -14,12 +16,13 @@ export default function Hero() {
         Experience hands-on learning with AI guidance, expert-curated
         projects, and career-ready outcomes
       </p>
-      <button
+      <Link
         // IMPORTANT: Allow clicks on the button
+        href='/explore-courses'
         className="pointer-events-auto relative px-8 py-3 mt-6 md:mt-8 text-lg font-semibold text-white rounded-xl border-none cursor-pointer bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 bg-[length:300%_300%] animate-gradient-shift transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg hover:shadow-orange-500/40 "
       >
         Explore Courses
-      </button>
+      </Link>
     </div>
   );
 }

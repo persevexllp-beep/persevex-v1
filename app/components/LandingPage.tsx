@@ -211,6 +211,41 @@ const LandingPage: FC = () => {
   const totalUnits = managementUnits + DWELL_TIME_UNITS + technicalUnits;
   const coursesSectionHeight = 120 + totalUnits * 70;
 
+
+   const handleCourseSwitch = (view: 'management' | 'technical') => {
+    if (!coursesSectionWrapperRef.current || !layout) return;
+
+    const { coursesTop } = layout;
+    const sectionHeight = coursesSectionWrapperRef.current.offsetHeight;
+    const viewportHeight = window.innerHeight;
+
+    // These calculations must match the ones in the main handleScroll function
+    const coursesStartZone = coursesTop - viewportHeight * 0.8;
+    const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
+    const totalZoneHeight = coursesEndZone - coursesStartZone;
+    
+    // Define the progress points for each section
+    const managementAnimationEndProgress = managementUnits / totalUnits;
+    const technicalAnimationStartProgress = (managementUnits + DWELL_TIME_UNITS) / totalUnits;
+
+    let targetProgress = 0;
+
+    if (view === 'management') {
+      // Scroll to a point where the first card is clearly visible and animating
+      targetProgress = 0.1;
+    } else {
+      // Scroll to a point in the middle of the technical courses animation
+      const technicalAnimationDuration = 1.0 - technicalAnimationStartProgress;
+      targetProgress = technicalAnimationStartProgress + (technicalAnimationDuration / 2);
+    }
+
+    // Convert the target progress (0-1) back to an absolute pixel scroll position
+    const targetScrollPosition = coursesStartZone + (totalZoneHeight * targetProgress);
+
+    window.scrollTo({ top: targetScrollPosition, behavior: 'smooth' });
+  };
+
+
   useEffect(() => {
     const calculateLayout = () => {
       if (
@@ -1041,7 +1076,7 @@ const LandingPage: FC = () => {
             style={{ height: `${coursesSectionHeight}vh` }}
           >
             <div className="sticky top-0 h-screen w-full">
-              <CoursesSection progress={coursesProgress} />
+              <CoursesSection progress={coursesProgress}  onSwitchView={handleCourseSwitch}  />
             </div>
           </div>
           <div style={{ height: "50vh" }} />

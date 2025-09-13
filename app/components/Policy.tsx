@@ -18,7 +18,7 @@ const PolicySection: FC = () => {
           </div>
 
           <div className="flex flex-col mb- gap-4 lg:gap-12">
-            <div className="flex border rounded-4xl items-center justify-center px-8 py-12 flex-col gap-2">
+            <div className="flex border rounded-4xl items-center justify-center px-4 py-8 flex-col gap-2">
               <Link href="/privacy-policy">
                 <AnimatedTitle 
                   as="h1" 
@@ -31,7 +31,7 @@ const PolicySection: FC = () => {
              
             </div>
 
-            <div className="flex items-center justify-center px-8 py-12 border rounded-4xl flex-col gap-2">
+            <div className="flex items-center justify-center px-4 py-8 border rounded-4xl flex-col gap-2">
               <Link href="/terms-&-conditions">
                 <AnimatedTitle 
                   as="h1" 
@@ -44,7 +44,7 @@ const PolicySection: FC = () => {
              
             </div>
 
-            <div className="flex items-center justify-center px-8 py-12 border rounded-4xl  flex-col gap-2">
+            <div className="flex items-center  justify-center px-8 py-8 border rounded-4xl  flex-col gap-2">
               <Link href="/return-policy">
                 <AnimatedTitle 
                   as="h1" 

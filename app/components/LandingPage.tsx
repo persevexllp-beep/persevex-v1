@@ -1050,7 +1050,7 @@ const LandingPage: FC = () => {
             className="absolute bottom-6 left-1/2 z-[-3] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--recognized-by-opacity)",
-              WebkitTextStroke: "1px white",
+              WebkitTextStroke: "2px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}
@@ -1061,7 +1061,7 @@ const LandingPage: FC = () => {
             className="absolute bottom-6 left-1/2 z-[-5] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--about-us-opacity)",
-              WebkitTextStroke: "1px white",
+              WebkitTextStroke: "2px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}
@@ -1072,7 +1072,7 @@ const LandingPage: FC = () => {
             className="absolute bottom-6 left-1/2 z-[-6] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--questions-opacity)",
-              WebkitTextStroke: "1px white",
+              WebkitTextStroke: "2px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}
@@ -1083,7 +1083,7 @@ const LandingPage: FC = () => {
             className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--contact-us-opacity)",
-              WebkitTextStroke: "1px white",
+              WebkitTextStroke: "2px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}
@@ -1094,7 +1094,7 @@ const LandingPage: FC = () => {
             className="absolute bottom-6 left-1/2 z-[-8] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--policy-opacity)",
-              WebkitTextStroke: "1px white",
+              WebkitTextStroke: "2px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}

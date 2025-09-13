@@ -1080,10 +1080,10 @@ const LandingPage: FC = () => {
             Questions
           </h2>
           <h2
-            className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            className="absolute bottom-6 left-1/2 z-[-7] text-[20vw] md:text-[16vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--contact-us-opacity)",
-              WebkitTextStroke: "2px white",
+              WebkitTextStroke: "1px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}
@@ -1091,10 +1091,10 @@ const LandingPage: FC = () => {
             Contact Us
           </h2>
           <h2
-            className="absolute bottom-6 left-1/2 z-[-8] text-[20vw] md:text-[16vw] lg:text-[240px] font-black uppercase text-transparent select-none leading-none"
+            className="absolute bottom-6 left-1/2 z-[-8] text-[20vw] md:text-[16vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
             style={{
               opacity: "var(--policy-opacity)",
-              WebkitTextStroke: "2px white",
+              WebkitTextStroke: "1px white",
               transform: "translateX(-50%) translateY(4rem)",
               whiteSpace: "nowrap",
             }}

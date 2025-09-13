@@ -73,15 +73,15 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
-      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[420px] p-'}`}
+      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl ${isMobile ? 'h-[380px] p-6' : 'h-[420px] p-8'}`}
     >
-      <div className="w-full h-full ">
-        <Image src={course.cardBg_image} alt="image" height={1000} width={1000} />
+      <div className="absolute inset-0 w-full h-full ">
+        <Image src={course.cardBg_image} alt={course.title} layout="fill" objectFit="cover" />
       </div>
 
       <button
         onClick={() => router.push(course.route)}
-        className="absolute z-10 w-44 py-2.5 mt-   px-5 cursor-pointer  lg:mb-4 font-medium text-white border  rounded-lg transition-colors focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="absolute z-10 w-44 py-2.5 px-5 cursor-pointer  lg:mb-4 font-medium text-white border bg-black/30 backdrop-blur-sm border-white/50  rounded-lg transition-colors hover:bg-white/10 focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>
@@ -94,9 +94,20 @@ const Card = ({ course, animatedProgress, i, isMobile }: { course: CourseType, a
   );
 };
 
+const domains = [
+  { name: 'Management', view: 'management', enabled: true },
+  { name: 'Computer Science', view: 'technical', enabled: true },
+  { name: 'Electronics', view: null, enabled: false },
+  { name: 'Mechanical', view: null, enabled: false },
+  { name: 'Civil', view: null, enabled: false },
+];
+
+
 const CoursesSection: React.FC<CoursesSectionProps> = ({ progress, onSwitchView }) => {
   const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
   const isMobile = useIsMobile();
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
 
   const smoothedProgress = useSpring(progress, {
     stiffness: 400,
@@ -114,6 +125,19 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({ progress, onSwitchView 
    useMotionValueEvent(progress, "change", (latest) => {
     setActiveView(latest >= switchPoint ? 'technical' : 'management');
   });
+
+  useEffect(() => {
+    const activeDomainIndex = domains.findIndex(d => d.view === activeView);
+    if (activeDomainIndex !== -1) {
+        const activeButton = buttonRefs.current[activeDomainIndex];
+        if (activeButton) {
+            setSliderStyle({
+                left: activeButton.offsetLeft,
+                width: activeButton.offsetWidth,
+            });
+        }
+    }
+  }, [activeView]);
 
   const textTransitionProgress = useTransform(
     smoothedProgress,
@@ -143,32 +167,31 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({ progress, onSwitchView 
   
   const managementPointerEvents = useTransform(managementStackOpacity, (o) => (o > 0.1 ? "auto" : "none"));
   const technicalPointerEvents = useTransform(technicalStackOpacity, (o) => (o > 0.1 ? "auto" : "none"));
-
+  
   return (
     <div
       className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0"
     >
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10">
-        <div className="relative flex w-fit items-center rounded-full bg-transparent px-1 lg:p-1 backdrop-blur-sm">
+        <div className="relative flex w-fit items-center rounded-full bg-black/30 p-1 backdrop-blur-sm border border-white/20">
             <motion.div
-              className="absolute left-1 top-1 h-[calc(100%-0.5rem)] w-[110px] rounded-full bg-white"
-              animate={{ x: activeView === 'management' ? '0%' : '100%' }}
+              className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white"
+              animate={sliderStyle}
               transition={{ type: 'spring', stiffness: 350, damping: 30 }}
             />
-            <button
-               onClick={() => onSwitchView('management')}
-              className={`relative z-10 w-[110px] cursor-pointer rounded-full lg:py-2 text-sm font-semibold transition-colors duration-300 ${activeView === 'management' ? 'text-gray-900' : 'text-white'
-                }`}
-            >
-              Management
-            </button>
-            <button
-              onClick={() => onSwitchView('technical')} 
-              className={`relative z-10 w-[110px] cursor-pointer rounded-full py-2 text-sm font-semibold transition-colors duration-300 ${activeView === 'technical' ? 'text-gray-900' : 'text-white'
-                }`}
-            >
-              Technical
-            </button>
+            {domains.map((domain, index) => (
+                <button
+                    key={domain.name}
+                    ref={el => { buttonRefs.current[index] = el; }} // <-- THE FIX IS HERE
+                    onClick={() => domain.enabled && onSwitchView(domain.view as 'management' | 'technical')}
+                    disabled={!domain.enabled}
+                    className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-5 text-xs md:text-sm font-semibold transition-colors duration-300
+                    ${!domain.enabled ? 'cursor-not-allowed text-white/50' : (activeView === domain.view ? 'text-gray-900' : 'text-white')}
+                    `}
+                >
+                    {domain.name}
+                </button>
+            ))}
           </div>
       </div>
         

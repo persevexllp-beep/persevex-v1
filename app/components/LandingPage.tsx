@@ -24,14 +24,12 @@ import RecognizedBySection from "./RecognizedBySection";
 import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
 import { useScroll } from "../contexts/scrollContext";
+import { allDomains, DomainView } from "../constants/courseConstant";
 import ContactUsSection from "./ContactUs";
 import PolicySection from "./Policy";
 import FooterSection from "./FooterSection";
-import {
-  managementCourses,
-  technicalCourses,
-} from "../constants/courseConstant";
 import FaqSection from "./FaqSection";
+
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
@@ -130,117 +128,134 @@ const DustPlaneController: FC<{
   return <DustPlane ref={dustPlaneRef} renderOrder={-2} />;
 };
 
+
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
   const isMobile = useIsMobile();
   const coursesProgress = useMotionValue(0);
-  const [headerProgress, setHeaderProgress] = useState<number>(0);
-  const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
-  const watermarkProgressRef = useRef<number>(0);
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const heroWrapperRef = useRef<HTMLDivElement>(null);
-  const saturnWrapperRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const starfieldOverlayRef = useRef<HTMLDivElement>(null);
-  const whiteOverlayRef = useRef<HTMLDivElement>(null);
-  const textMaskContainerRef = useRef<HTMLDivElement>(null);
-  const contentWrapperRef = useRef<HTMLDivElement>(null);
-  const fadeOverlayRef = useRef<HTMLDivElement>(null);
+    const [headerProgress, setHeaderProgress] = useState<number>(0);
+    const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
+    const watermarkProgressRef = useRef<number>(0);
+    const textContainerRef = useRef<HTMLDivElement>(null);
+    const heroWrapperRef = useRef<HTMLDivElement>(null);
+    const saturnWrapperRef = useRef<HTMLDivElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const starfieldOverlayRef = useRef<HTMLDivElement>(null);
+    const whiteOverlayRef = useRef<HTMLDivElement>(null);
+    const textMaskContainerRef = useRef<HTMLDivElement>(null);
+    const contentWrapperRef = useRef<HTMLDivElement>(null);
+    const fadeOverlayRef = useRef<HTMLDivElement>(null);
 
-  const coursesSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const partnersSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
-  const aboutUsToFaqTransitionRef = useRef<HTMLDivElement>(null);
-  const faqSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const faqToContactTransitionRef = useRef<HTMLDivElement>(null);
-  const contactUsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const policySectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const footerSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
+    const coursesSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const partnersSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
+    const aboutUsToFaqTransitionRef = useRef<HTMLDivElement>(null);
+    const faqSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const faqToContactTransitionRef = useRef<HTMLDivElement>(null);
+    const contactUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const policySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+    const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
 
-  const [edgeProgress, setEdgeProgress] = useState<number>(0);
-  const [partnersProgress, setPartnersProgress] = useState<number>(0);
-  const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
-  const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
-  const [stackingProgress, setStackingProgress] = useState<number>(0);
-  const [cascadingProgress, setCascadingProgress] = useState<number>(0);
-  const [faqProgress, setFaqProgress] = useState<number>(0);
-  const [contactUsProgress, setContactUsProgress] = useState<number>(0);
+    const [edgeProgress, setEdgeProgress] = useState<number>(0);
+    const [partnersProgress, setPartnersProgress] = useState<number>(0);
+    const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
+    const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
+    const [stackingProgress, setStackingProgress] = useState<number>(0);
+    const [cascadingProgress, setCascadingProgress] = useState<number>(0);
+    const [faqProgress, setFaqProgress] = useState<number>(0);
+    const [contactUsProgress, setContactUsProgress] = useState<number>(0);
 
-  const aboutUsWord = "ABOUT US";
-  const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
-  const targetPartnersProgressRef = useRef(0);
-  const smoothedPartnersProgressRef = useRef(0);
+    const aboutUsWord = "ABOUT US";
+    const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
+    const targetPartnersProgressRef = useRef(0);
+    const smoothedPartnersProgressRef = useRef(0);
 
-  const formattedTestimonials: Testimonial[] = useMemo(
-    () =>
-      testimonialsData.map((t) => ({
-        quote: t.quote,
-        name: t.name,
-        designation: t.title,
-        src: t.image,
-        bgImage: t.bgImage,
-        bgPosition: t.bgPosition,
-        planetImage: t.planetImage,
-      })),
-    []
-  );
+    const formattedTestimonials: Testimonial[] = useMemo(
+        () =>
+        testimonialsData.map((t) => ({
+            quote: t.quote,
+            name: t.name,
+            designation: t.title,
+            src: t.image,
+            bgImage: t.bgImage,
+            bgPosition: t.bgPosition,
+            planetImage: t.planetImage,
+        })),
+        []
+    );
 
-  const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
-  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
-  const managementUnits = managementCourses.length;
-  const technicalUnits = technicalCourses.length;
-  const DWELL_TIME_UNITS = 1;
-  const totalUnits = managementUnits + DWELL_TIME_UNITS + technicalUnits;
+    const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
+    const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+
+  const { totalUnits, domainProgressRanges } = useMemo(() => {
+    const DWELL_TIME_UNITS = 1;
+    let accumulatedUnits = 0;
+    const enabledDomains = allDomains.filter(d => d.enabled);
+    const totalUnits = enabledDomains.reduce((sum, domain) => sum + domain.courses.length, 0) + (enabledDomains.length - 1) * DWELL_TIME_UNITS;
+
+    const domainProgressRanges = enabledDomains.map(domain => {
+      const startUnit = accumulatedUnits;
+      accumulatedUnits += domain.courses.length;
+      const endUnit = accumulatedUnits;
+      accumulatedUnits += DWELL_TIME_UNITS;
+
+      return {
+        view: domain.view,
+        startProgress: startUnit / totalUnits,
+        endProgress: endUnit / totalUnits,
+        middleProgress: (startUnit / totalUnits + endUnit / totalUnits) / 2
+      };
+    });
+
+    return { totalUnits, domainProgressRanges };
+  }, []);
+
   const coursesSectionHeight = 120 + totalUnits * 70;
 
-  const handleCourseSwitch = (view: "management" | "technical") => {
+  const handleCourseSwitch = (view: DomainView) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
+    
+    const targetDomain = domainProgressRanges.find(d => d.view === view);
+    if (!targetDomain) return;
+
     const { coursesTop } = layout;
     const sectionHeight = coursesSectionWrapperRef.current.offsetHeight;
     const viewportHeight = window.innerHeight;
     const coursesStartZone = coursesTop - viewportHeight * 0.8;
     const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
     const totalZoneHeight = coursesEndZone - coursesStartZone;
-    const technicalAnimationStartProgress =
-      (managementUnits + DWELL_TIME_UNITS) / totalUnits;
-    let targetProgress = 0;
-    if (view === "management") {
-      targetProgress = 0.1;
-    } else {
-      const technicalAnimationDuration = 1.0 - technicalAnimationStartProgress;
-      targetProgress =
-        technicalAnimationStartProgress + technicalAnimationDuration / 2;
-    }
-    const targetScrollPosition =
-      coursesStartZone + totalZoneHeight * targetProgress;
+
+    const targetProgress = targetDomain.middleProgress;
+    
+    const targetScrollPosition = coursesStartZone + totalZoneHeight * targetProgress;
     window.scrollTo({ top: targetScrollPosition, behavior: "smooth" });
   };
 
-  useEffect(() => {
+  const handleSetCourseProgress = (targetProgress: number) => {
+    if (!coursesSectionWrapperRef.current || !layout) return;
+
+    const { coursesTop } = layout;
+    const sectionEl = coursesSectionWrapperRef.current;
+    const sectionHeight = sectionEl.offsetHeight;
+    const viewportHeight = window.innerHeight;
+
+    const coursesStartZone = coursesTop - viewportHeight * 0.8;
+    const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
+    const totalZoneHeight = coursesEndZone - coursesStartZone;
+
+    const targetScrollPosition = coursesStartZone + (targetProgress * totalZoneHeight);
+    
+    window.scrollTo({
+      top: targetScrollPosition,
+      behavior: 'smooth',
+    });
+  };
+
+   useEffect(() => {
     const calculateLayout = () => {
       if (
         coursesSectionWrapperRef.current &&
@@ -305,6 +320,8 @@ const LandingPage: FC = () => {
 
   const targetProgressRef = useRef(0);
   const smoothedProgressRef = useRef(0);
+
+  
 
   useEffect(() => {
     let animationFrameId: number;
@@ -955,6 +972,7 @@ const LandingPage: FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [layout, testimonialsAnimationDurationVh, coursesProgress, isMobile]);
 
+
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
   const partnersSectionMarginTop = isMobile ? "-250vh" : "-50vh";
@@ -1189,10 +1207,13 @@ const LandingPage: FC = () => {
             style={{ height: `${coursesSectionHeight}vh` }}
           >
             <div className="sticky top-0 h-screen w-full">
+              {/* // NEW CODE START */}
               <CoursesSection
                 progress={coursesProgress}
                 onSwitchView={handleCourseSwitch}
+                onSetProgress={handleSetCourseProgress}
               />
+              {/* // NEW CODE END */}
             </div>
           </div>
           <div style={{ height: "50vh" }} />

@@ -1,3 +1,4 @@
+import { ChartCandlestick, Network, Search } from "lucide-react";
 import {
   AIIcon,
   CloudIcon,
@@ -44,6 +45,8 @@ export interface ContentType {
   subheading: string;
   paragraph: string;
 }
+
+
 
 export const technicalContent: ContentType = {
   heading: "Build the Future.",
@@ -425,6 +428,143 @@ export const managementCourses: CourseType[] = [
     large_description:
       "This course explores contemporary human resource management practices essential for building and maintaining a productive workforce. Topics include talent acquisition, employee engagement, performance management, and legal considerations in HR. You'll gain practical skills to create a positive work environment that attracts and retains top talent.",
   },
+  {
+  "id": "m4",
+  "title": "Stock Market & Crypto Investing",
+  "description":
+    "Master the art of investing in both traditional stock markets and the emerging world of cryptocurrencies.",
+  "icon": ChartCandlestick,
+  "route": "/courses/stock-market-crypto",
+  "slug": "stock-market-crypto",
+  "image": "/digitalmar.png",
+  "cardBg_image": "/digital.png",
+  "projects": [
+    {
+      "name": "Equity Research Report",
+      "description":
+        "Conduct in-depth analysis of a publicly traded company and produce a professional research report.",
+      "image":
+        "https://images.unsplash.com/photo-1559526324-c1f275fbfa32?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "name": "Crypto Portfolio Strategy",
+      "description":
+        "Develop a diversified cryptocurrency portfolio based on fundamental analysis and risk tolerance.",
+      "image":
+        "https://images.unsplash.com/photo-1621504450183-225ce7e8e129?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "name": "Technical Analysis Trading Plan",
+      "description":
+        "Create a rule-based trading plan using technical indicators like MACD, RSI, and Moving Averages.",
+      "image":
+        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "name": "Options Trading Strategy",
+      "description":
+        "Design and backtest an options trading strategy, such as a covered call or a credit spread.",
+      "image":
+        "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "name": "DeFi Yield Farming Simulation",
+      "description":
+        "Analyze and simulate a yield farming strategy on a decentralized finance (DeFi) protocol.",
+      "image":
+        "https://images.unsplash.com/photo-1639755498822-e42751f7d730?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      "name": "Market Sentiment Analysis",
+      "description":
+        "Use tools to analyze market sentiment from social media and news to predict price movements.",
+      "image":
+        "https://images.unsplash.com/photo-1633113087844-368727a3a32f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+    }
+  ],
+  "modules": [
+    {
+      "title": "Foundations of Stock Market Investing",
+      "duration": "2 weeks",
+      "lessons": 5,
+      "description":
+        "Understand the fundamentals of the stock market, from types of stocks to market indices.",
+      "topics": [
+        "Introduction to Equity Markets",
+        "Understanding Stock Exchanges (NYSE, NASDAQ)",
+        "Fundamental Analysis vs. Technical Analysis",
+        "Reading Stock Quotes and Charts",
+        "Types of Orders (Market, Limit, Stop)"
+      ]
+    },
+    {
+      "title": "Advanced Technical Analysis",
+      "duration": "2 weeks",
+      "lessons": 6,
+      "description":
+        "Dive deep into chart patterns and indicators to predict market movements and time your trades.",
+      "topics": [
+        "Candlestick Patterns",
+        "Support and Resistance Levels",
+        "Moving Averages and MACD",
+        "Relative Strength Index (RSI) and Bollinger Bands",
+        "Fibonacci Retracement",
+        "Volume Analysis"
+      ]
+    },
+    {
+      "title": "Introduction to Cryptocurrencies & Blockchain",
+      "duration": "1 week",
+      "lessons": 4,
+      "description":
+        "Grasp the core concepts of blockchain technology and the cryptocurrency ecosystem.",
+      "topics": [
+        "What is Blockchain Technology?",
+        "Understanding Bitcoin and Ethereum",
+        "Altcoins and Stablecoins",
+        "Crypto Wallets and Security",
+        "Navigating Crypto Exchanges"
+      ]
+    },
+    {
+      "title": "Crypto Trading & DeFi",
+      "duration": "2 weeks",
+      "lessons": 5,
+      "description":
+        "Explore advanced crypto trading strategies and the world of Decentralized Finance (DeFi).",
+      "topics": [
+        "On-Chain Analysis",
+        "Tokenomics and Whitepaper Analysis",
+        "Introduction to DeFi: Lending, Borrowing, Staking",
+        "Yield Farming and Liquidity Pools",
+        "NFTs and the Metaverse Economy"
+      ]
+    },
+    {
+      "title": "Portfolio Management & Risk",
+      "duration": "1 week",
+      "lessons": 4,
+      "description":
+        "Learn to build and manage a diversified portfolio across stocks and crypto while managing risk.",
+      "topics": [
+        "Asset Allocation and Diversification",
+        "Risk-Reward Ratio",
+        "Hedging with Options and Futures",
+        "Psychology of Trading and Investing",
+        "Tax Implications of Investing"
+      ]
+    }
+  ],
+  "large_description":
+    "This comprehensive course demystifies the world of stock and cryptocurrency investing. You'll learn the fundamentals of market analysis, from traditional stock valuation to the intricacies of blockchain technology. The curriculum covers technical analysis, portfolio construction, risk management, and an introduction to advanced topics like options trading and DeFi. Whether you're a beginner or looking to enhance your skills, this course will equip you with the knowledge to navigate modern financial markets confidently.",
+  "programCardsHeading": [
+    "Foundations of Stock Market Investing",
+    "Advanced Technical Analysis",
+    "Introduction to Cryptocurrencies & Blockchain",
+    "Crypto Trading & DeFi",
+    "Portfolio Management & Risk"
+  ]
+}
 ];
 
 export const technicalCourses: CourseType[] = [
@@ -1172,9 +1312,488 @@ export const technicalCourses: CourseType[] = [
   },
 ];
 
+
+export const ElectronicsCourses: CourseType[] = [
+  {
+    id: "e1",
+    title: "Internet of Things (IoT)",
+    description:
+      "Learn to build and program connected smart devices for the real world.",
+    icon: Network,
+    route: "/courses/iot",
+    slug: "iot",
+    image: "/iot.png",
+    cardBg_image: "/iotbg.png",
+    projects: [
+      {
+        name: "Smart Home Automation",
+        description:
+          "Build a system to control lights, fans, and other appliances remotely via a web dashboard.",
+        image:
+          "https://images.unsplash.com/photo-1596248924036-d24778028a4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Weather Monitoring Station",
+        description:
+          "Create a device that collects temperature, humidity, and pressure data and sends it to the cloud.",
+        image:
+          "https://images.unsplash.com/photo-1561553594-87db31828f8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Wearable Health Tracker",
+        description:
+          "Design a prototype for a wearable device to monitor vital signs like heart rate and steps.",
+        image:
+          "https://images.unsplash.com/photo-1517838277531-412e46251d2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Smart Agriculture System",
+        description:
+          "Develop an automated system to monitor soil moisture and control an irrigation pump.",
+        image:
+          "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Asset Tracking System",
+        description:
+          "Build a GPS-based tracker to monitor the real-time location of a vehicle or package.",
+        image:
+          "https://images.unsplash.com/photo-1567684014761-b65e2e59b2eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Home Security System",
+        description:
+          "Create a motion-activated security camera that sends alerts and images to a user's phone.",
+        image:
+          "https://images.unsplash.com/photo-1589935447037-38b439c0b115?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+    ],
+    modules: [
+      {
+        title: "Intro to IoT & Microcontrollers",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Grasp the fundamentals of IoT and learn to program microcontrollers like ESP32.",
+        topics: [
+          "What is the Internet of Things (IoT)?",
+          "Introduction to Microcontrollers (Arduino, ESP32)",
+          "Basic Electronics: Sensors, Actuators, and Circuits",
+          "Setting Up the Development Environment (Arduino IDE)",
+          "Writing Your First Embedded Program (Blink)",
+        ],
+      },
+      {
+        title: "Sensors, Actuators, and Communication",
+        duration: "2 weeks",
+        lessons: 6,
+        description:
+          "Interface a variety of sensors and actuators with your microcontroller to interact with the physical world.",
+        topics: [
+          "Reading Digital and Analog Sensors",
+          "Controlling Motors, Relays, and LEDs",
+          "Serial Communication Protocols (UART, I2C, SPI)",
+          "Connecting to Wi-Fi and Bluetooth",
+          "Power Management for IoT Devices",
+        ],
+      },
+      {
+        title: "IoT Cloud Platforms & Protocols",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Connect your devices to the internet and send data to cloud platforms using standard IoT protocols.",
+        topics: [
+          "Understanding Client-Server Architecture",
+          "Introduction to MQTT Protocol",
+          "Setting up an MQTT Broker",
+          "Connecting to Cloud Platforms (AWS IoT Core, Adafruit IO)",
+          "Publishing and Subscribing to Data Feeds",
+        ],
+      },
+      {
+        title: "Data Visualization & Device Control",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Build web-based dashboards to visualize sensor data and control your IoT devices from anywhere.",
+        topics: [
+          "Creating Real-time Dashboards",
+          "Visualizing Data with Gauges, Charts, and Graphs",
+          "Sending Commands from the Cloud to Your Device",
+          "Setting Up Alerts and Notifications",
+          "API Integration for IoT",
+        ],
+      },
+      {
+        title: "IoT Security and Project Deployment",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Learn best practices for securing your IoT ecosystem and deploying a final, robust project.",
+        topics: [
+          "Common IoT Security Vulnerabilities",
+          "Securing Device Communication with TLS/SSL",
+          "Over-the-Air (OTA) Updates",
+          "Designing a Scalable IoT Architecture",
+          "Final Project: Build and Deploy a Complete IoT System",
+        ],
+      },
+    ],
+    large_description:
+      "Dive into the world of the Internet of Things (IoT) and learn how to build smart, connected devices. This hands-on course takes you from basic electronics and microcontroller programming to connecting your creations to the cloud. You will work with popular platforms like the ESP32, master communication protocols like MQTT, and build interactive dashboards to visualize data and control hardware remotely. By the end, you will have the skills to design, build, and deploy your own secure and scalable IoT solutions from scratch.",
+    programCardsHeading: [
+      "Intro to IoT & Microcontrollers",
+      "Sensors, Actuators, and Communication",
+      "IoT Cloud Platforms & Protocols",
+      "Data Visualization & Device Control",
+      "IoT Security and Project Deployment",
+    ],
+  },
+];
+
+
+export const MechanicalCourses: CourseType[] = [
+  {
+    id: "mechanical1",
+    title: "AutoCAD: 2D & 3D Design",
+    description:
+      "Master 2D drafting and 3D modeling with the industry-standard design software.",
+    icon: Search,
+    route: "/courses/autocad",
+    slug: "autocad",
+    image: "/autocad.png",
+    cardBg_image: "/autocadbg.png",
+    projects: [
+      {
+        name: "Architectural Floor Plan",
+        description:
+          "Design a detailed 2D floor plan for a house, including walls, doors, windows, and dimensions.",
+        image:
+          "https://images.unsplash.com/photo-1581362678913-9154f982390b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Mechanical Part Modeling",
+        description:
+          "Create a precise 3D model of a mechanical component, like a gear or bracket, ready for manufacturing.",
+        image:
+          "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "3D Interior Design Scene",
+        description:
+          "Model and render a realistic 3D interior scene, complete with furniture, lighting, and textures.",
+        image:
+          "https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Assembly Drawing with BOM",
+        description:
+          "Create an exploded view of a multi-part assembly and automatically generate a bill of materials.",
+        image:
+          "https://images.unsplash.com/photo-1628198495111-a83151368531?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Site Plan Layout",
+        description:
+          "Develop a 2D site plan for a construction project, showing property lines, building footprints, and landscaping.",
+        image:
+          "https://images.unsplash.com/photo-1599493356244-a7b68a18357a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Piping and Instrumentation Diagram",
+        description:
+          "Draft a professional P&ID schematic for an industrial process using standard symbols and annotations.",
+        image:
+          "https://images.unsplash.com/photo-1614361324261-1b78b05615f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+    ],
+    modules: [
+      {
+        title: "AutoCAD Fundamentals & 2D Drafting",
+        duration: "2 weeks",
+        lessons: 6,
+        description:
+          "Get started with the AutoCAD interface and master the essential tools for creating precise 2D drawings.",
+        topics: [
+          "Navigating the AutoCAD Interface & Ribbon",
+          "Drawing & Modifying Objects (Line, Circle, Arc, Trim)",
+          "Using Layers, Colors, and Linetypes for Organization",
+          "Precision Drawing with Snaps and Grids",
+          "Adding Text and Dimensions to Drawings",
+          "Working with Blocks and Attributes for Reusability",
+        ],
+      },
+      {
+        title: "Advanced 2D Techniques & Plotting",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Enhance your 2D drafting efficiency with advanced commands and learn to print your designs to scale.",
+        topics: [
+          "Using Polylines and Splines for Complex Shapes",
+          "Creating and Editing Hatch Patterns",
+          "Working with External References (Xrefs)",
+          "Layouts, Viewports, and Plotting to Scale",
+        ],
+      },
+      {
+        title: "Introduction to 3D Modeling",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Transition from 2D to 3D by learning the fundamental concepts and tools for creating 3D solid models.",
+        topics: [
+          "Understanding the 3D Workspace and UCS",
+          "Creating Primitive Solids (Box, Cylinder, Sphere)",
+          "Extrude, Revolve, Sweep, and Loft Commands",
+          "Boolean Operations: Union, Subtract, Intersect",
+          "Navigating 3D Models with Orbit and ViewCube",
+        ],
+      },
+      {
+        title: "Advanced 3D Modeling & Editing",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Refine your 3D models with advanced editing tools and learn to generate 2D views from them.",
+        topics: [
+          "Filleting and Chamfering 3D Edges",
+          "Working with 3D Gizmos for Move, Rotate, Scale",
+          "Solid Editing Commands: Shell, Taper, Slice",
+          "Creating Complex Shapes from 2D Profiles",
+          "Generating 2D Orthographic and Section Views from 3D Models",
+        ],
+      },
+      {
+        title: "Rendering and Visualization",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Bring your 3D models to life by applying materials, setting up lighting, and creating photorealistic renderings.",
+        topics: [
+          "Applying Materials and Textures from the Library",
+          "Setting up Lights (Point, Spot, Sunlight)",
+          "Configuring Cameras and Perspectives for Views",
+          "Rendering a Final Image with Realistic Shadows",
+        ],
+      },
+    ],
+    large_description:
+      "This course provides a complete journey into AutoCAD, the world's leading software for computer-aided design (CAD). Starting with the basics of 2D drafting, you'll learn to create precise and detailed technical drawings used in architecture, engineering, and construction. Then, you'll transition into the third dimension, mastering the tools to build complex 3D models. The curriculum covers everything from basic shapes to advanced solid editing and culminates in creating photorealistic renderings of your designs. By the end, you'll be proficient in producing professional-grade drawings and models for any technical field.",
+    programCardsHeading: [
+      "AutoCAD Fundamentals & 2D Drafting",
+      "Advanced 2D Techniques & Plotting",
+      "Introduction to 3D Modeling",
+      "Advanced 3D Modeling & Editing",
+      "Rendering and Visualization",
+    ],
+  },
+];
+
+export const CivilCourses: CourseType[] = [
+{
+    id: "a1",
+    title: "AutoCAD: 2D & 3D Design",
+    description:
+      "Master 2D drafting and 3D modeling with the industry-standard design software.",
+    icon: Search,
+    route: "/courses/autocad",
+    slug: "autocad",
+    image: "/autocad.png",
+    cardBg_image: "/autocadbg.png",
+    projects: [
+      {
+        name: "Architectural Floor Plan",
+        description:
+          "Design a detailed 2D floor plan for a house, including walls, doors, windows, and dimensions.",
+        image:
+          "https://images.unsplash.com/photo-1581362678913-9154f982390b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Mechanical Part Modeling",
+        description:
+          "Create a precise 3D model of a mechanical component, like a gear or bracket, ready for manufacturing.",
+        image:
+          "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "3D Interior Design Scene",
+        description:
+          "Model and render a realistic 3D interior scene, complete with furniture, lighting, and textures.",
+        image:
+          "https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Assembly Drawing with BOM",
+        description:
+          "Create an exploded view of a multi-part assembly and automatically generate a bill of materials.",
+        image:
+          "https://images.unsplash.com/photo-1628198495111-a83151368531?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Site Plan Layout",
+        description:
+          "Develop a 2D site plan for a construction project, showing property lines, building footprints, and landscaping.",
+        image:
+          "https://images.unsplash.com/photo-1599493356244-a7b68a18357a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+      {
+        name: "Piping and Instrumentation Diagram",
+        description:
+          "Draft a professional P&ID schematic for an industrial process using standard symbols and annotations.",
+        image:
+          "https://images.unsplash.com/photo-1614361324261-1b78b05615f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      },
+    ],
+    modules: [
+      {
+        title: "AutoCAD Fundamentals & 2D Drafting",
+        duration: "2 weeks",
+        lessons: 6,
+        description:
+          "Get started with the AutoCAD interface and master the essential tools for creating precise 2D drawings.",
+        topics: [
+          "Navigating the AutoCAD Interface & Ribbon",
+          "Drawing & Modifying Objects (Line, Circle, Arc, Trim)",
+          "Using Layers, Colors, and Linetypes for Organization",
+          "Precision Drawing with Snaps and Grids",
+          "Adding Text and Dimensions to Drawings",
+          "Working with Blocks and Attributes for Reusability",
+        ],
+      },
+      {
+        title: "Advanced 2D Techniques & Plotting",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Enhance your 2D drafting efficiency with advanced commands and learn to print your designs to scale.",
+        topics: [
+          "Using Polylines and Splines for Complex Shapes",
+          "Creating and Editing Hatch Patterns",
+          "Working with External References (Xrefs)",
+          "Layouts, Viewports, and Plotting to Scale",
+        ],
+      },
+      {
+        title: "Introduction to 3D Modeling",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Transition from 2D to 3D by learning the fundamental concepts and tools for creating 3D solid models.",
+        topics: [
+          "Understanding the 3D Workspace and UCS",
+          "Creating Primitive Solids (Box, Cylinder, Sphere)",
+          "Extrude, Revolve, Sweep, and Loft Commands",
+          "Boolean Operations: Union, Subtract, Intersect",
+          "Navigating 3D Models with Orbit and ViewCube",
+        ],
+      },
+      {
+        title: "Advanced 3D Modeling & Editing",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Refine your 3D models with advanced editing tools and learn to generate 2D views from them.",
+        topics: [
+          "Filleting and Chamfering 3D Edges",
+          "Working with 3D Gizmos for Move, Rotate, Scale",
+          "Solid Editing Commands: Shell, Taper, Slice",
+          "Creating Complex Shapes from 2D Profiles",
+          "Generating 2D Orthographic and Section Views from 3D Models",
+        ],
+      },
+      {
+        title: "Rendering and Visualization",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Bring your 3D models to life by applying materials, setting up lighting, and creating photorealistic renderings.",
+        topics: [
+          "Applying Materials and Textures from the Library",
+          "Setting up Lights (Point, Spot, Sunlight)",
+          "Configuring Cameras and Perspectives for Views",
+          "Rendering a Final Image with Realistic Shadows",
+        ],
+      },
+    ],
+    large_description:
+      "This course provides a complete journey into AutoCAD, the world's leading software for computer-aided design (CAD). Starting with the basics of 2D drafting, you'll learn to create precise and detailed technical drawings used in architecture, engineering, and construction. Then, you'll transition into the third dimension, mastering the tools to build complex 3D models. The curriculum covers everything from basic shapes to advanced solid editing and culminates in creating photorealistic renderings of your designs. By the end, you'll be proficient in producing professional-grade drawings and models for any technical field.",
+    programCardsHeading: [
+      "AutoCAD Fundamentals & 2D Drafting",
+      "Advanced 2D Techniques & Plotting",
+      "Introduction to 3D Modeling",
+      "Advanced 3D Modeling & Editing",
+      "Rendering and Visualization",
+    ],
+  },
+]
+
 export const managementContent: ContentType = {
   heading: "Lead with Confidence.",
   subheading: "Excel in Business & Management.",
   paragraph:
     "Our management curriculum is tailored for aspiring leaders and seasoned professionals alike. Gain the strategic skills needed to navigate the complexities of the modern business world.",
 };
+
+
+export const electronicsContent: ContentType = {
+  heading: "Engineer the Connections.",
+  subheading: "Explore the World of Electronics.",
+  paragraph: "From microcontrollers to the Internet of Things, our courses provide the foundational knowledge to build and innovate in the field of electronics.",
+};
+
+export const mechanicalContent: ContentType = {
+  heading: "Design the Movement.",
+  subheading: "Master Mechanical Engineering.",
+  paragraph: "Learn the principles of design, analysis, and manufacturing with industry-standard software and hands-on projects that bring ideas to life.",
+};
+
+export const civilContent: ContentType = {
+  heading: "Build the World.",
+  subheading: "Innovate in Civil Engineering.",
+  paragraph: "Shape the infrastructure of tomorrow. Our curriculum covers structural design, analysis, and modern construction techniques.",
+};
+
+
+// NEW: Create a single, unified data structure for all domains
+export const allDomains = [
+  {
+    view: 'management',
+    name: 'Management',
+    courses: managementCourses,
+    content: managementContent,
+    enabled: true,
+  },
+  {
+    view: 'technical',
+    name: 'Computer Science',
+    courses: technicalCourses,
+    content: technicalContent,
+    enabled: true,
+  },
+  {
+    view: 'electronics',
+    name: 'Electronics',
+    courses: ElectronicsCourses,
+    content: electronicsContent,
+    enabled: true,
+  },
+  {
+    view: 'mechanical',
+    name: 'Mechanical',
+    courses: MechanicalCourses,
+    content: mechanicalContent,
+    enabled: true,
+  },
+  {
+    view: 'civil',
+    name: 'Civil',
+    courses: CivilCourses,
+    content: civilContent,
+    enabled: true,
+  },
+];
+
+
+export type DomainView = typeof allDomains[number]['view'];

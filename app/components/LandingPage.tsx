@@ -1219,10 +1219,11 @@ const LandingPage: FC = () => {
             }}
           >
             <div className="sticky top-0 flex h-screen items-center justify-center">
-              <AnimatedTestimonials
-                testimonials={formattedTestimonials}
-                progress={testimonialProgress}
-              />
+            <AnimatedTestimonials
+  testimonials={formattedTestimonials}
+  progress={testimonialProgress}
+  isMobile={isMobile} // <-- Add this line
+/>
             </div>
           </div>
           <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>

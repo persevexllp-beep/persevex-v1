@@ -338,7 +338,6 @@ const LandingPage: FC = () => {
           policyOpacity = 0,
           footerOpacity = 0;
 
-        // --- CORRECTED WATERMARK LOGIC ---
         if (currentProgress < 1.0) {
           persevexOpacity = (1 - currentProgress) * 0.4;
           coursesOpacity = currentProgress * 0.4;
@@ -373,10 +372,8 @@ const LandingPage: FC = () => {
           aboutUsOpacity = 0;
           questionsOpacity = p * 0.4;
         } else if (currentProgress < 14.0) {
-          const p = currentProgress - 13.0;
           questionsOpacity = 0.4;
-        } // Dwell
-        else if (currentProgress < 15.0) {
+        } else if (currentProgress < 15.0) {
           const p = currentProgress - 14.0;
           questionsOpacity = (1 - p) * 0.4;
           contactUsOpacity = p * 0.4;
@@ -417,7 +414,7 @@ const LandingPage: FC = () => {
           1
         );
         const isDisplayingAboutUsContent = riseProgress >= 1;
-        const isStartingContactUsTransition = currentProgress > 15.01; // Adjusted
+        const isStartingContactUsTransition = currentProgress > 15.01;
         setShowStickyHeader(
           isDisplayingAboutUsContent && !isStartingContactUsTransition
         );
@@ -746,8 +743,7 @@ const LandingPage: FC = () => {
         newWatermarkProgress = 13 + progress;
       } else if (currentScroll >= faqScrollStart) {
         newWatermarkProgress = 13;
-      } // Dwell
-      else if (currentScroll >= aboutUsToFaqTransitionStart) {
+      } else if (currentScroll >= aboutUsToFaqTransitionStart) {
         const progress = clamp(
           (currentScroll - aboutUsToFaqTransitionStart) /
             aboutUsToFaqTransitionDuration,
@@ -1240,10 +1236,28 @@ const LandingPage: FC = () => {
           ></div>
 
           {isMobile ? (
-            <div ref={cardStackingWrapperRef} className="w-full text-white">
-              <AboutUsExtendedComp stackingProgress={0} cascadingProgress={0} />
-              <FaqSection progress={1} />
-            </div>
+            <>
+              <div ref={cardStackingWrapperRef} className="w-full text-white">
+                <AboutUsExtendedComp
+                  stackingProgress={0}
+                  cascadingProgress={0}
+                />
+              </div>
+              <div ref={aboutUsToFaqTransitionRef} style={{ height: 0 }} />
+              <div ref={faqSectionWrapperRef} className="py-16">
+                <FaqSection progress={1} />
+              </div>
+              <div ref={faqToContactTransitionRef} style={{ height: 0 }} />
+              <div ref={contactUsSectionWrapperRef}>
+                <ContactUsSection progress={1} />
+              </div>
+              <div ref={policySectionWrapperRef}>
+                <PolicySection />
+              </div>
+              <div ref={footerSectionWrapperRef}>
+                <FooterSection />
+              </div>
+            </>
           ) : (
             <>
               <div
@@ -1262,10 +1276,7 @@ const LandingPage: FC = () => {
                   </div>
                 </div>
               </div>
-              <div
-                ref={aboutUsToFaqTransitionRef}
-                style={{ height: "60vh" }}
-              />
+              <div ref={aboutUsToFaqTransitionRef} style={{ height: "60vh" }} />
               <div ref={faqSectionWrapperRef} style={{ height: "100vh" }}>
                 <div className="sticky top-0 h-screen flex items-center justify-center">
                   <FaqSection progress={faqProgress} />
@@ -1280,15 +1291,14 @@ const LandingPage: FC = () => {
                   <ContactUsSection progress={contactUsProgress} />
                 </div>
               </div>
+              <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
+                <PolicySection />
+              </div>
+              <div ref={footerSectionWrapperRef}>
+                <FooterSection />
+              </div>
             </>
           )}
-
-          <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
-            <PolicySection />
-          </div>
-          <div ref={footerSectionWrapperRef}>
-            <FooterSection />
-          </div>
         </div>
       </main>
     </>

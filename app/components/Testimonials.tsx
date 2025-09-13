@@ -4,7 +4,7 @@ import {
   motion,
   useMotionValue,
   useSpring,
-  animate,
+  AnimatePresence,
 } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -65,11 +65,7 @@ export const AnimatedTestimonials = ({
   const trackRef = useRef<HTMLDivElement>(null);
 
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
-  
-  const isDraggingRef = useRef(false);
-  // --- 1. Refs to store the anchor point after a drag ---
-  const anchorX = useRef<number | null>(null);
-  const anchorProgress = useRef<number | null>(null);
+  const [showIndicator, setShowIndicator] = useState(isMobile);
   
   const x = useMotionValue(0);
   const smoothedX = useSpring(x, {
@@ -92,7 +88,7 @@ export const AnimatedTestimonials = ({
         
         setConstraints({ left, right });
         
-        if (!isDraggingRef.current) {
+        if (isMobile) {
           x.set(right);
         }
       }
@@ -100,35 +96,24 @@ export const AnimatedTestimonials = ({
     calculateConstraints();
     window.addEventListener("resize", calculateConstraints);
     return () => window.removeEventListener("resize", calculateConstraints);
-  }, [testimonials, x]);
+  }, [testimonials, isMobile, x]);
 
-  // --- 2. The Final Logic: Combining Anchors with Scroll Progress ---
   useEffect(() => {
-    if (isDraggingRef.current) return;
-
-    let targetX: number;
+    if (isMobile) return;
     const totalRange = constraints.right - constraints.left;
-    if (totalRange === 0) return; // Avoid division by zero
+    if (totalRange === 0) return;
+    const targetX = constraints.right - totalRange * progress;
+    x.set(targetX);
+  }, [progress, constraints, isMobile, x]);
 
-    // If we have an anchor, calculate movement relative to it.
-    if (anchorProgress.current !== null && anchorX.current !== null) {
-      const progressDelta = progress - anchorProgress.current;
-      const xDelta = -totalRange * progressDelta;
-      targetX = anchorX.current + xDelta;
-    } else {
-      // Otherwise, calculate position based on absolute scroll progress.
-      targetX = constraints.right - totalRange * progress;
-    }
-    
-    // Clamp the target to ensure it never goes beyond the defined constraints
-    const clampedTargetX = Math.max(constraints.left, Math.min(constraints.right, targetX));
+  useEffect(() => {
+    if (!isMobile) return;
+    const timer = setTimeout(() => {
+      setShowIndicator(false);
+    }, 3500);
 
-    animate(x, clampedTargetX, {
-      type: "spring",
-      stiffness: 150,
-      damping: 30,
-    });
-  }, [progress, constraints, x]);
+    return () => clearTimeout(timer);
+  }, [isMobile]);
 
   return (
     <div
@@ -141,41 +126,38 @@ export const AnimatedTestimonials = ({
         style={{ x: isMobile ? x : smoothedX }}
         drag={isMobile ? "x" : false}
         dragConstraints={isMobile ? constraints : undefined}
-        onDragStart={
-          isMobile
-            ? () => {
-                isDraggingRef.current = true;
-                // --- 3. Invalidate the anchor when a new drag starts ---
-                anchorProgress.current = null;
-                anchorX.current = null;
-              }
-            : undefined
-        }
-       onDragEnd={
-          isMobile
-            ? () => {
-                isDraggingRef.current = false;
-                // Capture the exact position and progress when drag ends
-                const currentX = x.get();
-                const currentProgress = progress;
-                
-                // Set new anchor point
-                anchorX.current = currentX;
-                anchorProgress.current = currentProgress;
-                
-                // Debug logging (remove in production)
-                console.log('Drag ended - Anchor set:', { 
-                  anchorX: currentX, 
-                  anchorProgress: currentProgress 
-                });
-              }
-            : undefined
-        }
+        onDragStart={isMobile ? () => setShowIndicator(false) : undefined}
       >
         {testimonials.map((t, index) => (
           <TestimonialCard key={index} testimonial={t} />
         ))}
       </motion.div>
+
+      <AnimatePresence>
+        {showIndicator && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+          >
+            <div className="flex items-center justify-start w-24 h-7 p-1 overflow-hidden rounded-full border border-neutral-600 bg-black/50 backdrop-blur-sm">
+              <motion.div
+                // --- THIS IS THE ONLY CHANGE ---
+                className="w-8 h-full rounded-full bg-white" 
+                // --- FROM bg-neutral-400 TO bg-white ---
+                animate={{ x: [0, 56, 0] }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

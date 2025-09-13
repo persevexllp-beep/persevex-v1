@@ -209,8 +209,9 @@ const LandingPage: FC = () => {
     []
   );
 
-  const testimonialsAnimationDurationVh = 300;
-  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+  // Make the testimonial scroll duration shorter on mobile for a better UX
+const testimonialsAnimationDurationVh = isMobile ? 100 : 300;
+const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
   const managementUnits = managementCourses.length;
   const technicalUnits = technicalCourses.length;
   const DWELL_TIME_UNITS = 1;

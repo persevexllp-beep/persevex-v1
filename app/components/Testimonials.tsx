@@ -151,13 +151,23 @@ export const AnimatedTestimonials = ({
               }
             : undefined
         }
-        onDragEnd={
+       onDragEnd={
           isMobile
             ? () => {
                 isDraggingRef.current = false;
-                // --- 4. Set the new anchor point when the drag finishes ---
-                anchorX.current = x.get();
-                anchorProgress.current = progress;
+                // Capture the exact position and progress when drag ends
+                const currentX = x.get();
+                const currentProgress = progress;
+                
+                // Set new anchor point
+                anchorX.current = currentX;
+                anchorProgress.current = currentProgress;
+                
+                // Debug logging (remove in production)
+                console.log('Drag ended - Anchor set:', { 
+                  anchorX: currentX, 
+                  anchorProgress: currentProgress 
+                });
               }
             : undefined
         }

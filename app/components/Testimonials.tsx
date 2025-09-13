@@ -144,9 +144,7 @@ export const AnimatedTestimonials = ({
           >
             <div className="flex items-center justify-start w-24 h-7 p-1 overflow-hidden rounded-full border border-neutral-600 bg-black/50 backdrop-blur-sm">
               <motion.div
-                // --- THIS IS THE ONLY CHANGE ---
                 className="w-8 h-full rounded-full bg-white" 
-                // --- FROM bg-neutral-400 TO bg-white ---
                 animate={{ x: [0, 56, 0] }}
                 transition={{
                   duration: 2.5,

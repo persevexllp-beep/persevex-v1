@@ -99,6 +99,7 @@ export default function Navbar() {
               Programs
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
+            
             <AnimatePresence>
               {isDesktopDropdownOpen && (
                 <motion.div 
@@ -124,12 +125,22 @@ export default function Navbar() {
               )}
             </AnimatePresence>
           </div>
+           <Link
+            href="https://lms.persevex.com/login/index.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer"
+          >
+            LMS
+          </Link>
           {scrollButtons.map((button) => (
             <button key={button.name} onClick={() => scrollToSection(button.key)} className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer">
               {button.name}
             </button>
           ))}
         </nav>
+
+
         <div className="md:hidden z-50">
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -176,6 +187,17 @@ export default function Navbar() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </motion.div>
+              <motion.div variants={mobileLinkVariants}>
+              <Link
+                href="https://lms.persevex.com/login/index.php"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-semibold py-4"
+              >
+                LMS
+              </Link>
             </motion.div>
             {scrollButtons.map((button) => (
               <motion.button

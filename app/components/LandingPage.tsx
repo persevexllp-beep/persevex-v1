@@ -209,9 +209,8 @@ const LandingPage: FC = () => {
     []
   );
 
-  // Make the testimonial scroll duration shorter on mobile for a better UX
-const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
-const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+  const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
+  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
   const managementUnits = managementCourses.length;
   const technicalUnits = technicalCourses.length;
   const DWELL_TIME_UNITS = 1;
@@ -712,7 +711,6 @@ const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
       const aboutUsToFaqTransitionDuration = viewportHeight;
       const validationToStoryTransitionDuration = viewportHeight;
 
-      // --- CORRECTED SCROLL PROGRESS LOGIC ---
       if (currentScroll >= footerTransitionStart) {
         const progress = clamp(
           (currentScroll - footerTransitionStart) / footerTransitionDuration,
@@ -1220,11 +1218,11 @@ const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
             }}
           >
             <div className="sticky top-0 flex h-screen items-center justify-center">
-            <AnimatedTestimonials
-  testimonials={formattedTestimonials}
-  progress={testimonialProgress}
-  isMobile={isMobile} // <-- Add this line
-/>
+              <AnimatedTestimonials
+                testimonials={formattedTestimonials}
+                progress={testimonialProgress}
+                isMobile={isMobile}
+              />
             </div>
           </div>
           <div ref={recognizedBySectionWrapperRef} style={{ height: "100vh" }}>
@@ -1296,8 +1294,8 @@ const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
               <div ref={policySectionWrapperRef} style={{ height: "100vh" }}>
                 <PolicySection />
               </div>
-               <div style={{ height: "50vh" }} />
-              
+              <div style={{ height: "50vh" }} />
+
               <div ref={footerSectionWrapperRef}>
                 <FooterSection />
               </div>

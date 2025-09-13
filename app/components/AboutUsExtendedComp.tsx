@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Stats from "./Stats"; 
 
 // --- HELPER HOOK ---
 const useIsMobile = (breakpoint = 768) => {
@@ -16,63 +17,41 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-// --- MODIFIED PROPS INTERFACE ---
+// --- PROPS INTERFACE ---
 interface AboutUsExtendedCompProps {
   stackingProgress: number;
   cascadingProgress: number;
-  // This new prop is a function to pass the sentinel element ref up to the parent
   setSentinelRef?: (el: HTMLDivElement | null) => void;
 }
 
-// Data remains the same
 const cardData = [
-  {
-    title: "Who We Are?",
-    imageSrc: "/whoweare.png",
-    content:
-      "At Persevex, we are a collective of educators, innovators and visionaries who believe that learning should be an open journey filled with curiosity and growth. Education for us is not a rigid system but a living experience that adapts to the pace and potential of every learner. With perseverance and passion as our foundation, we are building a platform where knowledge is absorbed deeply, where learners grow into creators, leaders and changemakers who can shape the future."
-  },
-  {
-    title: "Our Story",
-    imageSrc: "/ourstory.png",
-    content:
-      "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and a generation of learners who are ready to succeed and ready to lead with knowledge and confidence."
-  },
-  {
-    title: "Our Mission",
-    imageSrc: "/ourmission.png",
-    content:
-      "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and create a generation of learners who are ready to succeed and ready to lead with knowledge and confidence.",
-  },
+    {
+      title: "Who We Are?",
+      imageSrc: "/whoweare.png",
+      content:
+        "At Persevex, we are a collective of educators, innovators and visionaries who believe that learning should be an open journey filled with curiosity and growth. Education for us is not a rigid system but a living experience that adapts to the pace and potential of every learner. With perseverance and passion as our foundation, we are building a platform where knowledge is absorbed deeply, where learners grow into creators, leaders and changemakers who can shape the future."
+    },
+    {
+      title: "Our Story",
+      imageSrc: "/ourstory.png",
+      content:
+        "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and a generation of learners who are ready to succeed and ready to lead with knowledge and confidence."
+    },
+    {
+      title: "Our Mission",
+      imageSrc: "/ourmission.png",
+      content:
+        "The mission of Persevex is to redefine the way education empowers people. We believe that perseverance, when guided by the right tools, can unlock limitless possibilities. Through innovation, meaningful experiences and a focus on real-world application, we are are committed to making education accessible to everyone everywhere. Our purpose is not only to teach but to inspire resilience, nurture potential and create a generation of learners who are ready to succeed and ready to lead with knowledge and confidence.",
+    },
 ];
-
-const faqData = [
-    {
-      question: "What is the core philosophy of Persevex?",
-      answer: "Our core philosophy is that learning should be an open, adaptive journey. We believe in empowering every learner with tools and experiences that nurture curiosity, resilience, and real-world application, transforming them into future creators and leaders."
-    },
-    {
-      question: "How do I enroll in a course or internship?",
-      answer: "You can browse our available courses and internships on their respective pages. Simply click on the one you're interested in and follow the on-screen instructions to register and begin your learning journey with us."
-    },
-    {
-      question: "What makes the Persevex LMS unique?",
-      answer: "Our Learning Management System (LMS) is designed for deep, meaningful engagement. It integrates innovative tools, collaborative features, and a focus on practical application to ensure that knowledge is not just memorized, but truly absorbed and understood."
-    },
-    {
-      question: "Are there any features for educators?",
-      answer: "Yes! We provide a comprehensive suite of tools for educators to create, manage, and deliver engaging content. Our platform supports various teaching methodologies and provides analytics to track learner progress and adapt to their needs."
-    }
-];
-
+  
 // --- MAIN COMPONENT ---
 export default function AboutUsExtendedComp({
   stackingProgress,
   cascadingProgress,
-  setSentinelRef // Destructure the new prop
+  setSentinelRef
 }: AboutUsExtendedCompProps) {
   const isMobile = useIsMobile();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(null);
   
   const mobileSentinelRef = useRef<HTMLDivElement>(null);
@@ -91,7 +70,6 @@ export default function AboutUsExtendedComp({
     return (
       <div className="flex flex-col items-center w-full min-h-screen px-4 py-16 pt-32 text-white gap-20">
         
-        {/* --- NEW: About Us Heading for Mobile --- */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -105,7 +83,6 @@ export default function AboutUsExtendedComp({
           </p>
         </motion.div>
 
-        {/* Story Cards Section */}
         <motion.div
           className="flex flex-col gap-4 w-full max-w-md"
           layout
@@ -156,56 +133,15 @@ export default function AboutUsExtendedComp({
             );
           })}
         </motion.div>
-
-        {/* FAQ Section */}
-        <motion.div 
-          className="w-full max-w-md"
+        
+        <motion.div
+          className="w-full max-w-lg"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <h2 className="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
-          <div className="flex flex-col gap-4">
-             {faqData.map((item, index) => {
-                const isExpanded = expandedIndex === index;
-                return (
-                    <motion.div key={index} className="flex flex-col">
-                        <motion.button
-                            onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                            className="flex items-center justify-between w-full p-5 text-left text-white rounded-xl bg-black/30 border-2 border-white/20 cursor-pointer"
-                        >
-                            <span className="font-semibold text-base">{item.question}</span>
-                            <motion.div
-                                className="text-xl font-thin"
-                                animate={{ rotate: isExpanded ? 45 : 0 }}
-                                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            >
-                                +
-                            </motion.div>
-                        </motion.button>
-                        <AnimatePresence initial={false}>
-                            {isExpanded && (
-                                <motion.section
-                                    key="content"
-                                    initial="collapsed"
-                                    animate="open"
-                                    exit="collapsed"
-                                    variants={{
-                                      open: { opacity: 1, height: 'auto', marginTop: '16px' },
-                                      collapsed: { opacity: 0, height: 0, marginTop: '0px' }
-                                    }}
-                                    transition={{ duration: 0.4, ease: 'easeInOut' }}
-                                    className="text-gray-300 text-sm leading-relaxed px-5 overflow-hidden"
-                                >
-                                    {item.answer}
-                                </motion.section>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                );
-             })}
-          </div>
+          <Stats />
         </motion.div>
         
         <div ref={mobileSentinelRef} style={{ height: '1px', width: '1px', pointerEvents: 'none' }} />
@@ -217,23 +153,15 @@ export default function AboutUsExtendedComp({
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
   const easedStackingProgress = easeOutCubic(stackingProgress);
   
-  // Card Animations
   const isCard1Expanded = cascadingProgress >= 1.8 ? 1 : 0;
   const isCard2Expanded = cascadingProgress >= 2.8 ? 1 : 0;
   const expansionProgress = easeOutCubic(Math.max(0, Math.min(cascadingProgress / 0.8, 1)));
   const cardFadeProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.0) / 0.5, 1)));
   const cardStackOpacity = 1 - cardFadeProgress;
 
-  // FAQ Animations
-  const faqRiseProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.5) / 0.5, 1)));
-  const faqOpacity = faqRiseProgress;
-  const faqTranslateY = (1 - faqRiseProgress) * 600;
-  
-  // --- NEW: Heading Animations ---
-  const headingRiseProgress = easeOutCubic(Math.max(0, Math.min(cascadingProgress / 0.8, 1)));
-  const headingFadeProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.2) / 0.5, 1)));
-  const headingOpacity = headingRiseProgress * (1 - headingFadeProgress);
-  const headingTranslateY = (1 - headingRiseProgress) * 100;
+  const statsRiseProgress = easeOutCubic(Math.max(0, Math.min((cascadingProgress - 3.2) / 0.5, 1)));
+  const statsOpacity = statsRiseProgress;
+  const statsTranslateY = (1 - statsRiseProgress) * 600;
 
   const getCardStyle = (index: number): React.CSSProperties => {
     let transform = "", zIndex = 0, opacity = 1;
@@ -305,9 +233,8 @@ export default function AboutUsExtendedComp({
 
   return (
     <div className="flex flex-col items-center justify-start w-full pt-20 text-white">
-      <div className="relative w-full max-w-7xl lg-w-full mx-auto px-4 sm-px-6 min-h-[30rem]">
+      <div className="relative w-full max-w-7xl lg:w-full mx-auto px-4 sm:px-6 min-h-[30rem]">
      
-
         <div className="absolute inset-0 flex items-center justify-center w-full" style={{ opacity: cardStackOpacity, pointerEvents: cardStackOpacity < 0.1 ? 'none' : 'auto' }}>
           {cardData.map((card, index) => {
             let cardExpansionProgress = 0;
@@ -360,26 +287,18 @@ export default function AboutUsExtendedComp({
             );
           })}
         </div>
-        <div className="absolute inset-0 flex items-center justify-center w-full">
-            <motion.div className="w-full max-w-3xl mx-auto flex flex-col gap-4" initial={false} animate={{ opacity: faqOpacity, translateY: faqTranslateY }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-            
-                {faqData.map((item, index) => {
-                    const isExpanded = expandedIndex === index;
-                    return (
-                        <motion.div key={index} className="flex flex-col">
-                            <motion.button onClick={() => setExpandedIndex(isExpanded ? null : index)} className={`flex items-center justify-between w-full p-5 text-left text-white rounded-3xl cursor-pointer border-2 border-[rgba(255,255,255,0.3)]`} whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
-                                <span className="font-semibold text-lg">{item.question}</span>
-                                <motion.div className="text-2xl font-thin" animate={{ rotate: isExpanded ? 45 : 0 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>+</motion.div>
-                            </motion.button>
-                            <AnimatePresence initial={false}>
-                                {isExpanded && (
-                                    <motion.section key="content" initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: '16px' }} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={{ duration: 0.4, ease: 'easeInOut' }} className="text-gray-300 text-sm leading-relaxed px-5 overflow-hidden">{item.answer}</motion.section>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-                    );
-                })}
+        
+        <div className="absolute inset-0 flex items-center justify-center w-full pointer-events-none">
+          <div className="w-full max-w-4xl mx-auto">
+            <motion.div
+              className="mb-16 pointer-events-auto"
+              initial={false}
+              animate={{ opacity: statsOpacity, y: statsTranslateY }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Stats />
             </motion.div>
+          </div>
         </div>
       </div>
     </div>

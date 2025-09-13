@@ -1,13 +1,10 @@
-// app/contexts/ScrollContext.tsx
-
 "use client";
 
 import React, { createContext, useContext, useState, RefObject } from 'react';
 
 export const NUM_CARDS = 6;
 
-// The types are already correct, no changes needed here
-export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs' | "contactUs" | 'policy' | 'footer';
+export type SectionKey = 'courses' | 'ourEdge' | 'partners' | 'testimonials' | 'recognizedBy' | 'aboutUs' | 'faq'| "contactUs" | 'policy' | 'footer';
 
 export interface LayoutState {
   coursesTop: number;
@@ -17,9 +14,12 @@ export interface LayoutState {
   recognizedByTop: number;
   aboutUsTop: number;
   cardStackingTop: number;
+  aboutUsToFaqTransitionTop: number; // +++ ADD THIS LINE +++
   contactUsTop: number;
   policyTop: number;
   footerTop: number;
+  faqToContactTransitionTop: number
+  faqTop: number
 }
 
 interface ScrollContextType {
@@ -39,7 +39,6 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const scrollToSection = (key: SectionKey) => {
     const ref = sectionRefs[key];
 
-    // Special handling for "Our Edge"
     if (key === 'ourEdge' && layout) {
       const targetY = layout.edgeTop + (window.innerHeight * NUM_CARDS);
       window.scrollTo({
@@ -48,7 +47,6 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     } 
-    // Special handling for "Partners"
     else if (key === 'partners' && layout) {
       const targetY = layout.partnersTop + window.innerHeight;
       window.scrollTo({
@@ -57,7 +55,6 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     }
-    // Special handling for "About Us"
     else if (key === 'aboutUs' && layout) {
       const targetY = layout.aboutUsTop + (window.innerHeight * 2.6);
       window.scrollTo({
@@ -66,20 +63,14 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       });
       return;
     }
-    // +++ MODIFICATION START +++
-    // Add special handling for "Footer"
     else if (key === 'footer' && layout) {
-      // We explicitly scroll to the calculated top of the footer section.
-      // This is the most reliable way to get to the end of the page.
       window.scrollTo({
         top: layout.footerTop,
         behavior: 'smooth',
       });
       return;
     }
-    // +++ MODIFICATION END +++
 
-    // Default behavior for all other sections (like Courses, Contact Us, etc.)
     if (ref?.current) {
       ref.current.scrollIntoView({
         behavior: 'smooth',

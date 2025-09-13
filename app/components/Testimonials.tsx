@@ -2,9 +2,9 @@
 
 import {
   motion,
-  useTransform,
   useMotionValue,
   useSpring,
+  animate,
 } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -64,71 +64,71 @@ export const AnimatedTestimonials = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
-
-  // --- Logic for Desktop (Scroll-driven) ---
-  const motionProgress = useMotionValue(0);
-  const smoothedProgress = useSpring(motionProgress, {
+  const [constraints, setConstraints] = useState({ left: 0, right: 0 });
+  
+  const isDraggingRef = useRef(false);
+  // --- 1. Refs to store the anchor point after a drag ---
+  const anchorX = useRef<number | null>(null);
+  const anchorProgress = useRef<number | null>(null);
+  
+  const x = useMotionValue(0);
+  const smoothedX = useSpring(x, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
 
-  // This will be used for both desktop scroll and mobile initial position
-  const x = useTransform(
-    smoothedProgress,
-    [0, 1],
-    [dragConstraints.right, dragConstraints.left]
-  );
-  
-  // --- Simplified Logic for Mobile (Drag-driven only) ---
-  const xDrag = useMotionValue(0);
-
-  // Sync scroll progress to motion value for desktop animation
-  useEffect(() => {
-    motionProgress.set(progress);
-  }, [progress, motionProgress]);
-
-  // Calculate constraints and initial positions
   useEffect(() => {
     const calculateConstraints = () => {
       if (containerRef.current && trackRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const trackWidth = trackRef.current.scrollWidth;
-
         const firstCard = trackRef.current.firstChild as HTMLElement;
         if (!firstCard) return;
 
         const cardWidth = firstCard.offsetWidth;
-        const initialOffset = (containerWidth - cardWidth) / 2;
-
-        // The total distance the track can move is its own width minus the container's width.
-        const scrollableWidth = trackWidth - containerWidth;
+        const right = (containerWidth - cardWidth) / 2;
+        const left = -(trackWidth - containerWidth + right);
         
-        // The end position is the initial offset minus the total scrollable distance.
-        const endTranslate = initialOffset - scrollableWidth;
-
-        setDragConstraints({ left: endTranslate, right: initialOffset });
-
-        // On mobile, set the initial position of the draggable element.
-        // This only runs once when the constraints are first calculated.
-        if (isMobile) {
-          xDrag.set(initialOffset);
+        setConstraints({ left, right });
+        
+        if (!isDraggingRef.current) {
+          x.set(right);
         }
       }
     };
-
     calculateConstraints();
-    // Use a timeout to recalculate after initial render and layout shifts
-    const timeoutId = setTimeout(calculateConstraints, 100);
-
     window.addEventListener("resize", calculateConstraints);
-    return () => {
-      window.removeEventListener("resize", calculateConstraints);
-      clearTimeout(timeoutId);
-    };
-  }, [testimonials, isMobile, xDrag]); 
-  // Dependency array is correct.
+    return () => window.removeEventListener("resize", calculateConstraints);
+  }, [testimonials, x]);
+
+  // --- 2. The Final Logic: Combining Anchors with Scroll Progress ---
+  useEffect(() => {
+    if (isDraggingRef.current) return;
+
+    let targetX: number;
+    const totalRange = constraints.right - constraints.left;
+    if (totalRange === 0) return; // Avoid division by zero
+
+    // If we have an anchor, calculate movement relative to it.
+    if (anchorProgress.current !== null && anchorX.current !== null) {
+      const progressDelta = progress - anchorProgress.current;
+      const xDelta = -totalRange * progressDelta;
+      targetX = anchorX.current + xDelta;
+    } else {
+      // Otherwise, calculate position based on absolute scroll progress.
+      targetX = constraints.right - totalRange * progress;
+    }
+    
+    // Clamp the target to ensure it never goes beyond the defined constraints
+    const clampedTargetX = Math.max(constraints.left, Math.min(constraints.right, targetX));
+
+    animate(x, clampedTargetX, {
+      type: "spring",
+      stiffness: 150,
+      damping: 30,
+    });
+  }, [progress, constraints, x]);
 
   return (
     <div
@@ -138,15 +138,29 @@ export const AnimatedTestimonials = ({
       <motion.div
         ref={trackRef}
         className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
-        // --- Conditionally apply props based on isMobile ---
-        style={isMobile ? { x: xDrag } : { x }}
+        style={{ x: isMobile ? x : smoothedX }}
         drag={isMobile ? "x" : false}
-        dragConstraints={
+        dragConstraints={isMobile ? constraints : undefined}
+        onDragStart={
           isMobile
-            ? { left: dragConstraints.left, right: dragConstraints.right }
+            ? () => {
+                isDraggingRef.current = true;
+                // --- 3. Invalidate the anchor when a new drag starts ---
+                anchorProgress.current = null;
+                anchorX.current = null;
+              }
             : undefined
         }
-        // No more onDragStart/onDragEnd needed as we've removed the conflicting logic
+        onDragEnd={
+          isMobile
+            ? () => {
+                isDraggingRef.current = false;
+                // --- 4. Set the new anchor point when the drag finishes ---
+                anchorX.current = x.get();
+                anchorProgress.current = progress;
+              }
+            : undefined
+        }
       >
         {testimonials.map((t, index) => (
           <TestimonialCard key={index} testimonial={t} />

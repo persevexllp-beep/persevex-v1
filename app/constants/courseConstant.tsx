@@ -1322,8 +1322,8 @@ export const ElectronicsCourses: CourseType[] = [
     icon: Network,
     route: "/courses/iot",
     slug: "iot",
-    image: "/iot.png",
-    cardBg_image: "/iotbg.png",
+    image: "/human.png",
+    cardBg_image: "/human.png",
     projects: [
       {
         name: "Smart Home Automation",
@@ -1600,7 +1600,7 @@ export const CivilCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/humanres.png",
+    image: "/human.png",
     cardBg_image: "/human.png",
     projects: [
       {

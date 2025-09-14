@@ -1462,8 +1462,8 @@ export const MechanicalCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/autocad.png",
-    cardBg_image: "/autocadbg.png",
+    image: "/humanres.png",
+    cardBg_image: "/human.png",
     projects: [
       {
         name: "Architectural Floor Plan",
@@ -1600,8 +1600,8 @@ export const CivilCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/autocad.png",
-    cardBg_image: "/autocadbg.png",
+    image: "/humanres.png",
+    cardBg_image: "/human.png",
     projects: [
       {
         name: "Architectural Floor Plan",

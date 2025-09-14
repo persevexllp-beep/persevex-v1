@@ -323,7 +323,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         });
       }
     }
-  }, [activeView]);
+  }, [activeView, isMobile]); // Added isMobile to dependencies to re-calculate on resize
 
   const handleTileClick = (domain: DomainView, index: number) => {
     const targetDomain = domainData.find((d) => d.view === domain);
@@ -343,23 +343,26 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-8 items-center pb-12 md:pb-0">
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-4">
-        <div className="relative flex w-fit items-center rounded-full bg-black/30 p-1 backdrop-blur-sm ">
-          <motion.div
-            className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white"
-            animate={sliderStyle}
-            transition={{ type: "spring", stiffness: 350, damping: 30 }}
-          />
-          {allDomains.map((domain, index) => (
-            <button
-              key={domain.name}
-              ref={(el) => {
-                buttonRefs.current[index] = el;
-              }}
-              onClick={() => domain.enabled && onSwitchView(domain.view)}
-              disabled={!domain.enabled}
-              className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs md:text-sm font-semibold transition-colors duration-300
+    <div className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-12 md:pb-0">
+      {/* Changed: Adjusted width and padding for mobile */}
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex w-full flex-col items-center gap-4 px-4 md:w-auto md:px-0">
+        {/* Changed: Added this wrapper to make buttons scrollable */}
+        <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
+          <div className="relative mx-auto flex w-fit items-center rounded-full bg-black/30 p-1 backdrop-blur-sm md:mx-0">
+            <motion.div
+              className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white"
+              animate={sliderStyle}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            />
+            {allDomains.map((domain, index) => (
+              <button
+                key={domain.name}
+                ref={(el) => {
+                  buttonRefs.current[index] = el;
+                }}
+                onClick={() => domain.enabled && onSwitchView(domain.view)}
+                disabled={!domain.enabled}
+                className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs md:text-sm font-semibold transition-colors duration-300
                     ${
                       !domain.enabled
                         ? "cursor-not-allowed text-white/50"
@@ -368,13 +371,15 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                         : "text-white"
                     }
                     `}
-            >
-              {domain.name}
-            </button>
-          ))}
+              >
+                {domain.name}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="relative w-[90vw] md:max-w-5xl h-8 flex items-center justify-center">
+        {/* Changed: Adjusted width for consistency */}
+        <div className="relative w-full h-8 flex items-center justify-center">
           {domainData.map((domain) => (
             <DomainTiles
               key={domain.view}
@@ -388,8 +393,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="absolute top-0 left-0 w-full pt-48 mt-24 px-8 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
-        <div className="relative w-full lg:ml-24 lg:h-80">
+      <div className="w-full pt-44 text-center md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
+        <div className="relative w-full h-56 md:h-80 lg:ml-24">
           {domainData.map((domain) => (
             <DomainContent
               key={domain.view}
@@ -400,7 +405,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="relative w-full md:w-1/2 h-[480px] mt-24 lg:mt-0 flex items-center justify-center">
+      <div className="relative w-full md:w-1/2 h-[480px] mt-4 md:mt-0 flex items-center justify-center">
         {domainData.map((domain) => (
           <DomainCardStack
             key={domain.view}

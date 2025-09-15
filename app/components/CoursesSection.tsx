@@ -135,6 +135,29 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
 
+  const domainIcons = [
+    {
+      name: "Management",
+      iconPath: "/managementimage.png",
+    },
+    {
+      name: "Civil",
+      iconPath: "/civilimage.png",
+    },
+    {
+      name: "Computer Science",
+      iconPath: "/csimage.png",
+    },
+    {
+      name: "Mechanical",
+      iconPath: "/mechanicalimage.png",
+    },
+    {
+      name: "Electronics",
+      iconPath: "/electricalimage.png",
+    },
+  ];
+
   const smoothedProgress = useSpring(progress, {
     stiffness: 400,
     damping: 90,
@@ -193,9 +216,9 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   );
 
   return (
-    <div className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-4 md:pb-0">
+    <div className="lg:relative w-full h-full text-white flex flex-col md:flex-row gap-24 lg:gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-8 md:pb-0">
       {!isMobile && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
+        <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
             <div className="relative mx-auto flex flex-wrap justify-center items-center w-fit max-w-full rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:flex-nowrap md:rounded-full md:p-1 md:mx-0">
               <motion.div
@@ -216,7 +239,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                         !domain.enabled
                           ? "cursor-not-allowed text-white/50"
                           : activeView === domain.view
-                          ? "text-orange-600"
+                          ? "text-black"
                           : "text-white"
                       }
                       `}
@@ -262,7 +285,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       )}
 
       <div className="w-full pt-16 lg:pt-24 text-center  md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-18 justify-center">
-        <div className="relative w-full h-28 md:h-80 lg:ml-24">
+        <div className="relative w-full h-full md:h-80 lg:ml-24">
           <AnimatePresence mode="wait">
             {activeDomain && (
               <motion.div
@@ -288,7 +311,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="relative w-full md:w-1/2 h-[480px]  md:mt-20 flex items-center justify-center">
+      <div className="relative w-full md:w-1/2 h-full lg:h-[480px] mt-4  md:mt-20 flex items-center justify-center">
         {activeDomain &&
           activeDomain.courses.map((course, i) => (
             <Card
@@ -301,43 +324,15 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           ))}
       </div>
 
-     {isMobile && (
-        <div className="w-full flex flex-col gap-4 md:hidden px-2">
-           <div className="w-full">
-              <AnimatePresence mode="wait">
-                {activeDomain && (
-                  <motion.div
-                    key={activeDomain.view}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                      {activeDomain.courses.map((course, i) => (
-                        <button
-                          key={course.id}
-                          onClick={() => handleTileClick(i)}
-                          className={`w-full py-1 px-3 text-xs font-medium rounded-full transition-all duration-300 border
-                          ${
-                            activeCardIndex === i
-                              ? "bg-white text-orange-600 border-white shadow-lg font-semibold"
-                              : "bg-black/40 text-white border-white/30 backdrop-blur-sm"
-                          }`}
-                        >
-                          {/* THIS IS THE KEY CHANGE */}
-                          {course.shortTitle || course.title}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-full">
-              <div className="grid grid-cols-2 gap-2  w-full">
-                {allDomains.map((domain, index) => (
+      {isMobile && (
+        <div className="w-full flex flex-col gap-4 md:hidden ">
+          <div className="w-full  rounded-2xl overflow-x-auto scrollbar-hide">
+            <div className="relative mx-auto flex flex-wrap justify-center items-center gap-2 w-full max-w-full p-2 backdrop-blur-sm">
+              {allDomains.map((domain, index) => {
+                const iconData = domainIcons.find(
+                  (icon) => icon.name === domain.name
+                );
+                return (
                   <button
                     key={domain.name}
                     ref={(el) => {
@@ -345,23 +340,65 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     }}
                     onClick={() => domain.enabled && onSwitchView(domain.view)}
                     disabled={!domain.enabled}
-                    className={`w-full py-1 px-3 text-xs font-semibold rounded-full  transition-all duration-300 border
+                    title={domain.name} // Accessibility improvement
+                    className={`relative z-10 flex h-14 w-14 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
                     ${
                       !domain.enabled
-                        ? "cursor-not-allowed text-white/50 bg-black/20 border-white/20"
+                        ? "cursor-not-allowed opacity-50"
                         : activeView === domain.view
-                        ? "bg-white text-orange-600 border-white shadow-lg"
-                        : "bg-black/40 text-white border-white/30 backdrop-blur-sm"
+                        ? "scale-110 bg-white/90 ring-2 ring-white/50" // Active state
+                        : "bg-white/10 hover:bg-white/20" // Inactive state
                     }
                     `}
                   >
-                    {domain.name}
+                    {iconData ? (
+                      <Image
+                        src={iconData.iconPath}
+                        alt={domain.name}
+                        width={36}
+                        height={36}
+                        className="object-contain"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold text-white">
+                        {domain.name.slice(0, 3)}
+                      </span>
+                    )}
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
-
-           
+          </div>
+          <div className="w-full border rounded-2xl  overflow-x-auto scrollbar-hide md:w-fit">
+            <AnimatePresence mode="wait">
+              {activeDomain && (
+                <motion.div
+                  key={activeDomain.view}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative  mx- flex flex-wrap justify-center   items-center w- max-w rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:w-fit md:flex-nowrap md:rounded-full md:p-1 md:mx-0"
+                >
+                  <div className="  flex  items-center justify-center flex-wrap gap-2">
+                    {activeDomain.courses.map((course, i) => (
+                      <button
+                        key={course.id}
+                        onClick={() => handleTileClick(i)}
+                        className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs md:text-sm font-semibold transition-colors duration-300
+                          ${
+                            activeCardIndex === i
+                              ? " text-orange-600 bg-white font-semibold"
+                              : " text-white bg-black/40 backdrop-blur-sm"
+                          }`}
+                      >
+                        {course.shortTitle || course.title}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       )}

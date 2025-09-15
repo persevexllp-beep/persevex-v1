@@ -57,130 +57,8 @@ export const technicalContent: ContentType = {
 };
 
 export const managementCourses: CourseType[] = [
-  {
-    id: "m1",
-    title: "Finance for Managers",
-    shortTitle: 'Finance',
-    description:
-      "Understand key financial principles to make better business decisions.",
-    icon: FinanceIcon,
-    route: "/courses/finance",
-    slug: "finance",
-    image: "/finan.png",
-    cardBg_image: "/financepng.png",
-    projects: [
-            {
-                name: 'Financial Modeling',
-                description: 'Build comprehensive financial models for business valuation and forecasting.',
-                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            }, 
-            {
-                name: 'Investment Analysis',
-                description: 'Analyze investment opportunities using various valuation methods and risk assessment.',
-                image: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            },
-            {
-                name: 'M&A Valuation',
-                description: 'Perform merger and acquisition analysis including synergy valuation and deal structuring.',
-                image: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            },
-            {
-                name: 'Portfolio Management',
-                description: 'Create and optimize investment portfolios based on risk-return objectives.',
-                image: 'https://images.unsplash.com/photo-1642543348745-03b1219733d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            }, 
-            {
-                name: 'Financial Planning',
-                description: 'Develop comprehensive financial plans for individuals or businesses.',
-                image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            },
-            {
-                name: 'Risk Analysis',
-                description: 'Identify, assess, and mitigate financial risks using quantitative methods.',
-                image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-            }
-        ],
-    modules: [
-      {
-        title: "Financial Statements & Analysis",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Learn to analyze and interpret financial statements to make informed business decisions.",
-        topics: [
-          "Understanding Income Statements, Balance Sheets, and Cash Flow Statements",
-          "Financial Ratio Analysis and Interpretation",
-          "Trend Analysis and Comparative Analysis",
-          "Common-Size Financial Statements",
-          "Financial Statement Forecasting",
-        ],
-      },
-      {
-        title: "Excel for Financial Modeling",
-        duration: "1 week",
-        lessons: 4,
-        description:
-          "Master advanced Excel techniques essential for building robust financial models.",
-        topics: [
-          "Advanced Excel Functions (VLOOKUP, INDEX-MATCH, OFFSET)",
-          "Data Tables and Scenario Analysis",
-          "Sensitivity Analysis and Goal Seek",
-          "Excel Shortcuts and Efficiency Techniques",
-        ],
-      },
-      {
-        title: "Discounted Cash Flow (DCF) Modeling",
-        duration: "2 weeks",
-        lessons: 6,
-        description:
-          "Build comprehensive DCF models to value companies and investment opportunities.",
-        topics: [
-          "Forecasting Revenue and Expenses",
-          "Calculating Free Cash Flows",
-          "Determining Discount Rates (WACC)",
-          "Terminal Value Calculations",
-          "Sensitivity Analysis and Scenario Modeling",
-          "Building a Complete DCF Model",
-        ],
-      },
-      {
-        title: "M&A Modeling and LBO Analysis",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Learn to model mergers, acquisitions, and leveraged buyouts to evaluate deal structures.",
-        topics: [
-          "Accretion/Dilution Analysis",
-          "Synergy Valuation",
-          "Purchase Price Allocation",
-          "LBO Model Structure and Returns Analysis",
-          "Debt Schedules and Covenant Analysis",
-        ],
-      },
-      {
-        title: "Advanced Valuation Techniques",
-        duration: "1 week",
-        lessons: 4,
-        description:
-          "Explore advanced valuation methodologies used by investment professionals.",
-        topics: [
-          "Comparable Company Analysis",
-          "Precedent Transaction Analysis",
-          "Sum-of-the-Parts Valuation",
-          "Real Options Valuation",
-        ],
-      },
-    ],
-    large_description:
-      "This course provides a comprehensive overview of financial principles essential for effective management. Topics include financial statement analysis, budgeting, forecasting, and investment decision-making. By the end of the course, you'll be equipped to interpret financial data and make informed decisions that drive business success.",
-    programCardsHeading: [
-      "Financial Statements & Analysis",
-      "Excel for Financial Modeling",
-      "Discounted Cash Flow (DCF) Modeling",
-      "M&A Modeling and LBO Analysis",
-      "Advanced Valuation Techniques",
-    ],
-  },
+  
+
   {
     id: "m2",
     title: "Digital Marketing Strategy",
@@ -432,6 +310,130 @@ export const managementCourses: CourseType[] = [
     large_description:
       "This course explores contemporary human resource management practices essential for building and maintaining a productive workforce. Topics include talent acquisition, employee engagement, performance management, and legal considerations in HR. You'll gain practical skills to create a positive work environment that attracts and retains top talent.",
   },
+    {
+    id: "m1",
+    title: "Finance for Managers",
+    shortTitle: 'Finance',
+    description:
+      "Understand key financial principles to make better business decisions.",
+    icon: FinanceIcon,
+    route: "/courses/finance",
+    slug: "finance",
+    image: "/finan.png",
+    cardBg_image: "/financepng.png",
+    projects: [
+            {
+                name: 'Financial Modeling',
+                description: 'Build comprehensive financial models for business valuation and forecasting.',
+                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            }, 
+            {
+                name: 'Investment Analysis',
+                description: 'Analyze investment opportunities using various valuation methods and risk assessment.',
+                image: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                name: 'M&A Valuation',
+                description: 'Perform merger and acquisition analysis including synergy valuation and deal structuring.',
+                image: 'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                name: 'Portfolio Management',
+                description: 'Create and optimize investment portfolios based on risk-return objectives.',
+                image: 'https://images.unsplash.com/photo-1642543348745-03b1219733d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            }, 
+            {
+                name: 'Financial Planning',
+                description: 'Develop comprehensive financial plans for individuals or businesses.',
+                image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                name: 'Risk Analysis',
+                description: 'Identify, assess, and mitigate financial risks using quantitative methods.',
+                image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+            }
+        ],
+    modules: [
+      {
+        title: "Financial Statements & Analysis",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Learn to analyze and interpret financial statements to make informed business decisions.",
+        topics: [
+          "Understanding Income Statements, Balance Sheets, and Cash Flow Statements",
+          "Financial Ratio Analysis and Interpretation",
+          "Trend Analysis and Comparative Analysis",
+          "Common-Size Financial Statements",
+          "Financial Statement Forecasting",
+        ],
+      },
+      {
+        title: "Excel for Financial Modeling",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Master advanced Excel techniques essential for building robust financial models.",
+        topics: [
+          "Advanced Excel Functions (VLOOKUP, INDEX-MATCH, OFFSET)",
+          "Data Tables and Scenario Analysis",
+          "Sensitivity Analysis and Goal Seek",
+          "Excel Shortcuts and Efficiency Techniques",
+        ],
+      },
+      {
+        title: "Discounted Cash Flow (DCF) Modeling",
+        duration: "2 weeks",
+        lessons: 6,
+        description:
+          "Build comprehensive DCF models to value companies and investment opportunities.",
+        topics: [
+          "Forecasting Revenue and Expenses",
+          "Calculating Free Cash Flows",
+          "Determining Discount Rates (WACC)",
+          "Terminal Value Calculations",
+          "Sensitivity Analysis and Scenario Modeling",
+          "Building a Complete DCF Model",
+        ],
+      },
+      {
+        title: "M&A Modeling and LBO Analysis",
+        duration: "2 weeks",
+        lessons: 5,
+        description:
+          "Learn to model mergers, acquisitions, and leveraged buyouts to evaluate deal structures.",
+        topics: [
+          "Accretion/Dilution Analysis",
+          "Synergy Valuation",
+          "Purchase Price Allocation",
+          "LBO Model Structure and Returns Analysis",
+          "Debt Schedules and Covenant Analysis",
+        ],
+      },
+      {
+        title: "Advanced Valuation Techniques",
+        duration: "1 week",
+        lessons: 4,
+        description:
+          "Explore advanced valuation methodologies used by investment professionals.",
+        topics: [
+          "Comparable Company Analysis",
+          "Precedent Transaction Analysis",
+          "Sum-of-the-Parts Valuation",
+          "Real Options Valuation",
+        ],
+      },
+    ],
+    large_description:
+      "This course provides a comprehensive overview of financial principles essential for effective management. Topics include financial statement analysis, budgeting, forecasting, and investment decision-making. By the end of the course, you'll be equipped to interpret financial data and make informed decisions that drive business success.",
+    programCardsHeading: [
+      "Financial Statements & Analysis",
+      "Excel for Financial Modeling",
+      "Discounted Cash Flow (DCF) Modeling",
+      "M&A Modeling and LBO Analysis",
+      "Advanced Valuation Techniques",
+    ],
+  },
   {
   "id": "m4",
   "title": "Stock Market & Crypto Investing",
@@ -682,7 +684,7 @@ export const technicalCourses: CourseType[] = [
   {
     id: "t2",
     title: "Artificial Intelligence",
-    shortTitle: 'AI',
+    shortTitle: 'Artificial Intelligence',
     description: "Explore the foundations of AI and build intelligent agents.",
     icon: AIIcon,
     route: "/courses/artificial-intelligence",
@@ -813,8 +815,8 @@ export const technicalCourses: CourseType[] = [
   },
   {
     id: "t3",
-    title: "Machine Learning Ops",
-    shortTitle: 'MLOps',
+    title: "Machine Learning",
+    shortTitle: 'ML',
     description: "Dive into data analysis, model deployment, and MLOps.",
     icon: MLIcon,
     route: "/courses/machine-learning",
@@ -942,7 +944,7 @@ export const technicalCourses: CourseType[] = [
   {
     id: "t4",
     title: "Cloud Computing (AWS)",
-    shortTitle: 'Cloud (AWS)',
+    shortTitle: 'Cloud Computing',
     description:
       "Architect and deploy scalable, fault-tolerant applications on AWS.",
     icon: CloudIcon,

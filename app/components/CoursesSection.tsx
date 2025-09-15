@@ -104,8 +104,8 @@ const Card = ({
         <Image
           src={course.cardBg_image}
           alt={course.title}
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{objectFit:"cover"}}
         />
       </div>
 

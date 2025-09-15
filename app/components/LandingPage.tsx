@@ -9,6 +9,7 @@ import {
   MutableRefObject,
   useMemo,
   RefObject,
+  useLayoutEffect,
 } from "react";
 import * as THREE from "three";
 import { useMotionValue } from "framer-motion";
@@ -197,38 +198,49 @@ const LandingPage: FC = () => {
     const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
     const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
-   const coursesSectionHeight = useMemo(() => {
-        const activeDomain = allDomains.find(d => d.view === activeCourseView);
-        const numCourses = activeDomain ? activeDomain.courses.length : 0;
+   // LandingPage.tsx
+
+// ... other code
+
+const coursesSectionHeight = useMemo(() => {
+    // 1. Find the maximum number of courses from any single enabled domain.
+    const maxCourses = Math.max(
+      ...allDomains
+        .filter(d => d.enabled)
+        .map(d => d.courses.length)
+    );
+
+    // 2. Calculate the height based on that maximum number.
+    // This ensures the container height is ALWAYS constant.
+    const numCourses = maxCourses > 0 ? maxCourses : 1;
+    const baseHeight = 120; // in vh
+    const heightPerCard = 70; // in vh
+    const animationDuration = numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
+
+    return baseHeight + animationDuration;
+}, []); // <-- CRITICAL: The dependency array is now empty.
+
+// ... rest of the component
+
+  // const handleCourseSwitch = (view: DomainView) => {
+  //   if (view !== activeCourseView) {
+  //     setActiveCourseView(view);
+  //     scrollRequestRef.current = true;
+  //   }
+  // };
+
+  // useLayoutEffect(() => {
+  //   if (scrollRequestRef.current && layout) {
+  //       const targetScrollY = layout.coursesTop;
         
-        const baseHeight = 120; // in vh
-        const heightPerCard = 70; // in vh
-        const animationDuration = numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
+  //       window.scrollTo({
+  //           top: targetScrollY,
+  //           behavior: "smooth"
+  //       });
 
-        return baseHeight + animationDuration;
-    }, [activeCourseView]);
-
-   const handleCourseSwitch = (view: DomainView) => {
-    if (view !== activeCourseView) {
-      setActiveCourseView(view);
-      scrollRequestRef.current = true;
-    }
-  };
-
-   // THIS IS THE CORRECTED CODE
-   useEffect(() => {
-    if (scrollRequestRef.current && layout) {
-        // The correct target is the exact top of the section.
-        const targetScrollY = layout.coursesTop;
-        
-        window.scrollTo({
-            top: targetScrollY,
-            behavior: "smooth"
-        });
-
-        scrollRequestRef.current = false;
-    }
-  }, [layout, activeCourseView]);
+  //       scrollRequestRef.current = false;
+  //   }
+  // }, [layout, activeCourseView]);
 
    const handleSetCourseProgress = (targetProgress: number) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
@@ -1204,7 +1216,7 @@ const LandingPage: FC = () => {
             <div className="sticky top-0 h-screen w-full">
               <CoursesSection
                 progress={coursesProgress}
-                onSwitchView={handleCourseSwitch}
+                onSwitchView={setActiveCourseView} 
                 onSetProgress={handleSetCourseProgress}
                 activeView={activeCourseView} // Pass down the controlled active view
               />

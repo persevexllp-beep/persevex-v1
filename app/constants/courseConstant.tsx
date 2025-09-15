@@ -1055,261 +1055,261 @@ export const technicalCourses: CourseType[] = [
     large_description:
       "This course introduces you to cloud computing concepts and the Amazon Web Services (AWS) platform. You'll learn how to design and deploy scalable, fault-tolerant applications using AWS services such as EC2, S3, Lambda, and RDS. The course also covers best practices for security, cost management, and performance optimization in the cloud.",
   },
-  {
-    id: "t5",
-    title: "Cybersecurity Essentials",
-    description: "Protect networks, systems, and data from cyber threats.",
-    icon: CybersecurityIcon,
-    route: "/courses/cyber-security",
-    slug: "cyber-security",
-    image: "/cybersec.png",
-    cardBg_image: "/cyber.png",
-    projects: [
-            {
-                name: 'Network Security Assessment',
-                description: 'Conduct comprehensive network security assessments to identify vulnerabilities and recommend solutions.',
-                image: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Ethical Hacking Lab',
-                description: 'Build and operate an ethical hacking lab to practice penetration testing techniques safely.',
-                image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Security Monitoring System',
-                description: 'Design and implement a security monitoring system using SIEM tools to detect and respond to threats.',
-                image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Incident Response Plan',
-                description: 'Develop a comprehensive incident response plan for organizations to effectively handle security breaches.',
-                image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Security Automation Framework',
-                description: 'Create automated security tools and scripts to streamline security operations and incident response.',
-                image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Web Application Security Testing',
-                description: 'Perform security assessments on web applications to identify and mitigate common vulnerabilities.',
-                image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            }
-        ],
-    modules: [
-      {
-        title: "Cybersecurity Fundamentals",
-        duration: "2 weeks",
-        lessons: 6,
-        description:
-          "Understand the core concepts, principles, and frameworks of cybersecurity.",
-        topics: [
-          "Introduction to Cybersecurity Landscape",
-          "Security Principles: CIA Triad and Defense in Depth",
-          "Types of Cyber Threats and Attack Vectors",
-          "Security Frameworks and Compliance Standards",
-          "Risk Assessment and Management",
-          "Cybersecurity Ethics and Legal Considerations",
-        ],
-      },
-      {
-        title: "Network Security",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Learn to secure network infrastructure and protect against network-based attacks.",
-        topics: [
-          "Network Architecture and Security Design",
-          "Firewalls, IDS/IPS, and Network Monitoring",
-          "VPNs and Secure Remote Access",
-          "Wireless Network Security",
-          "Network Vulnerability Assessment and Penetration Testing",
-        ],
-      },
-      {
-        title: "Application and Web Security",
-        duration: "2 weeks",
-        lessons: 6,
-        description:
-          "Master techniques for securing applications and web services against common vulnerabilities.",
-        topics: [
-          "OWASP Top 10 Vulnerabilities",
-          "Secure Coding Practices",
-          "Authentication and Authorization Mechanisms",
-          "API Security",
-          "Web Application Firewalls",
-          "Security Testing and Code Review",
-        ],
-      },
-      {
-        title: "Cryptography and Data Protection",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Understand cryptographic principles and implement data protection strategies.",
-        topics: [
-          "Cryptographic Algorithms and Protocols",
-          "Public Key Infrastructure (PKI)",
-          "Data Encryption and Hashing",
-          "Digital Signatures and Certificates",
-          "Data Loss Prevention Strategies",
-        ],
-      },
-      {
-        title: "Incident Response and Forensics",
-        duration: "2 weeks",
-        lessons: 6,
-        description:
-          "Learn to respond to security incidents and conduct digital forensic investigations.",
-        topics: [
-          "Incident Response Planning and Procedures",
-          "Digital Forensics Methodology",
-          "Evidence Collection and Handling",
-          "Malware Analysis",
-          "Log Analysis and Security Information Event Management (SIEM)",
-          "Disaster Recovery and Business Continuity",
-        ],
-      },
-    ],
-    programCardsHeading: [
-      "Cybersecurity Fundamentals",
-      "Network Security",
-      "Application & Web Security",
-      "Cryptography & Data Protection",
-      "Incident Response & Forensics",
-    ],
-    large_description:
-      "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities.",
-  },
-  {
-    id: "t6",
-    title: "Data Science",
-    description:
-      "Learn the art of data manipulation with our well designed data science course.",
-    icon: CybersecurityIcon,
-    route: "/courses/data-science",
-    slug: "data-science",
-    image: "/datasci.png",
-    cardBg_image: "/data.png",
-    projects:[
-            {
-                name: 'Customer Segmentation',
-                description: 'Analyze customer data to identify distinct segments for targeted marketing strategies.',
-                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Sales Forecasting',
-                description: 'Build predictive models to forecast future sales based on historical data and market trends.',
-                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Interactive Dashboard',
-                description: 'Create interactive data visualizations and dashboards to communicate insights effectively.',
-                image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Social Media Analysis',
-                description: 'Analyze social media data to extract insights about brand perception and customer sentiment.',
-                image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Fraud Detection System',
-                description: 'Develop models to identify fraudulent transactions and activities in financial data.',
-                image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            },
-            {
-                name: 'Market Basket Analysis',
-                description: 'Analyze purchase patterns to identify product associations and optimize product placement.',
-                image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
-            }
-        ],
-    modules: [
-      {
-        title: "Data Science Fundamentals",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Understand the data science lifecycle and essential tools for data analysis.",
-        topics: [
-          "Introduction to Data Science and Its Applications",
-          "Data Science Workflow and Methodology",
-          "Python for Data Science: NumPy and Pandas",
-          "Data Collection and Data Wrangling",
-          "Exploratory Data Analysis (EDA)",
-        ],
-      },
-      {
-        title: "Statistical Analysis and Visualization",
-        duration: "2 weeks",
-        lessons: 6,
-        description:
-          "Master statistical methods and data visualization techniques for effective data storytelling.",
-        topics: [
-          "Descriptive and Inferential Statistics",
-          "Probability Distributions and Hypothesis Testing",
-          "Correlation and Regression Analysis",
-          "Data Visualization Principles",
-          "Visualization Tools: Matplotlib, Seaborn, and Plotly",
-          "Interactive Dashboards with Tableau",
-        ],
-      },
-      {
-        title: "Machine Learning for Data Science",
-        duration: "3 weeks",
-        lessons: 7,
-        description:
-          "Apply machine learning algorithms to solve data science problems and make predictions.",
-        topics: [
-          "Supervised Learning Algorithms",
-          "Unsupervised Learning and Clustering",
-          "Dimensionality Reduction Techniques",
-          "Ensemble Methods",
-          "Time Series Analysis and Forecasting",
-          "Model Selection and Hyperparameter Tuning",
-          "Cross-Validation and Performance Metrics",
-        ],
-      },
-      {
-        title: "Big Data Analytics",
-        duration: "2 weeks",
-        lessons: 5,
-        description:
-          "Learn techniques for processing and analyzing large-scale datasets.",
-        topics: [
-          "Introduction to Big Data Ecosystems",
-          "Distributed Computing with Spark",
-          "SQL for Data Analysis",
-          "NoSQL Databases",
-          "Cloud Computing for Data Science",
-        ],
-      },
-      {
-        title: "Data Science in Practice",
-        duration: "3 weeks",
-        lessons: 6,
-        description:
-          "Apply data science techniques to real-world problems and learn best practices for deployment.",
-        topics: [
-          "End-to-End Data Science Projects",
-          "Feature Engineering in Practice",
-          "Model Deployment and API Development",
-          "Data Ethics and Privacy",
-          "Communicating Data Science Results",
-          "Data Science Project Management",
-        ],
-      },
-    ],
-    programCardsHeading: [
-      "Data Science Fundamentals",
-      "Stasticial Analysis and Visualization",
-      "Machine learning for Data Science",
-      "Big Data Analytics",
-      "Data Science in Practice",
-    ],
+  // {
+  //   id: "t5",
+  //   title: "Cybersecurity Essentials",
+  //   description: "Protect networks, systems, and data from cyber threats.",
+  //   icon: CybersecurityIcon,
+  //   route: "/courses/cyber-security",
+  //   slug: "cyber-security",
+  //   image: "/cybersec.png",
+  //   cardBg_image: "/cyber.png",
+  //   projects: [
+  //           {
+  //               name: 'Network Security Assessment',
+  //               description: 'Conduct comprehensive network security assessments to identify vulnerabilities and recommend solutions.',
+  //               image: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Ethical Hacking Lab',
+  //               description: 'Build and operate an ethical hacking lab to practice penetration testing techniques safely.',
+  //               image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Security Monitoring System',
+  //               description: 'Design and implement a security monitoring system using SIEM tools to detect and respond to threats.',
+  //               image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Incident Response Plan',
+  //               description: 'Develop a comprehensive incident response plan for organizations to effectively handle security breaches.',
+  //               image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Security Automation Framework',
+  //               description: 'Create automated security tools and scripts to streamline security operations and incident response.',
+  //               image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Web Application Security Testing',
+  //               description: 'Perform security assessments on web applications to identify and mitigate common vulnerabilities.',
+  //               image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           }
+  //       ],
+  //   modules: [
+  //     {
+  //       title: "Cybersecurity Fundamentals",
+  //       duration: "2 weeks",
+  //       lessons: 6,
+  //       description:
+  //         "Understand the core concepts, principles, and frameworks of cybersecurity.",
+  //       topics: [
+  //         "Introduction to Cybersecurity Landscape",
+  //         "Security Principles: CIA Triad and Defense in Depth",
+  //         "Types of Cyber Threats and Attack Vectors",
+  //         "Security Frameworks and Compliance Standards",
+  //         "Risk Assessment and Management",
+  //         "Cybersecurity Ethics and Legal Considerations",
+  //       ],
+  //     },
+  //     {
+  //       title: "Network Security",
+  //       duration: "2 weeks",
+  //       lessons: 5,
+  //       description:
+  //         "Learn to secure network infrastructure and protect against network-based attacks.",
+  //       topics: [
+  //         "Network Architecture and Security Design",
+  //         "Firewalls, IDS/IPS, and Network Monitoring",
+  //         "VPNs and Secure Remote Access",
+  //         "Wireless Network Security",
+  //         "Network Vulnerability Assessment and Penetration Testing",
+  //       ],
+  //     },
+  //     {
+  //       title: "Application and Web Security",
+  //       duration: "2 weeks",
+  //       lessons: 6,
+  //       description:
+  //         "Master techniques for securing applications and web services against common vulnerabilities.",
+  //       topics: [
+  //         "OWASP Top 10 Vulnerabilities",
+  //         "Secure Coding Practices",
+  //         "Authentication and Authorization Mechanisms",
+  //         "API Security",
+  //         "Web Application Firewalls",
+  //         "Security Testing and Code Review",
+  //       ],
+  //     },
+  //     {
+  //       title: "Cryptography and Data Protection",
+  //       duration: "2 weeks",
+  //       lessons: 5,
+  //       description:
+  //         "Understand cryptographic principles and implement data protection strategies.",
+  //       topics: [
+  //         "Cryptographic Algorithms and Protocols",
+  //         "Public Key Infrastructure (PKI)",
+  //         "Data Encryption and Hashing",
+  //         "Digital Signatures and Certificates",
+  //         "Data Loss Prevention Strategies",
+  //       ],
+  //     },
+  //     {
+  //       title: "Incident Response and Forensics",
+  //       duration: "2 weeks",
+  //       lessons: 6,
+  //       description:
+  //         "Learn to respond to security incidents and conduct digital forensic investigations.",
+  //       topics: [
+  //         "Incident Response Planning and Procedures",
+  //         "Digital Forensics Methodology",
+  //         "Evidence Collection and Handling",
+  //         "Malware Analysis",
+  //         "Log Analysis and Security Information Event Management (SIEM)",
+  //         "Disaster Recovery and Business Continuity",
+  //       ],
+  //     },
+  //   ],
+  //   programCardsHeading: [
+  //     "Cybersecurity Fundamentals",
+  //     "Network Security",
+  //     "Application & Web Security",
+  //     "Cryptography & Data Protection",
+  //     "Incident Response & Forensics",
+  //   ],
+  //   large_description:
+  //     "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities.",
+  // },
+  // {
+  //   id: "t6",
+  //   title: "Data Science",
+  //   description:
+  //     "Learn the art of data manipulation with our well designed data science course.",
+  //   icon: CybersecurityIcon,
+  //   route: "/courses/data-science",
+  //   slug: "data-science",
+  //   image: "/datasci.png",
+  //   cardBg_image: "/data.png",
+  //   projects:[
+  //           {
+  //               name: 'Customer Segmentation',
+  //               description: 'Analyze customer data to identify distinct segments for targeted marketing strategies.',
+  //               image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Sales Forecasting',
+  //               description: 'Build predictive models to forecast future sales based on historical data and market trends.',
+  //               image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Interactive Dashboard',
+  //               description: 'Create interactive data visualizations and dashboards to communicate insights effectively.',
+  //               image: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Social Media Analysis',
+  //               description: 'Analyze social media data to extract insights about brand perception and customer sentiment.',
+  //               image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Fraud Detection System',
+  //               description: 'Develop models to identify fraudulent transactions and activities in financial data.',
+  //               image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           },
+  //           {
+  //               name: 'Market Basket Analysis',
+  //               description: 'Analyze purchase patterns to identify product associations and optimize product placement.',
+  //               image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+  //           }
+  //       ],
+  //   modules: [
+  //     {
+  //       title: "Data Science Fundamentals",
+  //       duration: "2 weeks",
+  //       lessons: 5,
+  //       description:
+  //         "Understand the data science lifecycle and essential tools for data analysis.",
+  //       topics: [
+  //         "Introduction to Data Science and Its Applications",
+  //         "Data Science Workflow and Methodology",
+  //         "Python for Data Science: NumPy and Pandas",
+  //         "Data Collection and Data Wrangling",
+  //         "Exploratory Data Analysis (EDA)",
+  //       ],
+  //     },
+  //     {
+  //       title: "Statistical Analysis and Visualization",
+  //       duration: "2 weeks",
+  //       lessons: 6,
+  //       description:
+  //         "Master statistical methods and data visualization techniques for effective data storytelling.",
+  //       topics: [
+  //         "Descriptive and Inferential Statistics",
+  //         "Probability Distributions and Hypothesis Testing",
+  //         "Correlation and Regression Analysis",
+  //         "Data Visualization Principles",
+  //         "Visualization Tools: Matplotlib, Seaborn, and Plotly",
+  //         "Interactive Dashboards with Tableau",
+  //       ],
+  //     },
+  //     {
+  //       title: "Machine Learning for Data Science",
+  //       duration: "3 weeks",
+  //       lessons: 7,
+  //       description:
+  //         "Apply machine learning algorithms to solve data science problems and make predictions.",
+  //       topics: [
+  //         "Supervised Learning Algorithms",
+  //         "Unsupervised Learning and Clustering",
+  //         "Dimensionality Reduction Techniques",
+  //         "Ensemble Methods",
+  //         "Time Series Analysis and Forecasting",
+  //         "Model Selection and Hyperparameter Tuning",
+  //         "Cross-Validation and Performance Metrics",
+  //       ],
+  //     },
+  //     {
+  //       title: "Big Data Analytics",
+  //       duration: "2 weeks",
+  //       lessons: 5,
+  //       description:
+  //         "Learn techniques for processing and analyzing large-scale datasets.",
+  //       topics: [
+  //         "Introduction to Big Data Ecosystems",
+  //         "Distributed Computing with Spark",
+  //         "SQL for Data Analysis",
+  //         "NoSQL Databases",
+  //         "Cloud Computing for Data Science",
+  //       ],
+  //     },
+  //     {
+  //       title: "Data Science in Practice",
+  //       duration: "3 weeks",
+  //       lessons: 6,
+  //       description:
+  //         "Apply data science techniques to real-world problems and learn best practices for deployment.",
+  //       topics: [
+  //         "End-to-End Data Science Projects",
+  //         "Feature Engineering in Practice",
+  //         "Model Deployment and API Development",
+  //         "Data Ethics and Privacy",
+  //         "Communicating Data Science Results",
+  //         "Data Science Project Management",
+  //       ],
+  //     },
+  //   ],
+  //   programCardsHeading: [
+  //     "Data Science Fundamentals",
+  //     "Stasticial Analysis and Visualization",
+  //     "Machine learning for Data Science",
+  //     "Big Data Analytics",
+  //     "Data Science in Practice",
+  //   ],
     
-    large_description:
-      "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities.",
-  },
+  //   large_description:
+  //     "This course provides an overview of cybersecurity principles and practices essential for protecting digital assets. Topics include network security, threat detection, incident response, and risk management. You'll learn how to implement security measures to safeguard systems and data from cyber threats and vulnerabilities.",
+  // },
 ];
 
 

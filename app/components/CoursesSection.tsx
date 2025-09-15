@@ -148,7 +148,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   useMotionValueEvent(progress, "change", (latest) => {
     if (activeDomain) {
       const courseCount = activeDomain.courses.length;
-      // Map the 0-1 progress directly to a card index
       const cardIndex = Math.round(latest * (courseCount > 1 ? courseCount - 1 : 0));
       setActiveCardIndex(
         Math.max(0, Math.min(cardIndex, courseCount - 1))
@@ -172,19 +171,20 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     }
   }, [activeView, isMobile]);
 
-  // Simplified: handleTileClick now calculates a simple 0-1 progress value.
+  // THIS FUNCTION IS CORRECTED
   const handleTileClick = (index: number) => {
     if (!activeDomain) return;
     const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
-      onSetProgress(0.5); // Go to the middle for a single card
+      onSetProgress(0.5); 
       return;
     }
-    const targetProgress = index / (courseCount - 1);
+    // The previous formula was: index / (courseCount - 1);
+    // This is the correct formula to match the animation transform.
+    const targetProgress = (index + 1) / courseCount;
     onSetProgress(targetProgress);
   };
   
-  // Simplified: The animated progress maps the 0-1 smoothedProgress directly.
   const animatedCardProgress = useTransform(
     smoothedProgress,
     [0, 1],
@@ -225,7 +225,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           </div>
         </div>
 
-        <div className="relative w-full max-w-8xl h-10 flex items-center justify-center">
+        <div className="relative w-full max-w-8xl h-10  flex items-center justify-center">
           <AnimatePresence mode="wait">
             {activeDomain && (
               <motion.div
@@ -241,11 +241,11 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     <button
                       key={course.id}
                        onClick={() => handleTileClick(i)}
-                      className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-300 border
+                      className={`flex-shrink-0 rounded-full px-4 py-1 text-sm font-medium whitespace-nowrap transition-all duration-300 border
                         ${
                           activeCardIndex === i
-                            ? "bg-white text-black font-semibold border-white shadow-lg"
-                            : "bg-black/40 text-white border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50"
+                            ? "bg-white text-black cursor-pointer font-semibold border-white shadow-lg"
+                            : "bg-black/40 text-white cursor-pointer border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50"
                         }`}
                     >
                       {course.title}
@@ -258,7 +258,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="w-full pt-44 text-center md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-28 justify-center">
+      <div className="w-full pt-44 text-center md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-18 justify-center">
         <div className="relative w-full h-56 md:h-80 lg:ml-24">
           <AnimatePresence mode="wait">
             {activeDomain && (
@@ -285,7 +285,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="relative w-full md:w-1/2 h-[480px] mt-4 md:mt-12 flex items-center justify-center">
+      <div className="relative w-full md:w-1/2 h-[480px] mt-4 md:mt-20 flex items-center justify-center">
         {activeDomain &&
           activeDomain.courses.map((course, i) => (
             <Card

@@ -160,6 +160,12 @@ const LandingPage: FC = () => {
     const policySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
     const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
 
+    const [activeCourseView, setActiveCourseView] = useState<DomainView>(
+        allDomains.find(d => d.enabled)?.view || 'management'
+    );
+
+    const scrollRequestRef = useRef<boolean>(false);
+
     const [edgeProgress, setEdgeProgress] = useState<number>(0);
     const [partnersProgress, setPartnersProgress] = useState<number>(0);
     const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
@@ -191,51 +197,40 @@ const LandingPage: FC = () => {
     const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
     const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
-  const { totalUnits, domainProgressRanges } = useMemo(() => {
-    const DWELL_TIME_UNITS = 1;
-    let accumulatedUnits = 0;
-    const enabledDomains = allDomains.filter(d => d.enabled);
-    const totalUnits = enabledDomains.reduce((sum, domain) => sum + domain.courses.length, 0) + (enabledDomains.length - 1) * DWELL_TIME_UNITS;
+   const coursesSectionHeight = useMemo(() => {
+        const activeDomain = allDomains.find(d => d.view === activeCourseView);
+        const numCourses = activeDomain ? activeDomain.courses.length : 0;
+        
+        const baseHeight = 120; // in vh
+        const heightPerCard = 70; // in vh
+        const animationDuration = numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
 
-    const domainProgressRanges = enabledDomains.map(domain => {
-      const startUnit = accumulatedUnits;
-      accumulatedUnits += domain.courses.length;
-      const endUnit = accumulatedUnits;
-      accumulatedUnits += DWELL_TIME_UNITS;
+        return baseHeight + animationDuration;
+    }, [activeCourseView]);
 
-      return {
-        view: domain.view,
-        startProgress: startUnit / totalUnits,
-        endProgress: endUnit / totalUnits,
-        middleProgress: (startUnit / totalUnits + endUnit / totalUnits) / 2
-      };
-    });
-
-    return { totalUnits, domainProgressRanges };
-  }, []);
-
-  const coursesSectionHeight = 120 + totalUnits * 70;
-
-  const handleCourseSwitch = (view: DomainView) => {
-    if (!coursesSectionWrapperRef.current || !layout) return;
-    
-    const targetDomain = domainProgressRanges.find(d => d.view === view);
-    if (!targetDomain) return;
-
-    const { coursesTop } = layout;
-    const sectionHeight = coursesSectionWrapperRef.current.offsetHeight;
-    const viewportHeight = window.innerHeight;
-    const coursesStartZone = coursesTop - viewportHeight * 0.8;
-    const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
-    const totalZoneHeight = coursesEndZone - coursesStartZone;
-
-    const targetProgress = targetDomain.middleProgress;
-    
-    const targetScrollPosition = coursesStartZone + totalZoneHeight * targetProgress;
-    window.scrollTo({ top: targetScrollPosition, behavior: "smooth" });
+   const handleCourseSwitch = (view: DomainView) => {
+    if (view !== activeCourseView) {
+      setActiveCourseView(view);
+      scrollRequestRef.current = true;
+    }
   };
 
-  const handleSetCourseProgress = (targetProgress: number) => {
+   // THIS IS THE CORRECTED CODE
+   useEffect(() => {
+    if (scrollRequestRef.current && layout) {
+        // The correct target is the exact top of the section.
+        const targetScrollY = layout.coursesTop;
+        
+        window.scrollTo({
+            top: targetScrollY,
+            behavior: "smooth"
+        });
+
+        scrollRequestRef.current = false;
+    }
+  }, [layout, activeCourseView]);
+
+   const handleSetCourseProgress = (targetProgress: number) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
 
     const { coursesTop } = layout;
@@ -1207,13 +1202,12 @@ const LandingPage: FC = () => {
             style={{ height: `${coursesSectionHeight}vh` }}
           >
             <div className="sticky top-0 h-screen w-full">
-              {/* // NEW CODE START */}
               <CoursesSection
                 progress={coursesProgress}
                 onSwitchView={handleCourseSwitch}
                 onSetProgress={handleSetCourseProgress}
+                activeView={activeCourseView} // Pass down the controlled active view
               />
-              {/* // NEW CODE END */}
             </div>
           </div>
           <div style={{ height: "50vh" }} />
@@ -1327,4 +1321,4 @@ const LandingPage: FC = () => {
     </>
   );
 };
-export default LandingPage;
+export default LandingPage

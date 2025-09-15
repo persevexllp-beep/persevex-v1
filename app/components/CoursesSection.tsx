@@ -6,6 +6,7 @@ import {
   useMotionValueEvent,
   MotionValue,
   useSpring,
+  AnimatePresence,
 } from "framer-motion";
 import {
   CourseType,
@@ -19,6 +20,7 @@ interface CoursesSectionProps {
   progress: MotionValue<number>;
   onSwitchView: (view: DomainView) => void;
   onSetProgress: (progress: number) => void;
+  activeView: DomainView;
 }
 
 const useIsMobile = (breakpoint = 768) => {
@@ -122,134 +124,12 @@ const Card = ({
   );
 };
 
-const DomainTiles = ({
-  domain,
-  smoothedProgress,
-  activeCardIndex,
-  activeView,
-  handleTileClick,
-}: any) => {
-  const FADE_MARGIN = 0.05;
-  const opacity = useTransform(
-    smoothedProgress,
-    [
-      domain.startProgress - FADE_MARGIN,
-      domain.middleProgress,
-      domain.endProgress + FADE_MARGIN,
-    ],
-    [0, 1, 0]
-  );
-  const pointerEvents = useTransform(opacity, (o) =>
-    o > 0.1 ? "auto" : "none"
-  );
-
-  return (
-    <motion.div
-      key={`${domain.view}-tiles`}
-      className="absolute inset-0 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
-      style={{ opacity, pointerEvents }}
-    >
-      {domain.courses.map((course: any, i: any) => (
-        <button
-          key={course.id}
-          onClick={() => handleTileClick(domain.view, i)}
-          className={`flex-shrink-0 rounded-full px-3 py-1 text-xs transition-colors duration-300
-                ${
-                  activeCardIndex === i && activeView === domain.view
-                    ? "bg-white cursor-pointer text-black font-semibold"
-                    : "bg-black/30 cursor-pointer backdrop-blur-sm"
-                }`}
-        >
-          {course.title}
-        </button>
-      ))}
-    </motion.div>
-  );
-};
-
-const DomainContent = ({ domain, smoothedProgress }: any) => {
-  const FADE_MARGIN = 0.05;
-  const opacity = useTransform(
-    smoothedProgress,
-    [
-      domain.startProgress - FADE_MARGIN,
-      domain.middleProgress,
-      domain.endProgress + FADE_MARGIN,
-    ],
-    [0, 1, 0]
-  );
-  const y = useTransform(
-    smoothedProgress,
-    [
-      domain.startProgress - FADE_MARGIN,
-      domain.middleProgress,
-      domain.endProgress + FADE_MARGIN,
-    ],
-    [20, 0, -20]
-  );
-
-  return (
-    <motion.div
-      key={`${domain.view}-content`}
-      className="absolute top-0 left-0 w-full"
-      style={{ opacity, y }}
-    >
-      <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
-        {domain.content.heading}
-        <span className="block opacity-80">{domain.content.subheading}</span>
-      </h2>
-      <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-4">
-        {domain.content.paragraph}
-      </p>
-    </motion.div>
-  );
-};
-
-const DomainCardStack = ({ domain, smoothedProgress, isMobile }: any) => {
-  const animatedProgress = useTransform(
-    smoothedProgress,
-    [domain.startProgress, domain.endProgress],
-    [-1, domain.courses.length - 1]
-  );
-  const FADE_MARGIN = 0.05;
-  const opacity = useTransform(
-    smoothedProgress,
-    [
-      domain.startProgress - FADE_MARGIN,
-      domain.middleProgress,
-      domain.endProgress + FADE_MARGIN,
-    ],
-    [0, 1, 0]
-  );
-  const pointerEvents = useTransform(opacity, (o) =>
-    o > 0.1 ? "auto" : "none"
-  );
-
-  return (
-    <motion.div
-      key={`${domain.view}-stack`}
-      className="absolute inset-0 flex justify-center mt-24 lg:mt-0 items-center"
-      style={{ opacity, pointerEvents }}
-    >
-      {domain.courses.map((course: any, i: any) => (
-        <Card
-          key={course.id}
-          course={course}
-          animatedProgress={animatedProgress}
-          i={i}
-          isMobile={isMobile}
-        />
-      ))}
-    </motion.div>
-  );
-};
-
 const CoursesSection: React.FC<CoursesSectionProps> = ({
   progress,
   onSwitchView,
   onSetProgress,
+  activeView,
 }) => {
-  const [activeView, setActiveView] = useState<DomainView>("management");
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const isMobile = useIsMobile();
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -260,55 +140,22 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     damping: 90,
   });
 
-  const { domainData, totalUnits } = useMemo(() => {
-    const DWELL_TIME_UNITS = 1;
-    let accumulatedUnits = 0;
-    const enabledDomains = allDomains.filter((d) => d.enabled);
-    const totalUnits =
-      enabledDomains.reduce((sum, domain) => sum + domain.courses.length, 0) +
-      (enabledDomains.length - 1) * DWELL_TIME_UNITS;
-
-    const data = enabledDomains.map((domain) => {
-      const startUnit = accumulatedUnits;
-      accumulatedUnits += domain.courses.length;
-      const endUnit = accumulatedUnits;
-      accumulatedUnits += DWELL_TIME_UNITS;
-
-      const startProgress = startUnit / totalUnits;
-      const endProgress = endUnit / totalUnits;
-      const middleProgress = (startProgress + endProgress) / 2;
-
-      return {
-        ...domain,
-        startProgress,
-        endProgress,
-        middleProgress,
-      };
-    });
-
-    return { domainData: data, totalUnits };
-  }, []);
+  const activeDomain = useMemo(
+    () => allDomains.find((d) => d.view === activeView),
+    [activeView]
+  );
 
   useMotionValueEvent(progress, "change", (latest) => {
-    const newActiveDomain = domainData.find(
-      (d) => latest >= d.startProgress && latest < d.endProgress + 0.05
-    );
-    if (newActiveDomain) {
-      if (newActiveDomain.view !== activeView) {
-        setActiveView(newActiveDomain.view);
-      }
-
-      const progressWithinDomain =
-        (latest - newActiveDomain.startProgress) /
-        (newActiveDomain.endProgress - newActiveDomain.startProgress);
-      const cardIndex = Math.round(
-        -1 + progressWithinDomain * newActiveDomain.courses.length
-      );
+    if (activeDomain) {
+      const courseCount = activeDomain.courses.length;
+      // Map the 0-1 progress directly to a card index
+      const cardIndex = Math.round(latest * (courseCount > 1 ? courseCount - 1 : 0));
       setActiveCardIndex(
-        Math.max(0, Math.min(cardIndex, newActiveDomain.courses.length - 1))
+        Math.max(0, Math.min(cardIndex, courseCount - 1))
       );
     }
   });
+
 
   useEffect(() => {
     const activeDomainIndex = allDomains.findIndex(
@@ -323,32 +170,32 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         });
       }
     }
-  }, [activeView, isMobile]); // Added isMobile to dependencies to re-calculate on resize
+  }, [activeView, isMobile]);
 
-  const handleTileClick = (domain: DomainView, index: number) => {
-    const targetDomain = domainData.find((d) => d.view === domain);
-    if (!targetDomain) return;
-    const courseCount = targetDomain.courses.length;
+  // Simplified: handleTileClick now calculates a simple 0-1 progress value.
+  const handleTileClick = (index: number) => {
+    if (!activeDomain) return;
+    const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
-      onSetProgress(targetDomain.middleProgress);
+      onSetProgress(0.5); // Go to the middle for a single card
       return;
     }
-    const progressWithinRange = index / (courseCount - 1);
-    const targetProgress =
-      targetDomain.startProgress +
-      progressWithinRange *
-        (targetDomain.endProgress - targetDomain.startProgress);
-
+    const targetProgress = index / (courseCount - 1);
     onSetProgress(targetProgress);
   };
+  
+  // Simplified: The animated progress maps the 0-1 smoothedProgress directly.
+  const animatedCardProgress = useTransform(
+    smoothedProgress,
+    [0, 1],
+    [-1, (activeDomain?.courses.length || 1) - 1]
+  );
 
   return (
     <div className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-12 md:pb-0">
-      {/* Changed: Adjusted width and padding for mobile */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 flex w-full flex-col items-center gap-4 px-4 md:w-auto md:px-0">
-        {/* Changed: Added this wrapper to make buttons scrollable */}
-        <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
-          <div className="relative mx-auto flex w-fit items-center rounded-full bg-black/30 p-1 backdrop-blur-sm md:mx-0">
+      <div className="absolute  top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4  m">
+        <div className="w-full  overflow-x-auto scrollbar-hide md:w-fit">
+          <div className="relative mx-auto flex max-w-5xl items-center rounded-full bg-black/30 p-1 backdrop-blur-sm md:mx-0">
             <motion.div
               className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white"
               animate={sliderStyle}
@@ -378,42 +225,77 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           </div>
         </div>
 
-        {/* Changed: Adjusted width for consistency */}
-        <div className="relative w-full h-8 flex items-center justify-center">
-          {domainData.map((domain) => (
-            <DomainTiles
-              key={domain.view}
-              domain={domain}
-              smoothedProgress={smoothedProgress}
-              activeCardIndex={activeCardIndex}
-              activeView={activeView}
-              handleTileClick={handleTileClick}
-            />
-          ))}
+        <div className="relative w-full max-w-8xl h-10 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {activeDomain && (
+              <motion.div
+                key={activeDomain.view}
+                className="absolute inset-0 flex items-center justify-center gap-2 px-2 overflow-x-auto scrollbar-hide"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center gap-2 flex-nowrap min-w-fit">
+                  {activeDomain.courses.map((course, i) => (
+                    <button
+                      key={course.id}
+                       onClick={() => handleTileClick(i)}
+                      className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-300 border
+                        ${
+                          activeCardIndex === i
+                            ? "bg-white text-black font-semibold border-white shadow-lg"
+                            : "bg-black/40 text-white border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50"
+                        }`}
+                    >
+                      {course.title}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <div className="w-full pt-44 text-center md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-44 justify-center">
+      <div className="w-full pt-44 text-center md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-28 justify-center">
         <div className="relative w-full h-56 md:h-80 lg:ml-24">
-          {domainData.map((domain) => (
-            <DomainContent
-              key={domain.view}
-              domain={domain}
-              smoothedProgress={smoothedProgress}
-            />
-          ))}
+          <AnimatePresence mode="wait">
+            {activeDomain && (
+              <motion.div
+                key={activeDomain.view}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
+                  {activeDomain.content.heading}
+                  <span className="block opacity-80">
+                    {activeDomain.content.subheading}
+                  </span>
+                </h2>
+                <p className="lg:text-lg text-sm md:text-xl opacity-90 mt-4">
+                  {activeDomain.content.paragraph}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <div className="relative w-full md:w-1/2 h-[480px] mt-4 md:mt-0 flex items-center justify-center">
-        {domainData.map((domain) => (
-          <DomainCardStack
-            key={domain.view}
-            domain={domain}
-            smoothedProgress={smoothedProgress}
-            isMobile={isMobile}
-          />
-        ))}
+      <div className="relative w-full md:w-1/2 h-[480px] mt-4 md:mt-12 flex items-center justify-center">
+        {activeDomain &&
+          activeDomain.courses.map((course, i) => (
+            <Card
+              key={`${activeDomain.view}-${course.id}`}
+              course={course}
+              animatedProgress={animatedCardProgress}
+              i={i}
+              isMobile={isMobile}
+            />
+          ))}
       </div>
     </div>
   );

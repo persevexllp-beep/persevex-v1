@@ -39,7 +39,7 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
   const getButtonClass = (isActive: boolean) => 
     `w-full p-4 rounded-lg text-left transition-all duration-300 flex items-center gap-4 ${
       isActive
-        ? 'bg-white text-blue-900 shadow-lg font-bold'
+        ? 'bg-orange-400 cursor-pointer text-white shadow-lg font-bold'
         : 'text-gray-300 hover:bg-white/10'
     }`;
 

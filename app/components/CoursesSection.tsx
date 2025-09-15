@@ -145,15 +145,29 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     [activeView]
   );
 
-  useMotionValueEvent(progress, "change", (latest) => {
+   // THIS IS THE CORRECTED HOOK
+  useMotionValueEvent(smoothedProgress, "change", (latest) => {
     if (activeDomain) {
       const courseCount = activeDomain.courses.length;
-      const cardIndex = Math.round(latest * (courseCount > 1 ? courseCount - 1 : 0));
+      if (courseCount <= 1) {
+        setActiveCardIndex(0);
+        return;
+      }
+      
+      const animatedValue = (latest * courseCount) - 1;
+
+      // THE FIX: Subtract a small threshold (e.g., 0.3) before rounding.
+      // This means the button won't switch until the card is 80% (0.5 + 0.3)
+      // of the way through its animation, which feels much more natural.
+      const cardIndex = Math.round(animatedValue - 0.3);
+
       setActiveCardIndex(
         Math.max(0, Math.min(cardIndex, courseCount - 1))
       );
     }
   });
+
+
 
 
   useEffect(() => {
@@ -171,16 +185,19 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     }
   }, [activeView, isMobile]);
 
-  // THIS FUNCTION IS CORRECTED
+  // This function is for CLICKING and remains correct.
   const handleTileClick = (index: number) => {
+    // 1. Instantly update the button for immediate user feedback.
+    setActiveCardIndex(index);
+    
     if (!activeDomain) return;
     const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
       onSetProgress(0.5); 
       return;
     }
-    // The previous formula was: index / (courseCount - 1);
-    // This is the correct formula to match the animation transform.
+
+    // 2. Trigger the scroll to the correct position for that card.
     const targetProgress = (index + 1) / courseCount;
     onSetProgress(targetProgress);
   };

@@ -15,6 +15,11 @@ import {
 } from "../constants/courseConstant";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { IoIosPeople } from "react-icons/io";
+import { FaLaptopCode } from "react-icons/fa6";
+import { GiPlug } from "react-icons/gi";
+import { GiMechanicalArm } from "react-icons/gi";
+import { MdEngineering } from "react-icons/md";
 
 interface CoursesSectionProps {
   progress: MotionValue<number>;
@@ -135,27 +140,13 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
 
+  // --- MODIFIED: Use imported icons instead of paths ---
   const domainIcons = [
-    {
-      name: "Management",
-      iconPath: "/managementimage.png",
-    },
-    {
-      name: "Civil",
-      iconPath: "/civilimage.png",
-    },
-    {
-      name: "Computer Science",
-      iconPath: "/csimage.png",
-    },
-    {
-      name: "Mechanical",
-      iconPath: "/mechanicalimage.png",
-    },
-    {
-      name: "Electronics",
-      iconPath: "/electricalimage.png",
-    },
+    { name: "Management", icon: IoIosPeople },
+    { name: "Civil", icon: MdEngineering },
+    { name: "Computer Science", icon: FaLaptopCode },
+    { name: "Mechanical", icon: GiMechanicalArm },
+    { name: "Electronics", icon: GiPlug },
   ];
 
   const smoothedProgress = useSpring(progress, {
@@ -329,9 +320,13 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           <div className="w-full  rounded-2xl overflow-x-auto scrollbar-hide">
             <div className="relative mx-auto flex flex-wrap justify-center items-center gap-2 w-full max-w-full p-2 backdrop-blur-sm">
               {allDomains.map((domain, index) => {
+                // --- MODIFIED: Rendering logic for react-icons ---
                 const iconData = domainIcons.find(
                   (icon) => icon.name === domain.name
                 );
+                // Assign to a PascalCase variable for JSX
+                const IconComponent = iconData ? iconData.icon : null;
+
                 return (
                   <button
                     key={domain.name}
@@ -351,13 +346,14 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     }
                     `}
                   >
-                    {iconData ? (
-                      <Image
-                        src={iconData.iconPath}
-                        alt={domain.name}
-                        width={36}
-                        height={36}
-                        className="object-contain"
+                    {IconComponent ? (
+                      <IconComponent
+                        size={36}
+                        className={`transition-colors duration-300 ${
+                          activeView === domain.view
+                            ? "text-slate-800"
+                            : "text-white"
+                        }`}
                       />
                     ) : (
                       <span className="text-xs font-semibold text-white">
@@ -405,5 +401,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     </div>
   );
 };
+
 
 export default React.memo(CoursesSection);

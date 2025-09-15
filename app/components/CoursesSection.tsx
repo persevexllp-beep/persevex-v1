@@ -318,7 +318,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       {isMobile && (
         <div className="w-full flex flex-col gap-4 md:hidden ">
           <div className="w-full  rounded-2xl overflow-x-auto scrollbar-hide">
-            <div className="relative mx-auto flex flex-wrap justify-center items-center gap-2 w-full max-w-full p-2 backdrop-blur-sm">
+            <div className="relative mx-auto flex flex-wrap  justify-between items-center gap-2 w-full max-w-full p-2 backdrop-blur-sm">
               {allDomains.map((domain, index) => {
                 // --- MODIFIED: Rendering logic for react-icons ---
                 const iconData = domainIcons.find(
@@ -336,7 +336,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     onClick={() => domain.enabled && onSwitchView(domain.view)}
                     disabled={!domain.enabled}
                     title={domain.name} // Accessibility improvement
-                    className={`relative z-10 flex h-14 w-14 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
+                    className={`relative z-10 flex h-10 w-10 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
                     ${
                       !domain.enabled
                         ? "cursor-not-allowed opacity-50"
@@ -348,7 +348,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                   >
                     {IconComponent ? (
                       <IconComponent
-                        size={36}
+                        size={24}
                         className={`transition-colors duration-300 ${
                           activeView === domain.view
                             ? "text-slate-800"

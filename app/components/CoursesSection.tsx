@@ -18,7 +18,7 @@ import Image from "next/image";
 import { IoIosPeople } from "react-icons/io";
 import { FaLaptopCode } from "react-icons/fa6";
 import { GiPlug } from "react-icons/gi";
-import { GiMechanicalArm } from "react-icons/gi";
+import { FaScrewdriverWrench } from "react-icons/fa6";
 import { MdEngineering } from "react-icons/md";
 
 interface CoursesSectionProps {
@@ -145,7 +145,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     { name: "Management", icon: IoIosPeople },
     { name: "Civil", icon: MdEngineering },
     { name: "Computer Science", icon: FaLaptopCode },
-    { name: "Mechanical", icon: GiMechanicalArm },
+    { name: "Mechanical", icon: FaScrewdriverWrench },
     { name: "Electronics", icon: GiPlug },
   ];
 

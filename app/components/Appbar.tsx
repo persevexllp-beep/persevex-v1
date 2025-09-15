@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Link from 'next/link';
 import { useScroll, SectionKey } from '../contexts/scrollContext';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Image from 'next/image';
+import ProgramsMegaMenu from './ProgramsMegaMenu';
+
+type ProgramItem = { name: string; href: string; };
+type ProgramCategory = { branch: string; items: ProgramItem[]; };
 
 export default function Navbar() {
   const { scrollToSection } = useScroll();
@@ -25,27 +29,46 @@ export default function Navbar() {
     scrollToSection(key);
     setIsMobileMenuOpen(false);
   };
-
-  const programCategories = [
+  
+  const programCategories: ProgramCategory[] = [
     {
-      title: 'Technology',
+      branch: 'CSE / IT',
       items: [
-        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
+        { name: 'Machine Learning', href: '/courses/machine-learning' },
         { name: 'Web Development', href: '/courses/web-development' },
-        { name: 'Data Science', href: '/courses/data-science' },
+        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
         { name: 'Cyber Security', href: '/courses/cyber-security' },
-        {name: 'Cloud Computing', href: '/courses/cloud-computing' },
-        {name: 'Machine Learning', href: '/courses/machine-learning' },
+        { name: 'Data Science', href: '/courses/data-science' },
+        { name: 'Cloud Computing', href: '/courses/cloud-computing' },
       ],
     },
     {
-      title: 'Finance',
+      branch: 'Business & Finance',
       items: [
         { name: 'Finance', href: '/courses/finance' },
-        {name: 'Digital Marketing', href: '/courses/digital-marketing' },
-        {name: 'Modern Human Resourse', href: '/courses/human-resource' },
+        { name: 'Digital Marketing', href: '/courses/digital-marketing' },
+        { name: 'Modern Human Resourse', href: '/courses/human-resource' },
       ],
     },
+     {
+      branch: 'ECE / EEE',
+      items: [
+        { name: 'Embedded Systems', href: '/courses/embedded-systems' },
+        {name: 'Internet of Things(IOT)', href: '/courses/iot'}
+      ],
+    },
+    {
+      branch: 'Mechanical',
+      items: [
+        {name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocard'}
+      ]
+    },
+    {
+      branch: 'Civil',
+      items: [
+        {name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
+      ]
+    }
   ];
 
   const scrollButtons: { name: string; key: SectionKey }[] = [
@@ -55,16 +78,6 @@ export default function Navbar() {
     { name: "Testimonials", key: "testimonials" },
     { name: "About Us", key: "aboutUs" },
   ];
-
-  const desktopDropdownVariants: Variants = {
-    hidden: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2, ease: "easeOut" } },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25, staggerChildren: 0.05 } },
-  };
-
-  const desktopItemVariants: Variants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   const mobileMenuVariants: Variants = {
     hidden: { opacity: 0, transition: { duration: 0.3, ease: "easeOut" } },
@@ -102,26 +115,10 @@ export default function Navbar() {
             
             <AnimatePresence>
               {isDesktopDropdownOpen && (
-                <motion.div 
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl shadow-lg bg-zinc-900 ring-1 ring-white/10 z-10"
-                  initial="hidden" animate="visible" exit="hidden" variants={desktopDropdownVariants}
-                >
-                  <div className="py-2">
-                    {programCategories.map((category, index) => (
-                      <React.Fragment key={category.title}>
-                        {index > 0 && <div className="my-2 border-t border-white/10 mx-2"></div>}
-                        <p className="px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-wider">{category.title}</p>
-                        {category.items.map((item) => (
-                          <motion.div key={item.name} variants={desktopItemVariants}>
-                            <Link href={item.href} className="block px-4 py-2 text-sm text-gray-300 hover:bg-zinc-800 hover:text-white rounded-md mx-2 transition-colors duration-200" onClick={() => setIsDesktopDropdownOpen(false)}>
-                              {item.name}
-                            </Link>
-                          </motion.div>
-                        ))}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </motion.div>
+                <ProgramsMegaMenu
+                  programCategories={programCategories}
+                  onClose={() => setIsDesktopDropdownOpen(false)}
+                />
               )}
             </AnimatePresence>
           </div>
@@ -139,7 +136,6 @@ export default function Navbar() {
             </button>
           ))}
         </nav>
-
 
         <div className="md:hidden z-50">
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>

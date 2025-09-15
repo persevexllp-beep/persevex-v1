@@ -105,7 +105,7 @@ const Card = ({
           src={course.cardBg_image}
           alt={course.title}
           fill
-          style={{objectFit:"cover"}}
+          style={{ objectFit: "cover" }}
         />
       </div>
 
@@ -145,7 +145,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     [activeView]
   );
 
-   // THIS IS THE CORRECTED HOOK
+  // THIS IS THE CORRECTED HOOK
   useMotionValueEvent(smoothedProgress, "change", (latest) => {
     if (activeDomain) {
       const courseCount = activeDomain.courses.length;
@@ -153,22 +153,17 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         setActiveCardIndex(0);
         return;
       }
-      
-      const animatedValue = (latest * courseCount) - 1;
+
+      const animatedValue = latest * courseCount - 1;
 
       // THE FIX: Subtract a small threshold (e.g., 0.3) before rounding.
       // This means the button won't switch until the card is 80% (0.5 + 0.3)
       // of the way through its animation, which feels much more natural.
       const cardIndex = Math.round(animatedValue - 0.3);
 
-      setActiveCardIndex(
-        Math.max(0, Math.min(cardIndex, courseCount - 1))
-      );
+      setActiveCardIndex(Math.max(0, Math.min(cardIndex, courseCount - 1)));
     }
   });
-
-
-
 
   useEffect(() => {
     const activeDomainIndex = allDomains.findIndex(
@@ -189,11 +184,11 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   const handleTileClick = (index: number) => {
     // 1. Instantly update the button for immediate user feedback.
     setActiveCardIndex(index);
-    
+
     if (!activeDomain) return;
     const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
-      onSetProgress(0.5); 
+      onSetProgress(0.5);
       return;
     }
 
@@ -201,7 +196,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     const targetProgress = (index + 1) / courseCount;
     onSetProgress(targetProgress);
   };
-  
+
   const animatedCardProgress = useTransform(
     smoothedProgress,
     [0, 1],
@@ -210,11 +205,11 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
 
   return (
     <div className="relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-12 md:pb-0">
-      <div className="absolute  top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4  m">
-        <div className="w-full  overflow-x-auto scrollbar-hide md:w-fit">
-          <div className="relative mx-auto flex max-w-5xl items-center rounded-full bg-black/30 p-1 backdrop-blur-sm md:mx-0">
+      <div className="absolute   top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
+        <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
+          <div className="relative  mx- flex flex-wrap justify-center items-center w- max-w rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:w-fit md:flex-nowrap md:rounded-full md:p-1 md:mx-0">
             <motion.div
-              className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white"
+              className="absolute top-1 h-[calc(100%-0.5rem)] rounded-full bg-white hidden md:block"
               animate={sliderStyle}
               transition={{ type: "spring", stiffness: 350, damping: 30 }}
             />
@@ -231,7 +226,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                       !domain.enabled
                         ? "cursor-not-allowed text-white/50"
                         : activeView === domain.view
-                        ? "text-gray-900"
+                        ? "text-orange-600"
                         : "text-white"
                     }
                     `}
@@ -242,7 +237,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           </div>
         </div>
 
-        <div className="relative w-full max-w-8xl h-10  flex items-center justify-center">
+        {/* This container will now be hidden on mobile */}
+        <div className="relative w-full max-w-8xl h-10 hidden md:flex items-center justify-center">
           <AnimatePresence mode="wait">
             {activeDomain && (
               <motion.div
@@ -257,11 +253,11 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                   {activeDomain.courses.map((course, i) => (
                     <button
                       key={course.id}
-                       onClick={() => handleTileClick(i)}
+                      onClick={() => handleTileClick(i)}
                       className={`flex-shrink-0 rounded-full px-4 py-1 text-sm font-medium whitespace-nowrap transition-all duration-300 border
                         ${
                           activeCardIndex === i
-                            ? "bg-white text-black cursor-pointer font-semibold border-white shadow-lg"
+                            ? "bg-white text-orange-600 cursor-pointer font-semibold border-white shadow-lg"
                             : "bg-black/40 text-white cursor-pointer border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50"
                         }`}
                     >

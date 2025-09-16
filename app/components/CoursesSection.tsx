@@ -443,7 +443,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       </div>
       
       {isMobile && (
-        <div className="w-full rounded-2xl bg-black/20 p-2 backdrop-blur-sm mt-4 md:hidden z-20">
+        <div className="w-full rounded-2xl  p-2  mt-4 md:hidden z-20">
           <AnimatePresence mode="wait">
             {activeDomain && (
               <motion.div

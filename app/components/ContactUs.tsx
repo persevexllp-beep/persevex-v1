@@ -3,6 +3,8 @@ import React, { FC, FormEvent, useMemo, useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUkbelAPjlHEVBNf6gFjSKeky0zulirnvf-IQcdDsE36K2yVPFhaQ5Y3Y9-_H7Wb6OwQ/exec"; 
+
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -34,14 +36,40 @@ interface ContactUsSectionProps {
 
 const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
   const isMobile = useIsMobile();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus(null);
+    
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-    console.log("Form submitted:", data);
-    alert("Thank you for your message! We will get back to you soon.");
-    e.currentTarget.reset();
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      
+      const result = await response.json();
+
+      if (result.result === "success") {
+        setFormStatus("Thank you! Your message has been sent.");
+        alert("Thank you for your message! We will get back to you soon.");
+        e.currentTarget.reset();
+      } else {
+        throw new Error(result.message || "An unknown error occurred.");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message. Please try again later.";
+      setFormStatus(`Error: ${errorMessage}`);
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const { textStyle, formStyle } = useMemo(() => {
@@ -111,8 +139,8 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           variants={itemVariants}
           className="w-full max-w-lg bg-black/40 border-white/20 border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden"
         >
-       
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Form fields remain the same */}
             <div className="flex flex-col space-y-6">
               <div className="w-full">
                 <label htmlFor="name-mobile" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -132,8 +160,8 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
               <textarea name="message" id="message-mobile" rows={3} required placeholder="How can we help you?" className="block w-full px-4 py-3 rounded-lg bg-transparent border border-white/20 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 resize-none"/>
             </div>
             <div>
-              <button type="submit" className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">
-                Send Message
+              <button type="submit" disabled={isSubmitting} className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg text-base font-medium text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </div>
           </form>
@@ -153,32 +181,32 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
         </p>
       </div>
      
-      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white rounded-2xl p-8 backdrop-blur-sm   overflow-hidden">
-       
+      <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white rounded-2xl p-8 backdrop-blur-sm overflow-hidden">
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
-            <div className="w-full">
-              <label htmlFor="name-desktop" className="block text-xl font-medium text-gray-300 mb-2">Full Name</label>
-              <input type="text" name="name" id="name-desktop" autoComplete="name" required placeholder="John Doe" className="block w-full px-4 py-3 backdrop-blur-sm text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+            {/* Form fields remain the same */}
+            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
+                <div className="w-full">
+                <label htmlFor="name-desktop" className="block text-xl font-medium text-gray-300 mb-2">Full Name</label>
+                <input type="text" name="name" id="name-desktop" autoComplete="name" required placeholder="John Doe" className="block w-full px-4 py-3 backdrop-blur-sm text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+                </div>
+                <div className="w-full">
+                <label htmlFor="email-desktop" className="block text-xl font-medium text-gray-300 mb-2">Email Address</label>
+                <input type="email" name="email" id="email-desktop" autoComplete="email" required placeholder="you@example.com" className="block w-full px-4 py-3 text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+                </div>
             </div>
-            <div className="w-full">
-              <label htmlFor="email-desktop" className="block text-xl font-medium text-gray-300 mb-2">Email Address</label>
-              <input type="email" name="email" id="email-desktop" autoComplete="email" required placeholder="you@example.com" className="block w-full px-4 py-3 text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
+            <div>
+                <label htmlFor="phone-desktop" className="block text-xl font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
+                <input type="tel" name="phone" id="phone-desktop" autoComplete="tel" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 backdrop-blur-sm text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
             </div>
-          </div>
-          <div>
-            <label htmlFor="phone-desktop" className="block text-xl font-medium text-gray-300 mb-2">Phone Number (Optional)</label>
-            <input type="tel" name="phone" id="phone-desktop" autoComplete="tel" placeholder="+1 (555) 123-4567" className="block w-full px-4 py-3 backdrop-blur-sm text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300"/>
-          </div>
-          <div>
-            <label htmlFor="message-desktop" className="block text-xl font-medium text-gray-300 mb-2">Your Message</label>
-            <textarea name="message" id="message-desktop" rows={5} required placeholder="How can we help you achieve your goals?" className="block w-full px-4 py-3 text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300 resize-none"/>
-          </div>
-          <div>
-            <button type="submit" className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm  font-medium text-xl text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300">
-              Send Message
-            </button>
-          </div>
+            <div>
+                <label htmlFor="message-desktop" className="block text-xl font-medium text-gray-300 mb-2">Your Message</label>
+                <textarea name="message" id="message-desktop" rows={5} required placeholder="How can we help you achieve your goals?" className="block w-full px-4 py-3 text-xl rounded-lg bg-transparent border border-white placeholder-gray-500 text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white/50 transition-shadow duration-300 resize-none"/>
+            </div>
+            <div>
+              <button type="submit" disabled={isSubmitting} className="w-full cursor-pointer flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-xl text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </button>
+            </div>
         </form>
       </div>
     </div>

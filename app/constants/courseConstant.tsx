@@ -684,7 +684,7 @@ export const technicalCourses: CourseType[] = [
   {
     id: "t2",
     title: "Artificial Intelligence",
-    shortTitle: 'AI',
+    shortTitle: 'Aritficial Intelligence',
     description: "Explore the foundations of AI and build intelligent agents.",
     icon: AIIcon,
     route: "/courses/artificial-intelligence",
@@ -816,7 +816,7 @@ export const technicalCourses: CourseType[] = [
   {
     id: "t3",
     title: "Machine Learning",
-    shortTitle: 'ML',
+    shortTitle: 'Machine Learning',
     description: "Dive into data analysis, model deployment, and MLOps.",
     icon: MLIcon,
     route: "/courses/machine-learning",

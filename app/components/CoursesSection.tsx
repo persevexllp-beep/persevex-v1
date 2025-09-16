@@ -140,7 +140,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
 
-  // --- MODIFIED: Use imported icons instead of paths ---
   const domainIcons = [
     { name: "Management", icon: IoIosPeople },
     { name: "Civil", icon: MdEngineering },
@@ -207,7 +206,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   );
 
   return (
-    <div className="lg:relative w-full h-full text-white flex flex-col md:flex-row gap-24 lg:gap-8 justify-end md:justify-center mx-auto px-4 sm:px-8 items-center pb-8 md:pb-0">
+    <div className="lg:relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
         <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
@@ -240,7 +239,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
               ))}
             </div>
           </div>
-
           <div className="relative w-full max-w-8xl h-10 flex items-center justify-center">
             <AnimatePresence mode="wait">
               {activeDomain && (
@@ -275,8 +273,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       )}
 
-      <div className="w-full pt-16 lg:pt-24 text-center  md:text-left md:pt-0 md:static md:w-full md:p-0 flex items-center lg:mb-18 justify-center">
-        <div className="relative w-full h-full md:h-80 lg:ml-24">
+      <div className="w-full text-center md:text-left md:w-full flex items-center justify-center md:p-0 lg:mb-18">
+        <div className="w-full h-auto md:relative md:h-80 lg:ml-24">
           <AnimatePresence mode="wait">
             {activeDomain && (
               <motion.div
@@ -285,9 +283,9 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="absolute inset-0"
+                className="md:absolute md:inset-0"
               >
-                <h2 className=" text-2xl md:text-6xl font-extrabold leading-tight">
+                <h2 className="text-2xl sm:text-4xl md:text-6xl font-extrabold leading-tight">
                   {activeDomain.content.heading}
                   <span className="block opacity-80">
                     {activeDomain.content.subheading}
@@ -302,7 +300,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       </div>
 
-      <div className="relative w-full md:w-1/2 h-full lg:h-[480px] mt-4  md:mt-20 flex items-center justify-center">
+      <div className="relative w-full md:w-1/2 h-[400px] md:h-full lg:h-[480px] flex items-center justify-center z-10">
         {activeDomain &&
           activeDomain.courses.map((course, i) => (
             <Card
@@ -316,15 +314,13 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       </div>
 
       {isMobile && (
-        <div className="w-full flex flex-col gap-4 md:hidden ">
-          <div className="w-full  rounded-2xl overflow-x-auto scrollbar-hide">
-            <div className="relative mx-auto flex flex-wrap  justify-between items-center gap-2 w-full max-w-full p-2 backdrop-blur-sm">
+        <div className="relative w-full flex flex-col gap-4 md:hidden z-20 mt-24">
+          <div className="w-full rounded-2xl bg-black/20 p-2 backdrop-blur-sm">
+            <div className="flex flex-wrap justify-center items-center gap-2 w-full">
               {allDomains.map((domain, index) => {
-                // --- MODIFIED: Rendering logic for react-icons ---
                 const iconData = domainIcons.find(
                   (icon) => icon.name === domain.name
                 );
-                // Assign to a PascalCase variable for JSX
                 const IconComponent = iconData ? iconData.icon : null;
 
                 return (
@@ -335,16 +331,15 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     }}
                     onClick={() => domain.enabled && onSwitchView(domain.view)}
                     disabled={!domain.enabled}
-                    title={domain.name} // Accessibility improvement
+                    title={domain.name}
                     className={`relative z-10 flex h-10 w-10 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
                     ${
                       !domain.enabled
                         ? "cursor-not-allowed opacity-50"
                         : activeView === domain.view
-                        ? "scale-110 bg-white/90 ring-2 ring-white/50" // Active state
-                        : "bg-white/10 hover:bg-white/20" // Inactive state
-                    }
-                    `}
+                        ? "scale-110 bg-white/90 ring-2 ring-white/50"
+                        : "bg-white/10 hover:bg-white/20"
+                    }`}
                   >
                     {IconComponent ? (
                       <IconComponent
@@ -365,7 +360,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
               })}
             </div>
           </div>
-          <div className="w-full border rounded-2xl  overflow-x-auto scrollbar-hide md:w-fit">
+          <div className="w-full rounded-2xl bg bg-black/20 backdrop-blur-sm">
             <AnimatePresence mode="wait">
               {activeDomain && (
                 <motion.div
@@ -374,24 +369,22 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.3 }}
-                  className="relative  mx- flex flex-wrap justify-center   items-center w- max-w rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:w-fit md:flex-nowrap md:rounded-full md:p-1 md:mx-0"
+                  className="flex flex-wrap justify-center items-center w-full gap-2 p-2"
                 >
-                  <div className="  flex  items-center justify-center flex-wrap gap-2">
-                    {activeDomain.courses.map((course, i) => (
-                      <button
-                        key={course.id}
-                        onClick={() => handleTileClick(i)}
-                        className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs md:text-sm font-semibold transition-colors duration-300
+                  {activeDomain.courses.map((course, i) => (
+                    <button
+                      key={course.id}
+                      onClick={() => handleTileClick(i)}
+                      className={`z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs font-semibold transition-colors duration-300
                           ${
                             activeCardIndex === i
-                              ? " text-orange-600 bg-white font-semibold"
-                              : " text-white bg-black/40 backdrop-blur-sm"
+                              ? "bg-white text-orange-600 font-semibold"
+                              : "bg-black/40 text-white backdrop-blur-sm"
                           }`}
-                      >
-                        {course.shortTitle || course.title}
-                      </button>
-                    ))}
-                  </div>
+                    >
+                      {course.shortTitle || course.title}
+                    </button>
+                  ))}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -401,6 +394,5 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     </div>
   );
 };
-
 
 export default React.memo(CoursesSection);

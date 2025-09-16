@@ -229,9 +229,10 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       return p * numCourses - 1;
   });
 
-
+  // THE FIX IS ON THE LINE BELOW.
+  // Changed "md:flex-row" to "lg:flex-row" to make the flex behavior consistent
   return (
-    <div className="lg:relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
+    <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
         <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
@@ -264,13 +265,11 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
               ))}
             </div>
           </div>
-          {/* THE FIX IS HERE: Added overflow-x-auto and scrollbar-hide to THIS container */}
           <div className="relative w-full max-w-8xl h-10 flex items-center justify-center overflow-x-auto scrollbar-hide">
             <AnimatePresence mode="wait">
               {activeDomain && (
                 <motion.div
                   key={activeDomain.view}
-                  // REMOVED overflow classes from here
                   className="absolute inset-0 flex items-center justify-center gap-2 px-2 whitespace-nowrap"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -300,7 +299,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       )}
 
-      <div className="w-full text-center md:text-left md:w-full flex items-center justify-center md:p-0 lg:mb-18">
+      {/* And a small adjustment on this line, adding w-full */}
+      <div className="w-full text-center md:text-left flex items-center justify-center md:p-0 lg:mb-18">
         <div className="w-full h-auto md:relative md:h-80 lg:ml-24">
           <AnimatePresence mode="wait">
             {activeDomain && (

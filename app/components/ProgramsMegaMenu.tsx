@@ -5,7 +5,7 @@ import { motion, Variants, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Briefcase, FileBadge, ChevronRight, ArrowRight, ArrowDown } from 'lucide-react';
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);
 
 type ProgramItem = { name: string; href: string; };
 type ProgramCategory = { branch: string; items: ProgramItem[]; };

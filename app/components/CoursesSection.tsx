@@ -110,6 +110,11 @@ const Card = ({
           src={course.cardBg_image}
           alt={course.title}
           fill
+          // The `sizes` prop informs the browser about the image's width at different breakpoints.
+          // This is crucial for performance when using `fill`, as it allows Next.js to serve the most appropriately sized image.
+          // - Below 427px: the card is 90vw wide.
+          // - Above 427px: the card is capped at max-w-sm (384px).
+          sizes="(max-width: 427px) 90vw, 384px"
           style={{ objectFit: "cover" }}
         />
       </div>

@@ -17,7 +17,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "The Portfolio Management course provided me with a structured approach to asset allocation and risk management. My clients have seen consistent returns even in volatile markets.",
     name: "David K.",
     title: "Goldman Sachs",
-    image: "/dog6.jpg",
+    image: "/artificialint.png",
     bgImage: '/hat.png',
     bgPosition: 'top 40% right 50%',
     planetImage: '/artificialint.png' // New
@@ -27,7 +27,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "The Finance program at Persevex helped me land a role as an Analyst. The learning was top-notch, the internship was valuable, and the support was great throughout. Highly recommended for anyone serious about finance.",
     name: "Ravi K.",
     title: "Xaviers",
-    image: "/dog5.jpeg",
+    image: "/machine.png",
     bgImage: '/hat.png',
     bgPosition: 'bottom 40% left 10%',
     planetImage: '/machine.png' // New
@@ -37,7 +37,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's HR course helped me improve my understanding of people management and workplace dynamics. Their structured content and helpful mentors gave me a clear path to grow in my HR career.",
     name: "Virat S R.",
     title: "PurpleMerit",
-    image: "/cat2.jpeg",
+    image: "/cybersec.png",
     bgImage: '/hat.png',
     bgPosition: 'bottom 50% left 80%',
     planetImage: '/cybersec.png' // New
@@ -47,7 +47,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's Artificial Intelligence course helped me shift careers confidently. The hands-on projects, live sessions, and mentor support made learning enjoyable and effective. I now build and deploy AI models independently.",
     name: "Pramod C A.",
     title: "Infosys",
-    image: "/bear1.jpg",
+    image: "/finan.png",
     bgImage: '/hat.png',
     bgPosition: 'top 15% left 15%',
     planetImage: '/finan.png' // New
@@ -57,7 +57,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's internship and training in data science gave me hands-on experience and the technical skills needed to succeed in the field. If you're aiming to upskill and gain real-world exposure, this is the place to start.",
     name: "Samarth M N.",
     title: "Cognizant",
-    image: "/dog3.jpg",
+    image: "/digitalmar.png",
     bgImage: '/hat.png',
     bgPosition: 'center right 10%',
     planetImage: '/digitalmar.png' // New
@@ -67,7 +67,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Joined Persevex's Digital Marketing course and it exceeded my expectations. From SEO to social media strategy, everyttaught in-depth and practically. I'm now working as a mstrategist and it's all thanks to the solid foundatihere.",
     name: "Aryan.",
     title: "EY",
-    image: "/cat1.jpg",
+    image: "/webdevl.png",
     bgImage: '/hat.png',
     bgPosition: 'bottom center',
     planetImage: '/webdevl.png' // New
@@ -77,7 +77,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's internship and training in machine learning gave me practical experience and the confidence to work in the field. If you're looking to upskill and gain real exposure, this is the place to be.",
     name: "Nruputanga",
     title: "Accenture",
-    image: "/dog1.jpeg",
+    image: "/datasci.png",
     bgImage: '/hat.png',
     bgPosition: 'top left',
     planetImage: '/datasci.png' // Re-using planet1 for the 7th card

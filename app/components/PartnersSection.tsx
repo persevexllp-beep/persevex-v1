@@ -144,6 +144,7 @@ const PartnersSection: React.FC<PartnersSectionProps> = ({ progress }) => {
                   alt={`${partner.name} logo`}
                   fill
                   className="object-contain"
+                  sizes="(max-width: 427px) 90vw, 384px"
                />
             </div>
           </div>

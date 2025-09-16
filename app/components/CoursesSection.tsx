@@ -114,7 +114,7 @@ const Card: React.FC<CardProps> = ({
         
         exit: "exit",
          transition: { duration: 0.3, ease: "easeInOut" as const },
-        className: `relative overflow-hidden border-2 border-[rgba(255,255,255,0.3)] w-[90vw] max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[380px] p-6`
+        className: `relative overflow-hidden border-2 border-[rgba(255,255,255,0.3)] w-[80vw] max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[320px] p-`
       }
     : {
         style: {
@@ -139,7 +139,7 @@ const Card: React.FC<CardProps> = ({
           src={course.cardBg_image}
           alt={course.title}
           fill
-          sizes="(max-width: 427px) 90vw, 384px"
+          sizes="(max-width: 427px) 80vw, 304px"
           style={{ objectFit: "cover" }}
         />
       </div>
@@ -413,7 +413,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       )}
 
       {/* MODIFICATION 4: Conditionally render cards */}
-      <div className="relative w-full md:w-1/2 h-full p-2 md:h-full lg:h-[480px] flex items-center justify-center z-10">
+      <div className="relative w-full md:w-1/2 h-fit  p-2 md:h-full lg:h-[480px] flex items-center justify-center z-10">
         {activeDomain && (
             isMobile ? (
                 // --- MOBILE: FADE ANIMATION ---

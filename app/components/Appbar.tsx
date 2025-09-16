@@ -150,7 +150,8 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-center text-white"
+            // UPDATED: Changed justify-center to justify-start, added pt-24 for spacing from top, and overflow-y-auto for scrolling on small screens.
+            className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-start pt-24 text-white overflow-y-auto"
             variants={mobileMenuVariants}
             initial="hidden"
             animate="visible"
@@ -159,7 +160,8 @@ export default function Navbar() {
             <motion.div variants={mobileLinkVariants} className="text-center w-full">
               <button
                 onClick={() => setIsMobileProgramsOpen(!isMobileProgramsOpen)}
-                className="text-2xl font-semibold py-4 flex items-center justify-center w-full gap-2"
+                // UPDATED: Reduced font size and padding for a tighter mobile layout.
+                className="text-xl font-semibold py-3 flex items-center justify-center w-full gap-2"
               >
                 Programs
                 <motion.svg animate={{ rotate: isMobileProgramsOpen ? 180 : 0 }} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></motion.svg>
@@ -173,9 +175,15 @@ export default function Navbar() {
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="pt-2 pb-4 flex flex-col gap-3">
+                    <div className="pt-2 pb-4 flex flex-col gap-1">
                       {programCategories.flatMap(cat => cat.items).map(item => (
-                        <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="text-base text-gray-300 hover:text-white">
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          // UPDATED: Added py-2 for better tap targets on sub-menu items.
+                          className="py-2 text-base text-gray-300 hover:text-white"
+                        >
                           {item.name}
                         </Link>
                       ))}
@@ -190,7 +198,8 @@ export default function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-semibold py-4"
+                // UPDATED: Reduced font size and padding to match other items.
+                className="text-xl font-semibold py-3 block"
               >
                 LMS
               </Link>
@@ -200,7 +209,8 @@ export default function Navbar() {
                 key={button.name}
                 variants={mobileLinkVariants}
                 onClick={() => handleMobileLinkClick(button.key)}
-                className="text-2xl font-semibold py-4"
+                // UPDATED: Reduced font size and padding to match other items.
+                className="text-xl font-semibold py-3"
               >
                 {button.name}
               </motion.button>

@@ -40,7 +40,7 @@ const CurriculumSection: React.FC<CurriculumSectionProps> = ({ modules }) => {
   const [expanded, setExpanded] = useState<number | null>();
 
   return (
-    <div className="py-24">
+    <div className="py-24 px-4">
       <div className="text-center flex flex-col items-center justify-center max-w-4xl mx-auto">
         <div className="inline-flex mb-4 w-fit items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
           <span className="text-orange-400 text-sm font-medium">Curriculum</span>

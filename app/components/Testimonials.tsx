@@ -63,6 +63,7 @@ export const AnimatedTestimonials = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const controls = useAnimationControls();
+  const isAnimating = useRef(false); // Use a ref to track animation state
 
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
   const [showIndicator, setShowIndicator] = useState(isMobile);
@@ -77,19 +78,8 @@ export const AnimatedTestimonials = ({
   const DURATION_PER_CARD = 5;
   const totalDuration = testimonials.length * DURATION_PER_CARD;
 
+  // This effect calculates dimensions and is fine as is
   useEffect(() => {
-    const startAutoFlow = (duration: number) => {
-      controls.start({
-        x: constraints.left,
-        transition: {
-          duration,
-          ease: "linear" as const,
-          repeat: Infinity,
-          repeatType: "loop" as const,
-        },
-      });
-    };
-
     const calculateConstraints = () => {
       if (containerRef.current && trackRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
@@ -105,7 +95,6 @@ export const AnimatedTestimonials = ({
 
         if (isMobile) {
           x.set(right);
-          startAutoFlow(totalDuration);
         }
       }
     };
@@ -113,22 +102,47 @@ export const AnimatedTestimonials = ({
     calculateConstraints();
     window.addEventListener("resize", calculateConstraints);
     return () => {
-      controls.stop();
       window.removeEventListener("resize", calculateConstraints);
-    }
-  }, [testimonials, isMobile, x, controls, constraints.left, totalDuration]);
-
-  useEffect(() => {
-    if (isMobile) {
-      controls.stop();
-      return;
     };
-    const totalRange = constraints.right - constraints.left;
-    if (totalRange === 0) return;
-    const targetX = constraints.right - totalRange * progress;
-    x.set(targetX);
-  }, [progress, constraints, isMobile, x, controls]);
+  }, [testimonials, isMobile, x]);
 
+  // This effect now correctly handles BOTH desktop scroll and mobile animation control
+  useEffect(() => {
+    // Desktop logic: Update position based on scroll progress
+    if (!isMobile) {
+      const totalRange = constraints.right - constraints.left;
+      if (totalRange === 0) return;
+      const targetX = constraints.right - totalRange * progress;
+      x.set(targetX);
+      return;
+    }
+
+    // Mobile logic: Use progress to start/stop the animation
+    const shouldBeAnimating = progress > 0.05 && progress < 0.95;
+
+    if (shouldBeAnimating && !isAnimating.current) {
+      isAnimating.current = true;
+      const currentX = x.get();
+      const totalDistance = constraints.right - constraints.left;
+      const remainingDistance = currentX - constraints.left;
+      const progressPercent = totalDistance > 0 ? remainingDistance / totalDistance : 0;
+      const remainingDuration = totalDuration * progressPercent;
+      
+      controls.start({
+        x: constraints.left,
+        transition: {
+          duration: remainingDuration > 0 ? remainingDuration : totalDuration,
+          ease: "linear" as const,
+          repeat: Infinity,
+          repeatType: "loop" as const,
+        },
+      });
+    } else if (!shouldBeAnimating && isAnimating.current) {
+      isAnimating.current = false;
+      controls.stop();
+    }
+  }, [progress, constraints, isMobile, x, controls, totalDuration]);
+  
   useEffect(() => {
     if (!isMobile) return;
     const timer = setTimeout(() => {
@@ -140,6 +154,7 @@ export const AnimatedTestimonials = ({
 
   const handleDragStart = () => {
     setShowIndicator(false);
+    isAnimating.current = false;
     controls.stop();
   };
 
@@ -147,12 +162,13 @@ export const AnimatedTestimonials = ({
     const currentX = x.get();
     const totalDistance = constraints.right - constraints.left;
     const remainingDistance = currentX - constraints.left;
-    
+
     if (totalDistance === 0) return;
 
-    const progress = remainingDistance / totalDistance;
-    const remainingDuration = totalDuration * progress;
+    const progressPercent = remainingDistance / totalDistance;
+    const remainingDuration = totalDuration * progressPercent;
     
+    isAnimating.current = true;
     controls.start({
       x: constraints.left,
       transition: {

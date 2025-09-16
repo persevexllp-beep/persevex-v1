@@ -21,12 +21,12 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
           </span>
         </h1>
         
-        <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
+        <p className="text-sm md:text-xl text-gray-400 max-w-2xl leading-relaxed">
           Everything you need to know about our internship program. 
           Can't find the answer you're looking for? 
-          <span className="text-orange-400 hover:text-orange-300 cursor-pointer transition-colors">
+          <a href="#contact-form" className="text-orange-400 hover:text-orange-300 cursor-pointer transition-colors">
             {" "}Reach out to our team.
-          </span>
+          </a>
         </p>
       </div>
 
@@ -36,8 +36,8 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
         ))}
       </div>
 
-      <div className="mt-20">
-        <div className="max-w-5xl mx-auto p-8 rounded-2xl backdrop-blur-xs border border-gray-700/50 ">
+      <div id="contact-form" className="mt-20 scroll-mt-24"> {/* Added ID and scroll-margin */}
+        <div className="max-w-5xl mx-auto p-6 sm:p-8 rounded-2xl backdrop-blur-xs border border-gray-700/50 ">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-semibold text-white mb-2">
               Still have questions?

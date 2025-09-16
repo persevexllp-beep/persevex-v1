@@ -23,10 +23,10 @@ export default function AccordionItem({
       className="group relative"
     >
       {/* Glow effect */}
-      <div className="absolute -inset-0.5  rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
+      <div className="absolute -inset-0.5 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000 group-hover:duration-200"></div>
       
       {/* Main container */}
-      <div className="relative  backdrop-blur-xl rounded-2xl border border-gray-700/50 group-hover:border-orange-500/50 transition-all duration-300">
+      <div className="relative backdrop-blur-xl rounded-2xl border border-gray-700/50 group-hover:border-orange-500/50 transition-all duration-300">
         {/* Question Header */}
         <motion.div
           onClick={toggleOpen}
@@ -36,7 +36,7 @@ export default function AccordionItem({
         >
           <div className="flex items-start gap-4 flex-1">
             {/* Question number */}
-            <div className="flex-shrink-0 w-8 h-8 rounded-full  flex items-center justify-center text-orange-500 text-sm font-bold">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-orange-500 text-sm font-bold">
               {(index + 1).toString().padStart(2, '0')}
             </div>
             
@@ -52,7 +52,7 @@ export default function AccordionItem({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="flex-shrink-0 ml-4"
           >
-            <div className="w-10 h-10 rounded-full  flex items-center justify-center  transition-colors duration-300">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -102,7 +102,7 @@ export default function AccordionItem({
                   
                   {/* Answer text */}
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-gray-300 text-base md:text-lg leading-relaxed m-0">
+                    <p className="text-gray-300 text-sm md:text-lg leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>

@@ -27,10 +27,10 @@ const PartnerCard = ({ logo }: { logo: PartnerLogo }) => {
     <div
       className="
         relative group flex justify-center items-center
-        h-32 md:h-36 p-6 bg-white/5 border border-white/10 
+        h-32 md:h-36 p-6 bg-white border border-white/10 
         rounded-xl backdrop-blur-sm cursor-pointer
         transition-all duration-300 ease-in-out
-        hover:bg-white/15 hover:border-white/20 hover:scale-105
+         hover:border-white/20 hover:scale-105
       "
     >
       <Image

@@ -7,6 +7,7 @@ import {
   MotionValue,
   useSpring,
   AnimatePresence,
+  useMotionValue, // Import useMotionValue for fallback
 } from "framer-motion";
 import {
   CourseType,
@@ -45,19 +46,26 @@ const useIsMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-const Card = ({
+// MODIFICATION 1: Update Card props to make animation-specific props optional
+interface CardProps {
+  course: CourseType;
+  isMobile: boolean;
+  animatedProgress?: MotionValue<number>;
+  i?: number;
+}
+
+const Card: React.FC<CardProps> = ({
   course,
   animatedProgress,
   i,
   isMobile,
-}: {
-  course: CourseType;
-  animatedProgress: MotionValue<number>;
-  i: number;
-  isMobile: boolean;
 }) => {
   const router = useRouter();
-  const distance = useTransform(animatedProgress, (p) => p - i);
+
+  // --- DESKTOP STACKING ANIMATION LOGIC ---
+  // We use fallbacks (e.g., useMotionValue(0)) so the hooks don't break on mobile
+  // when animatedProgress or i are undefined.
+  const distance = useTransform(animatedProgress ?? useMotionValue(0), (p) => p - (i ?? 0));
   const initialY = 480;
   const stackOffset = 14;
   const stackScale = 0.05;
@@ -88,32 +96,49 @@ const Card = ({
   const overlayOpacity = useTransform(distance, (d) =>
     d > 0 ? Math.min(maxOverlayOpacity, d * baseDarknessFactor) : 0
   );
+  // --- END DESKTOP LOGIC ---
+
+  // MODIFICATION 2: Define animation variants for mobile fade effect
+  const mobileFadeVariants = {
+    initial: { opacity: 0, scale: 0.95 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
+  };
+  
+  // MODIFICATION 3: Conditionally apply animation props and styles
+  const motionProps = isMobile
+    ? {
+        variants: mobileFadeVariants,
+        initial: "initial",
+        animate: "animate",
+        
+        exit: "exit",
+         transition: { duration: 0.3, ease: "easeInOut" as const },
+        className: `relative overflow-hidden border-2 border-[rgba(255,255,255,0.3)] w-[90vw] max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[380px] p-6`
+      }
+    : {
+        style: {
+          translateY,
+          scale,
+          opacity: cardOpacity,
+          zIndex: i,
+          pointerEvents,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        },
+        className: `absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[420px] p-8`
+      };
 
   return (
     <motion.div
       key={course.id}
-      style={{
-        translateY,
-        scale,
-        opacity: cardOpacity,
-        zIndex: i,
-        pointerEvents,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-      className={`absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-[90vw] md:w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl ${
-        isMobile ? "h-[380px] p-6" : "h-[420px] p-8"
-      }`}
+      {...motionProps}
     >
       <div className="absolute inset-0 w-full h-full ">
         <Image
           src={course.cardBg_image}
           alt={course.title}
           fill
-          // The `sizes` prop informs the browser about the image's width at different breakpoints.
-          // This is crucial for performance when using `fill`, as it allows Next.js to serve the most appropriately sized image.
-          // - Below 427px: the card is 90vw wide.
-          // - Above 427px: the card is capped at max-w-sm (384px).
           sizes="(max-width: 427px) 90vw, 384px"
           style={{ objectFit: "cover" }}
         />
@@ -126,10 +151,12 @@ const Card = ({
         View Course
       </button>
 
-      <motion.div
-        className="absolute inset-0 bg-black rounded-2xl pointer-events-none"
-        style={{ opacity: overlayOpacity }}
-      />
+      {!isMobile && (
+        <motion.div
+            className="absolute inset-0 bg-black rounded-2xl pointer-events-none"
+            style={{ opacity: overlayOpacity }}
+        />
+      )}
     </motion.div>
   );
 };
@@ -164,7 +191,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   );
 
   useMotionValueEvent(smoothedProgress, "change", (latest) => {
-    if (activeDomain) {
+    // This logic is for desktop scrolling, so we gate it.
+    if (!isMobile && activeDomain) {
       const courseCount = activeDomain.courses.length;
       if (courseCount <= 1) {
         setActiveCardIndex(0);
@@ -200,40 +228,42 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     const courseCount = domain.courses.length;
     if (courseCount === 0) return;
 
-    // --- NEW LOGIC WITH SWITCH STATEMENT ---
-    let targetProgress;
-    switch (domain.view) {
-      case "management":
-        targetProgress = 0.24;
-        break;
-      case "technical":
-        targetProgress = 0.195;
-        break;
-      default:
-        // Default behavior for Electronics, Mechanical, Civil, etc.
-        targetProgress = 1 / courseCount;
-        break;
+    // For desktop, we set a specific progress to show the stack
+    if(!isMobile) {
+        let targetProgress;
+        switch (domain.view) {
+          case "management":
+            targetProgress = 0.24;
+            break;
+          case "technical":
+            targetProgress = 0.195;
+            break;
+          default:
+            targetProgress = 1 / courseCount;
+            break;
+        }
+        progress.set(targetProgress);
+        onSetProgress(targetProgress);
     }
-    // --- END OF NEW LOGIC ---
-
-    progress.set(targetProgress);
-    onSwitchView(domain.view);
-    onSetProgress(targetProgress);
     
-    // Always set the ACTIVE button to be the first one, regardless of scroll position
+    onSwitchView(domain.view);
     setActiveCardIndex(0);
   };
 
   const handleTileClick = (index: number) => {
     setActiveCardIndex(index);
-    if (!activeDomain) return;
-    const courseCount = activeDomain.courses.length;
-    if (courseCount <= 1) {
-      onSetProgress(1);
-      return;
+
+    // For desktop, clicking a tile drives the scroll animation
+    if (!isMobile && activeDomain) {
+        const courseCount = activeDomain.courses.length;
+        if (courseCount <= 1) {
+          onSetProgress(1);
+          return;
+        }
+        const targetProgress = (index + 1) / courseCount;
+        onSetProgress(targetProgress);
     }
-    const targetProgress = (index + 1) / courseCount;
-    onSetProgress(targetProgress);
+    // For mobile, just setting the index is enough to trigger the fade animation.
   };
   
   const cardAnimationDriver = useTransform(smoothedProgress, (p) => {
@@ -242,7 +272,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   });
 
   return (
-    <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
+    <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-6 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
         <div className="md:h-28 lg:h-auto lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
@@ -335,96 +365,112 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
           </AnimatePresence>
         </div>
       </div>
-
-      <div className="relative w-full md:w-1/2 h-[400px] md:h-full lg:h-[480px] flex items-center justify-center z-10">
-        {activeDomain &&
-          activeDomain.courses.map((course, i) => (
-            <Card
-              key={`${activeDomain.view}-${course.id}`}
-              course={course}
-              animatedProgress={cardAnimationDriver}
-              i={i}
-              isMobile={isMobile}
-            />
-          ))}
-      </div>
-
+      
       {isMobile && (
-        <div className="relative w-full flex flex-col gap-4 md:hidden z-20 mt-24">
-          <div className="w-full rounded-2xl bg-black/20 p-2 backdrop-blur-sm">
-            <div className="flex flex-wrap justify-center items-center gap-2 w-full">
-              {allDomains.map((domain, index) => {
-                const iconData = domainIcons.find(
-                  (icon) => icon.name === domain.name
-                );
-                const IconComponent = iconData ? iconData.icon : null;
+        <div className="w-full flex  justify-center  items-center gap-4 my-6">
+          {allDomains.map((domain, index) => {
+            const iconData = domainIcons.find(
+              (icon) => icon.name === domain.name
+            );
+            const IconComponent = iconData ? iconData.icon : null;
 
-                return (
-                  <button
-                    key={domain.name}
-                    ref={(el) => {
-                      buttonRefs.current[index] = el;
-                    }}
-                    onClick={() => domain.enabled && handleDomainSwitch(domain)}
-                    disabled={!domain.enabled}
-                    title={domain.name}
-                    className={`relative z-10 flex h-10 w-10 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
-                    ${
-                      !domain.enabled
-                        ? "cursor-not-allowed opacity-50"
-                        : activeView === domain.view
-                        ? "scale-110 bg-white/90 ring-2 ring-white/50"
-                        : "bg-white/10 hover:bg-white/20"
-                    }`}
-                  >
-                    {IconComponent ? (
-                      <IconComponent
-                        size={24}
-                        className={`transition-colors duration-300 ${
-                          activeView === domain.view
-                            ? "text-slate-800"
-                            : "text-white"
-                        }`}
-                      />
-                    ) : (
-                      <span className="text-xs font-semibold text-white">
-                        {domain.name.slice(0, 3)}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="w-full rounded-2xl bg bg-black/20 backdrop-blur-sm">
-            <AnimatePresence mode="wait">
-              {activeDomain && (
-                <motion.div
-                  key={activeDomain.view}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-wrap justify-center items-center w-full gap-2 p-2"
+            return (
+              <div key={domain.name} className="flex flex-col b items-center gap-1">
+                <button
+                  ref={(el) => {
+                    buttonRefs.current[index] = el;
+                  }}
+                  onClick={() => domain.enabled && handleDomainSwitch(domain)}
+                  disabled={!domain.enabled}
+                  title={domain.name}
+                  className={`relative z-10 flex h-12 w-12 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300
+                  ${
+                    !domain.enabled
+                      ? "cursor-not-allowed opacity-50"
+                      : activeView === domain.view
+                      ? "scale-110 bg-white/90 ring-2 ring-white/50"
+                      : "bg-white/10 hover:bg-white/20"
+                  }`}
                 >
-                  {activeDomain.courses.map((course, i) => (
-                    <button
-                      key={course.id}
-                      onClick={() => handleTileClick(i)}
-                      className={`z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs font-semibold transition-colors duration-300
-                          ${
-                            activeCardIndex === i
-                              ? "bg-white text-orange-600 font-semibold"
-                              : "bg-black/40 text-white backdrop-blur-sm"
-                          }`}
-                    >
-                      {course.shortTitle || course.title}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  {IconComponent && (
+                    <IconComponent
+                      size={28}
+                      className={`transition-colors duration-300 ${
+                        activeView === domain.view
+                          ? "text-slate-800"
+                          : "text-white"
+                      }`}
+                    />
+                  )}
+                </button>
+                <span className="text-[8px] font-medium text-white/80">
+                  {domain.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* MODIFICATION 4: Conditionally render cards */}
+      <div className="relative w-full md:w-1/2 h-full md:h-full lg:h-[480px] flex items-center justify-center z-10">
+        {activeDomain && (
+            isMobile ? (
+                // --- MOBILE: FADE ANIMATION ---
+                // We use AnimatePresence to handle the exit animation of the old card
+                // and the enter animation of the new card.
+                <AnimatePresence mode="wait">
+                    <Card
+                        // The key is crucial for AnimatePresence to detect a component change
+                        key={`${activeDomain.view}-${activeDomain.courses[activeCardIndex].id}`}
+                        course={activeDomain.courses[activeCardIndex]}
+                        isMobile={isMobile}
+                    />
+                </AnimatePresence>
+            ) : (
+                // --- DESKTOP: STACKING ANIMATION (Original logic) ---
+                activeDomain.courses.map((course, i) => (
+                    <Card
+                        key={`${activeDomain.view}-${course.id}`}
+                        course={course}
+                        animatedProgress={cardAnimationDriver}
+                        i={i}
+                        isMobile={isMobile}
+                    />
+                ))
+            )
+        )}
+      </div>
+      
+      {isMobile && (
+        <div className="w-full rounded-2xl bg-black/20 p-2 backdrop-blur-sm mt-4 md:hidden z-20">
+          <AnimatePresence mode="wait">
+            {activeDomain && (
+              <motion.div
+                key={activeDomain.view}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center w-full gap-2 px-2 overflow-x-auto scrollbar-hide  justify-center flex-wrap"
+              >
+                {activeDomain.courses.map((course, i) => (
+                  <button
+                    key={course.id}
+                    onClick={() => handleTileClick(i)}
+                    className={`z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs font-semibold transition-colors duration-300
+                        ${
+                          activeCardIndex === i
+                            ? "bg-white text-orange-600 font-semibold"
+                            : "bg-black/40 text-white backdrop-blur-sm"
+                        }`}
+                  >
+                    {course.shortTitle || course.title}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </div>

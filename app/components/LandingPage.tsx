@@ -11,7 +11,7 @@ import {
   RefObject,
 } from "react";
 import * as THREE from "three";
-import { useMotionValue } from "framer-motion"; 
+import { useMotionValue } from "framer-motion";
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -226,7 +226,12 @@ const LandingPage: FC = () => {
   const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
+  // ---------- THIS IS THE MODIFIED CODE BLOCK ----------
   const coursesSectionHeight = useMemo(() => {
+    if (isMobile) {
+      return 100; // Return a standard 100vh height for mobile
+    }
+    // Keep the original calculation for desktop
     const maxCourses = Math.max(
       ...allDomains.filter((d) => d.enabled).map((d) => d.courses.length)
     );
@@ -236,7 +241,8 @@ const LandingPage: FC = () => {
     const animationDuration =
       numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
     return baseHeight + animationDuration;
-  }, []);
+  }, [isMobile]); // Add isMobile to the dependency array
+  // ----------------------------------------------------
 
   const handleSetCourseProgress = (targetProgress: number) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
@@ -249,11 +255,8 @@ const LandingPage: FC = () => {
     const totalZoneHeight = coursesEndZone - coursesStartZone;
     const targetScrollPosition =
       coursesStartZone + targetProgress * totalZoneHeight;
-    // THE ONLY CHANGE IS HERE: "smooth" is now "auto"
     window.scrollTo({ top: targetScrollPosition, behavior: "auto" });
   };
-
-  
 
   useEffect(() => {
     const calculateLayout = () => {

@@ -9,10 +9,9 @@ import {
   MutableRefObject,
   useMemo,
   RefObject,
-  useLayoutEffect,
 } from "react";
 import * as THREE from "three";
-import { useMotionValue } from "framer-motion";
+import { useMotionValue } from "framer-motion"; // Note: Only used for coursesProgress prop, not for state management.
 import StarField from "./StarField";
 import DustPlane from "./DustPlane";
 import Hero from "./Hero";
@@ -31,26 +30,19 @@ import PolicySection from "./Policy";
 import FooterSection from "./FooterSection";
 import FaqSection from "./FaqSection";
 
-
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
 
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
-
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < breakpoint);
-    };
+    if (typeof window === "undefined") return;
+    const handleResize = () => setIsMobile(window.innerWidth < breakpoint);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [breakpoint]);
-
   return isMobile;
 };
 
@@ -129,140 +121,138 @@ const DustPlaneController: FC<{
   return <DustPlane ref={dustPlaneRef} renderOrder={-2} />;
 };
 
-
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
   const isMobile = useIsMobile();
   const coursesProgress = useMotionValue(0);
-    const [headerProgress, setHeaderProgress] = useState<number>(0);
-    const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
-    const watermarkProgressRef = useRef<number>(0);
-    const textContainerRef = useRef<HTMLDivElement>(null);
-    const heroWrapperRef = useRef<HTMLDivElement>(null);
-    const saturnWrapperRef = useRef<HTMLDivElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const starfieldOverlayRef = useRef<HTMLDivElement>(null);
-    const whiteOverlayRef = useRef<HTMLDivElement>(null);
-    const textMaskContainerRef = useRef<HTMLDivElement>(null);
-    const contentWrapperRef = useRef<HTMLDivElement>(null);
-    const fadeOverlayRef = useRef<HTMLDivElement>(null);
+  const [activeCourseView, setActiveCourseView] = useState<DomainView>(
+    allDomains.find((d) => d.enabled)?.view || "management"
+  );
 
-    const coursesSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const partnersSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
-    const aboutUsToFaqTransitionRef = useRef<HTMLDivElement>(null);
-    const faqSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const faqToContactTransitionRef = useRef<HTMLDivElement>(null);
-    const contactUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const policySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
-    const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const [headerProgress, setHeaderProgress] = useState<number>(0);
+  const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
+  const [edgeProgress, setEdgeProgress] = useState<number>(0);
+  const [partnersProgress, setPartnersProgress] = useState<number>(0);
+  const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
+  const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
+  const [stackingProgress, setStackingProgress] = useState<number>(0);
+  const [cascadingProgress, setCascadingProgress] = useState<number>(0);
+  const [faqProgress, setFaqProgress] = useState<number>(0);
+  const [contactUsProgress, setContactUsProgress] = useState<number>(0);
 
-    const [activeCourseView, setActiveCourseView] = useState<DomainView>(
-        allDomains.find(d => d.enabled)?.view || 'management'
-    );
+  // --- OPTIMIZATION: Use refs to store target scroll values without causing re-renders ---
+  const watermarkProgressRef = useRef<number>(0);
+  const targetEdgeProgressRef = useRef(0);
+  const targetPartnersProgressRef = useRef(0);
+  const targetTestimonialProgressRef = useRef(0);
+  const targetAboutUsProgressRef = useRef(0);
+  const targetStackingProgressRef = useRef(0);
+  const targetCascadingProgressRef = useRef(0);
+  const targetFaqProgressRef = useRef(0);
+  const targetContactUsProgressRef = useRef(0);
 
-    const scrollRequestRef = useRef<boolean>(false);
+  // --- OPTIMIZATION: Refs for smoothed values, to be updated in the animation loop ---
+  const smoothedWatermarkProgressRef = useRef(0);
+  const smoothedEdgeProgressRef = useRef(0);
+  const smoothedPartnersProgressRef = useRef(0);
+  const smoothedTestimonialProgressRef = useRef(0);
+  const smoothedAboutUsProgressRef = useRef(0);
+  const smoothedStackingProgressRef = useRef(0);
+  const smoothedCascadingProgressRef = useRef(0);
+  const smoothedFaqProgressRef = useRef(0);
+  const smoothedContactUsProgressRef = useRef(0);
 
-    const [edgeProgress, setEdgeProgress] = useState<number>(0);
-    const [partnersProgress, setPartnersProgress] = useState<number>(0);
-    const [testimonialProgress, setTestimonialProgress] = useState<number>(0);
-    const [aboutUsProgress, setAboutUsProgress] = useState<number>(0);
-    const [stackingProgress, setStackingProgress] = useState<number>(0);
-    const [cascadingProgress, setCascadingProgress] = useState<number>(0);
-    const [faqProgress, setFaqProgress] = useState<number>(0);
-    const [contactUsProgress, setContactUsProgress] = useState<number>(0);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const saturnWrapperRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const starfieldOverlayRef = useRef<HTMLDivElement>(null);
+  const whiteOverlayRef = useRef<HTMLDivElement>(null);
+  const textMaskContainerRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const fadeOverlayRef = useRef<HTMLDivElement>(null);
 
-    const aboutUsWord = "ABOUT US";
-    const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
-    const targetPartnersProgressRef = useRef(0);
-    const smoothedPartnersProgressRef = useRef(0);
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
+  const aboutUsToFaqTransitionRef = useRef<HTMLDivElement>(null);
+  const faqSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const faqToContactTransitionRef = useRef<HTMLDivElement>(null);
+  const contactUsSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const policySectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
+  const footerSectionWrapperRef = useRef<HTMLDivElement>(
+    null
+  ) as RefObject<HTMLDivElement>;
 
-    const formattedTestimonials: Testimonial[] = useMemo(
-        () =>
-        testimonialsData.map((t) => ({
-            quote: t.quote,
-            name: t.name,
-            designation: t.title,
-            src: t.image,
-            bgImage: t.bgImage,
-            bgPosition: t.bgPosition,
-            planetImage: t.planetImage,
-        })),
-        []
-    );
+  const aboutUsWord = "ABOUT US";
+  const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
 
-    const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
-    const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
+  const formattedTestimonials: Testimonial[] = useMemo(
+    () =>
+      testimonialsData.map((t) => ({
+        quote: t.quote,
+        name: t.name,
+        designation: t.title,
+        src: t.image,
+        bgImage: t.bgImage,
+        bgPosition: t.bgPosition,
+        planetImage: t.planetImage,
+      })),
+    []
+  );
 
-   // LandingPage.tsx
+  const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
+  const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
-// ... other code
-
-const coursesSectionHeight = useMemo(() => {
-    // 1. Find the maximum number of courses from any single enabled domain.
+  const coursesSectionHeight = useMemo(() => {
     const maxCourses = Math.max(
-      ...allDomains
-        .filter(d => d.enabled)
-        .map(d => d.courses.length)
+      ...allDomains.filter((d) => d.enabled).map((d) => d.courses.length)
     );
-
-    // 2. Calculate the height based on that maximum number.
-    // This ensures the container height is ALWAYS constant.
     const numCourses = maxCourses > 0 ? maxCourses : 1;
-    const baseHeight = 120; // in vh
-    const heightPerCard = 70; // in vh
-    const animationDuration = numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
-
+    const baseHeight = 120;
+    const heightPerCard = 70;
+    const animationDuration =
+      numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
     return baseHeight + animationDuration;
-}, []); // <-- CRITICAL: The dependency array is now empty.
+  }, []);
 
-// ... rest of the component
-
-  // const handleCourseSwitch = (view: DomainView) => {
-  //   if (view !== activeCourseView) {
-  //     setActiveCourseView(view);
-  //     scrollRequestRef.current = true;
-  //   }
-  // };
-
-  // useLayoutEffect(() => {
-  //   if (scrollRequestRef.current && layout) {
-  //       const targetScrollY = layout.coursesTop;
-        
-  //       window.scrollTo({
-  //           top: targetScrollY,
-  //           behavior: "smooth"
-  //       });
-
-  //       scrollRequestRef.current = false;
-  //   }
-  // }, [layout, activeCourseView]);
-
-   const handleSetCourseProgress = (targetProgress: number) => {
+  const handleSetCourseProgress = (targetProgress: number) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
-
     const { coursesTop } = layout;
     const sectionEl = coursesSectionWrapperRef.current;
     const sectionHeight = sectionEl.offsetHeight;
     const viewportHeight = window.innerHeight;
-
     const coursesStartZone = coursesTop - viewportHeight * 0.8;
     const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
     const totalZoneHeight = coursesEndZone - coursesStartZone;
-
-    const targetScrollPosition = coursesStartZone + (targetProgress * totalZoneHeight);
-    
-    window.scrollTo({
-      top: targetScrollPosition,
-      behavior: 'smooth',
-    });
+    const targetScrollPosition =
+      coursesStartZone + targetProgress * totalZoneHeight;
+    window.scrollTo({ top: targetScrollPosition, behavior: "smooth" });
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const calculateLayout = () => {
       if (
         coursesSectionWrapperRef.current &&
@@ -325,30 +315,73 @@ const coursesSectionHeight = useMemo(() => {
     });
   }, [setSectionRefs]);
 
-  const targetProgressRef = useRef(0);
-  const smoothedProgressRef = useRef(0);
-
-  
-
   useEffect(() => {
     let animationFrameId: number;
     const animationLoop = () => {
-      smoothedProgressRef.current = THREE.MathUtils.lerp(
-        smoothedProgressRef.current,
-        targetProgressRef.current,
-        0.075
-      );
-      watermarkProgressRef.current = targetProgressRef.current;
+      // --- OPTIMIZATION: All state updates are batched here, once per frame ---
+      const lerpFactor = 0.075;
 
+      // Smooth all progress values
+      smoothedWatermarkProgressRef.current = THREE.MathUtils.lerp(
+        smoothedWatermarkProgressRef.current,
+        watermarkProgressRef.current,
+        lerpFactor
+      );
+      smoothedEdgeProgressRef.current = THREE.MathUtils.lerp(
+        smoothedEdgeProgressRef.current,
+        targetEdgeProgressRef.current,
+        lerpFactor
+      );
       smoothedPartnersProgressRef.current = THREE.MathUtils.lerp(
         smoothedPartnersProgressRef.current,
         targetPartnersProgressRef.current,
-        0.075
+        lerpFactor
       );
-      setPartnersProgress(smoothedPartnersProgressRef.current);
+      smoothedTestimonialProgressRef.current = THREE.MathUtils.lerp(
+        smoothedTestimonialProgressRef.current,
+        targetTestimonialProgressRef.current,
+        lerpFactor
+      );
+      smoothedAboutUsProgressRef.current = THREE.MathUtils.lerp(
+        smoothedAboutUsProgressRef.current,
+        targetAboutUsProgressRef.current,
+        lerpFactor
+      );
+      smoothedStackingProgressRef.current = THREE.MathUtils.lerp(
+        smoothedStackingProgressRef.current,
+        targetStackingProgressRef.current,
+        lerpFactor
+      );
+      smoothedCascadingProgressRef.current = THREE.MathUtils.lerp(
+        smoothedCascadingProgressRef.current,
+        targetCascadingProgressRef.current,
+        lerpFactor
+      );
+      smoothedFaqProgressRef.current = THREE.MathUtils.lerp(
+        smoothedFaqProgressRef.current,
+        targetFaqProgressRef.current,
+        lerpFactor
+      );
+      smoothedContactUsProgressRef.current = THREE.MathUtils.lerp(
+        smoothedContactUsProgressRef.current,
+        targetContactUsProgressRef.current,
+        lerpFactor
+      );
 
-      const currentProgress = smoothedProgressRef.current;
+      // Set state for all values
+      setEdgeProgress(smoothedEdgeProgressRef.current);
+      setPartnersProgress(smoothedPartnersProgressRef.current);
+      setTestimonialProgress(smoothedTestimonialProgressRef.current);
+      setAboutUsProgress(smoothedAboutUsProgressRef.current);
+      setStackingProgress(smoothedStackingProgressRef.current);
+      setCascadingProgress(smoothedCascadingProgressRef.current);
+      setFaqProgress(smoothedFaqProgressRef.current);
+      setContactUsProgress(smoothedContactUsProgressRef.current);
+
+      const currentProgress = smoothedWatermarkProgressRef.current;
       setHeaderProgress(currentProgress);
+
+      // The rest of the animation logic remains the same
       if (textContainerRef.current && window.innerHeight) {
         let persevexOpacity = 0,
           coursesOpacity = 0,
@@ -713,6 +746,8 @@ const coursesSectionHeight = useMemo(() => {
         footerTop,
       } = layout;
 
+      // --- OPTIMIZATION: Removed all setState calls. Only update refs. ---
+
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
       let newWatermarkProgress = 0;
@@ -721,15 +756,12 @@ const coursesSectionHeight = useMemo(() => {
       const footerTransitionDuration = viewportHeight;
       const policyTransitionStart = policyTop - viewportHeight;
       const policyTransitionDuration = viewportHeight;
-      const contactUsToPolicyStart = contactUsTop;
-      const contactUsToPolicyDuration = viewportHeight;
       const contactUsStart = contactUsTop - viewportHeight;
       const contactUsDuration = viewportHeight;
       const faqToContactTransitionStart =
         faqToContactTransitionTop - viewportHeight;
       const faqToContactTransitionDuration = viewportHeight;
       const faqScrollStart = faqTop - viewportHeight;
-      const faqScrollDuration = viewportHeight;
       const aboutUsToFaqTransitionStart =
         aboutUsToFaqTransitionTop - viewportHeight;
       const aboutUsToFaqTransitionDuration = viewportHeight;
@@ -845,8 +877,7 @@ const coursesSectionHeight = useMemo(() => {
           (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
         );
       }
-
-      targetProgressRef.current = newWatermarkProgress;
+      watermarkProgressRef.current = newWatermarkProgress;
 
       const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       if (heroWrapperRef.current) {
@@ -879,12 +910,10 @@ const coursesSectionHeight = useMemo(() => {
       }
 
       const edgeAnimationDurationFactor = isMobile ? 3 : NUM_CARDS;
-      setEdgeProgress(
-        Math.min(
-          1,
-          Math.max(0, currentScroll - edgeTop) /
-            (viewportHeight * edgeAnimationDurationFactor)
-        )
+      targetEdgeProgressRef.current = Math.min(
+        1,
+        Math.max(0, currentScroll - edgeTop) /
+          (viewportHeight * edgeAnimationDurationFactor)
       );
 
       if (partnersSectionWrapperRef.current && partnersTop > 0) {
@@ -893,37 +922,30 @@ const coursesSectionHeight = useMemo(() => {
         const animationDuration = isMobile
           ? partnersSectionHeight * 0.75
           : partnersSectionHeight / 2;
-        const progress = clamp(
+        targetPartnersProgressRef.current = clamp(
           (currentScroll - partnersTop) / animationDuration,
           0,
           1
         );
-        targetPartnersProgressRef.current = progress;
       }
 
-      setTestimonialProgress(
-        Math.min(
-          1,
-          Math.max(
-            0,
-            (currentScroll - testimonialsTop) /
-              ((testimonialsAnimationDurationVh / 100) * viewportHeight)
-          )
-        )
-      );
-      const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
-      const aboutUsContentAnimDuration = viewportHeight * 4;
-      setAboutUsProgress(
-        clamp(
-          (currentScroll - aboutUsContentAnimStart) /
-            aboutUsContentAnimDuration,
+      targetTestimonialProgressRef.current = Math.min(
+        1,
+        Math.max(
           0,
-          1
+          (currentScroll - testimonialsTop) /
+            ((testimonialsAnimationDurationVh / 100) * viewportHeight)
         )
       );
 
-      let newStackingProgress = 0,
-        newCascadingProgress = 0;
+      const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
+      const aboutUsContentAnimDuration = viewportHeight * 4;
+      targetAboutUsProgressRef.current = clamp(
+        (currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration,
+        0,
+        1
+      );
+
       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
         const vh = window.innerHeight / 100;
@@ -931,7 +953,7 @@ const coursesSectionHeight = useMemo(() => {
         const cascadingDuration = 400 * vh;
         const stackingStart = start;
         const cascadeStart = stackingStart + stackingDuration;
-        newStackingProgress = clamp(
+        targetStackingProgressRef.current = clamp(
           (currentScroll - stackingStart) / stackingDuration,
           0,
           1
@@ -940,45 +962,40 @@ const coursesSectionHeight = useMemo(() => {
         if (currentScroll > cascadeStart) {
           const progressWithinCascade =
             (currentScroll - cascadeStart) / cascadingDuration;
-          newCascadingProgress = clamp(
+          targetCascadingProgressRef.current = clamp(
             progressWithinCascade * CASCADING_MAX_PROGRESS,
             0,
             CASCADING_MAX_PROGRESS
           );
         } else {
-          newCascadingProgress = 0;
+          targetCascadingProgressRef.current = 0;
         }
       }
-      setStackingProgress(newStackingProgress);
-      setCascadingProgress(newCascadingProgress);
 
       if (faqSectionWrapperRef.current && faqTop > 0) {
         const animationStart = faqTop - viewportHeight;
         const animationDuration = viewportHeight;
-        const progress = clamp(
+        targetFaqProgressRef.current = clamp(
           (currentScroll - animationStart) / animationDuration,
           0,
           1
         );
-        setFaqProgress(progress);
       }
 
       if (contactUsTop > 0) {
         const animationStart = contactUsTop - viewportHeight;
         const animationDuration = viewportHeight * 2;
-        const progress = clamp(
+        targetContactUsProgressRef.current = clamp(
           (currentScroll - animationStart) / animationDuration,
           0,
           1
         );
-        setContactUsProgress(progress);
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [layout, testimonialsAnimationDurationVh, coursesProgress, isMobile]);
-
 
   const extendedCompProgress = clamp((aboutUsProgress - 0.7) / 0.3, 0, 1);
   const ourEdgeSectionHeightVh = isMobile ? 250 : (NUM_CARDS + 1) * 100;
@@ -1010,7 +1027,9 @@ const coursesSectionHeight = useMemo(() => {
       <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }} gl={{ alpha: true }}>
           <Suspense fallback={null}>
-            <DustPlaneController watermarkProgressRef={watermarkProgressRef} />
+            <DustPlaneController
+              watermarkProgressRef={smoothedWatermarkProgressRef}
+            />
           </Suspense>
         </Canvas>
       </div>
@@ -1019,6 +1038,7 @@ const coursesSectionHeight = useMemo(() => {
         className="fixed top-0 left-0 w-full h-full z-40 pointer-events-none overflow-hidden"
       >
         <div className="hidden md:block">
+          {/* Watermark text rendering remains the same */}
           <h2
             className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
             style={{
@@ -1216,9 +1236,9 @@ const coursesSectionHeight = useMemo(() => {
             <div className="sticky top-0 h-screen w-full">
               <CoursesSection
                 progress={coursesProgress}
-                onSwitchView={setActiveCourseView} 
+                onSwitchView={setActiveCourseView}
                 onSetProgress={handleSetCourseProgress}
-                activeView={activeCourseView} // Pass down the controlled active view
+                activeView={activeCourseView}
               />
             </div>
           </div>
@@ -1261,7 +1281,6 @@ const coursesSectionHeight = useMemo(() => {
             ref={aboutUsSectionWrapperRef}
             style={{ height: `${aboutUsSectionHeightVh}vh` }}
           ></div>
-
           {isMobile ? (
             <>
               <div ref={cardStackingWrapperRef} className="w-full text-white">
@@ -1322,7 +1341,6 @@ const coursesSectionHeight = useMemo(() => {
                 <PolicySection />
               </div>
               <div style={{ height: "50vh" }} />
-
               <div ref={footerSectionWrapperRef}>
                 <FooterSection />
               </div>
@@ -1333,4 +1351,4 @@ const coursesSectionHeight = useMemo(() => {
     </>
   );
 };
-export default LandingPage
+export default LandingPage;

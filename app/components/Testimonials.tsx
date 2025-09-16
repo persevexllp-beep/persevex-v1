@@ -5,6 +5,7 @@ import {
   useMotionValue,
   useSpring,
   AnimatePresence,
+  useAnimationControls,
 } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -61,10 +62,10 @@ export const AnimatedTestimonials = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const controls = useAnimationControls();
 
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
   const [showIndicator, setShowIndicator] = useState(isMobile);
-  const [isAutoFlowActive, setIsAutoFlowActive] = useState(isMobile);
 
   const x = useMotionValue(0);
   const smoothedX = useSpring(x, {
@@ -73,7 +74,22 @@ export const AnimatedTestimonials = ({
     restDelta: 0.001,
   });
 
+  const DURATION_PER_CARD = 5;
+  const totalDuration = testimonials.length * DURATION_PER_CARD;
+
   useEffect(() => {
+    const startAutoFlow = (duration: number) => {
+      controls.start({
+        x: constraints.left,
+        transition: {
+          duration,
+          ease: "linear" as const,
+          repeat: Infinity,
+          repeatType: "loop" as const,
+        },
+      });
+    };
+
     const calculateConstraints = () => {
       if (containerRef.current && trackRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
@@ -89,21 +105,29 @@ export const AnimatedTestimonials = ({
 
         if (isMobile) {
           x.set(right);
+          startAutoFlow(totalDuration);
         }
       }
     };
+
     calculateConstraints();
     window.addEventListener("resize", calculateConstraints);
-    return () => window.removeEventListener("resize", calculateConstraints);
-  }, [testimonials, isMobile, x]);
+    return () => {
+      controls.stop();
+      window.removeEventListener("resize", calculateConstraints);
+    }
+  }, [testimonials, isMobile, x, controls, constraints.left, totalDuration]);
 
   useEffect(() => {
-    if (isMobile) return;
+    if (isMobile) {
+      controls.stop();
+      return;
+    };
     const totalRange = constraints.right - constraints.left;
     if (totalRange === 0) return;
     const targetX = constraints.right - totalRange * progress;
     x.set(targetX);
-  }, [progress, constraints, isMobile, x]);
+  }, [progress, constraints, isMobile, x, controls]);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -114,15 +138,30 @@ export const AnimatedTestimonials = ({
     return () => clearTimeout(timer);
   }, [isMobile]);
 
-  const DURATION_PER_CARD = 5;
-  const autoFlowAnimation = {
-    x: constraints.left,
-    transition: {
-      duration: testimonials.length * DURATION_PER_CARD,
-      ease: "linear" as const,
-      repeat: Infinity,
-      repeatType: "loop" as const,
-    },
+  const handleDragStart = () => {
+    setShowIndicator(false);
+    controls.stop();
+  };
+
+  const handleDragEnd = () => {
+    const currentX = x.get();
+    const totalDistance = constraints.right - constraints.left;
+    const remainingDistance = currentX - constraints.left;
+    
+    if (totalDistance === 0) return;
+
+    const progress = remainingDistance / totalDistance;
+    const remainingDuration = totalDuration * progress;
+    
+    controls.start({
+      x: constraints.left,
+      transition: {
+        duration: remainingDuration,
+        ease: "linear" as const,
+        repeat: Infinity,
+        repeatType: "loop" as const,
+      },
+    });
   };
 
   return (
@@ -139,17 +178,11 @@ export const AnimatedTestimonials = ({
           ref={trackRef}
           className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
           style={{ x: isMobile ? x : smoothedX }}
-          animate={isMobile && isAutoFlowActive ? autoFlowAnimation : undefined}
+          animate={controls}
           drag={isMobile ? "x" : false}
           dragConstraints={isMobile ? constraints : undefined}
-          onDragStart={
-            isMobile
-              ? () => {
-                  setShowIndicator(false);
-                  setIsAutoFlowActive(false);
-                }
-              : undefined
-          }
+          onDragStart={isMobile ? handleDragStart : undefined}
+          onDragEnd={isMobile ? handleDragEnd : undefined}
         >
           {testimonials.map((t, index) => (
             <TestimonialCard key={index} testimonial={t} />
@@ -157,7 +190,7 @@ export const AnimatedTestimonials = ({
         </motion.div>
 
         <AnimatePresence>
-          {showIndicator && isAutoFlowActive && (
+          {showIndicator && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

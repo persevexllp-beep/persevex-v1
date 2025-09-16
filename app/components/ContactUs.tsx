@@ -3,7 +3,7 @@ import React, { FC, FormEvent, useMemo, useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUkbelAPjlHEVBNf6gFjSKeky0zulirnvf-IQcdDsE36K2yVPFhaQ5Y3Y9-_H7Wb6OwQ/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAYwB174Qk9X9nJYWIAiRC81NkYJOgLJOjJtu9txvHmeaVlz0HraJdPGfgEQwYRfaToQ/exec"; 
 
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);

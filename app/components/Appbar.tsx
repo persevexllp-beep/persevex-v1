@@ -4,7 +4,6 @@ import React, {useState} from 'react';
 import Link from 'next/link';
 import { useScroll, SectionKey } from '../contexts/scrollContext';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import Image from 'next/image';
 import ProgramsMegaMenu from './ProgramsMegaMenu';
 
 type ProgramItem = { name: string; href: string; };
@@ -93,7 +92,6 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 left-0 right-0 z-50 h-16 flex items-center justify-between p-6 md:p-8 text-white ">
        <div className='flex items-center justify-center gap-4'>
-       
         <Link 
           href="/" 
           className="text-2xl cursor-pointer md:text-3xl font-bold tracking-wider"
@@ -112,7 +110,6 @@ export default function Navbar() {
               Programs
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            
             <AnimatePresence>
               {isDesktopDropdownOpen && (
                 <ProgramsMegaMenu
@@ -150,7 +147,6 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            // UPDATED: Changed justify-center to justify-start, added pt-24 for spacing from top, and overflow-y-auto for scrolling on small screens.
             className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-start pt-24 text-white overflow-y-auto"
             variants={mobileMenuVariants}
             initial="hidden"
@@ -160,7 +156,6 @@ export default function Navbar() {
             <motion.div variants={mobileLinkVariants} className="text-center w-full">
               <button
                 onClick={() => setIsMobileProgramsOpen(!isMobileProgramsOpen)}
-                // UPDATED: Reduced font size and padding for a tighter mobile layout.
                 className="text-xl font-semibold py-3 flex items-center justify-center w-full gap-2"
               >
                 Programs
@@ -181,7 +176,6 @@ export default function Navbar() {
                           key={item.name}
                           href={item.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          // UPDATED: Added py-2 for better tap targets on sub-menu items.
                           className="py-2 text-base text-gray-300 hover:text-white"
                         >
                           {item.name}
@@ -198,8 +192,7 @@ export default function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}
-                // UPDATED: Reduced font size and padding to match other items.
-                className="text-xl font-semibold py-3 block"
+                className="inline-block my-3 rounded-full bg-blue-600 px-10 py-2.5 text-lg font-semibold text-white transition-colors hover:bg-blue-700"
               >
                 LMS
               </Link>
@@ -209,7 +202,6 @@ export default function Navbar() {
                 key={button.name}
                 variants={mobileLinkVariants}
                 onClick={() => handleMobileLinkClick(button.key)}
-                // UPDATED: Reduced font size and padding to match other items.
                 className="text-xl font-semibold py-3"
               >
                 {button.name}

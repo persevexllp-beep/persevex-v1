@@ -195,25 +195,28 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     const courseCount = domain.courses.length;
     if (courseCount === 0) return;
 
-    // --- THIS IS THE NEW LOGIC ---
+    // --- NEW LOGIC WITH SWITCH STATEMENT ---
     let targetProgress;
-
-    // If the domain has many courses (e.g., more than 2), start in the middle.
-    if (courseCount > 2) {
-      targetProgress = 0.24; // You can adjust this value (e.g., to 0.5)
-    } else {
-      // Otherwise, for domains with 1 or 2 courses, center the first card perfectly.
-      targetProgress = 1 / courseCount;
+    switch (domain.view) {
+      case "management":
+        targetProgress = 0.24;
+        break;
+      case "technical":
+        targetProgress = 0.195;
+        break;
+      default:
+        // Default behavior for Electronics, Mechanical, Civil, etc.
+        targetProgress = 1 / courseCount;
+        break;
     }
     // --- END OF NEW LOGIC ---
 
     progress.set(targetProgress);
     onSwitchView(domain.view);
     onSetProgress(targetProgress);
-
-    // Also update the active card index to match the new progress
-    const newActiveCardIndex = Math.round(targetProgress * courseCount - 0.7);
-    setActiveCardIndex(Math.max(0, newActiveCardIndex));
+    
+    // Always set the ACTIVE button to be the first one, regardless of scroll position
+    setActiveCardIndex(0);
   };
 
   const handleTileClick = (index: number) => {
@@ -236,7 +239,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   return (
     <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
-        <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m h-28">
+        <div className="md:h-28 lg:h-auto lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
             <div className="relative mx-auto flex flex-wrap justify-center items-center w-fit max-w-full rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:flex-nowrap md:rounded-full md:p-1 md:mx-0">
               <motion.div

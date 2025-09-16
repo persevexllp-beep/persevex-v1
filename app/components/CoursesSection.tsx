@@ -166,7 +166,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         return;
       }
 
-      // Logic to determine which card is "active" based on scroll
       const animatedValue = latest * courseCount;
       const cardIndex = Math.round(animatedValue - 0.7);
       setActiveCardIndex(Math.max(0, Math.min(cardIndex, courseCount - 1)));
@@ -196,20 +195,25 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     const courseCount = domain.courses.length;
     if (courseCount === 0) return;
 
-    // This formula calculates the progress value needed to center the FIRST card.
-    const targetProgress = 1 / courseCount;
+    // --- THIS IS THE NEW LOGIC ---
+    let targetProgress;
 
-    // 1. **INSTANTLY SET THE ANIMATION STATE:**
+    // If the domain has many courses (e.g., more than 2), start in the middle.
+    if (courseCount > 2) {
+      targetProgress = 0.24; // You can adjust this value (e.g., to 0.5)
+    } else {
+      // Otherwise, for domains with 1 or 2 courses, center the first card perfectly.
+      targetProgress = 1 / courseCount;
+    }
+    // --- END OF NEW LOGIC ---
+
     progress.set(targetProgress);
-
-    // 2. Tell the parent component to switch the view data.
     onSwitchView(domain.view);
-    
-    // 3. Tell the parent component to scroll the page to match the new animation state.
     onSetProgress(targetProgress);
 
-    // 4. Update local UI state.
-    setActiveCardIndex(0);
+    // Also update the active card index to match the new progress
+    const newActiveCardIndex = Math.round(targetProgress * courseCount - 0.7);
+    setActiveCardIndex(Math.max(0, newActiveCardIndex));
   };
 
   const handleTileClick = (index: number) => {
@@ -217,7 +221,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     if (!activeDomain) return;
     const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
-      onSetProgress(1); // For a single card, progress of 1 centers it.
+      onSetProgress(1);
       return;
     }
     const targetProgress = (index + 1) / courseCount;
@@ -229,12 +233,10 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       return p * numCourses - 1;
   });
 
-  // THE FIX IS ON THE LINE BELOW.
-  // Changed "md:flex-row" to "lg:flex-row" to make the flex behavior consistent
   return (
     <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
-        <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
+        <div className="lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m h-28">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
             <div className="relative mx-auto flex flex-wrap justify-center items-center w-fit max-w-full rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:flex-nowrap md:rounded-full md:p-1 md:mx-0">
               <motion.div
@@ -299,7 +301,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         </div>
       )}
 
-      {/* And a small adjustment on this line, adding w-full */}
       <div className="w-full text-center md:text-left flex items-center justify-center md:p-0 lg:mb-18">
         <div className="w-full h-auto md:relative md:h-80 lg:ml-24">
           <AnimatePresence mode="wait">

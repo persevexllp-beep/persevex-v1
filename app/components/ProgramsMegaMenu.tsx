@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, Variants, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, FileBadge, ChevronRight, ArrowRight, ArrowDown } from 'lucide-react';
 
 const MotionLink = motion(Link);
 
@@ -27,94 +27,114 @@ const domainItemVariants: Variants = {
 };
 
 export default function ProgramsMegaMenu({ programCategories, onClose }: ProgramsMegaMenuProps) {
-  const [activeProgram, setActiveProgram] = useState<'Internship' | 'Placement'>('Internship');
-  const [activeBranch, setActiveBranch] = useState(programCategories[0]?.branch || '');
+  // Set default active states to match the provided image
+  const [activeProgram, setActiveProgram] = useState<'Internship Program' | 'Placement Provision Program'>('Placement Provision Program');
+  const [activeTopic, setActiveTopic] = useState(programCategories[0]?.branch || '');
 
   const programs = [
-    { name: 'Internship', label: 'INTERNSHIP PROGRAM', icon: <Briefcase size={28} /> },
+    { name: 'Internship Program', label: 'INTERNSHIP PROGRAM', icon: <Briefcase size={28} /> },
+    { name: 'Placement Provision Program', label: 'PLACEMENT PROVISION PROGRAM', icon: <FileBadge size={28} /> },
   ];
 
-  const activeDomains = programCategories.find(cat => cat.branch === activeBranch)?.items || [];
-
-  const getButtonClass = (isActive: boolean) => 
-    `w-full p-4 rounded-lg text-left transition-all duration-300 flex items-center gap-4 ${
-      isActive
-        ? 'bg-orange-400 cursor-pointer text-white shadow-lg font-bold'
-        : 'text-gray-300 hover:bg-white/10'
-    }`;
+  const activeCourses = programCategories.find(cat => cat.branch === activeTopic)?.items || [];
 
   return (
     <motion.div
       layout
       transition={{ type: "spring", stiffness: 500, damping: 40 }}
-      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[800px] rounded-2xl shadow-2xl backdrop-blur-xl ring-1 ring-white/10 z-10 text-white overflow-hidden"
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[950px] rounded-2xl shadow-2xl backdrop-blur-lg z-10 text-white overflow-hidden"
       initial="hidden"
       animate="visible"
       exit="hidden"
       variants={megaMenuVariants}
     >
-      <div className="grid grid-cols-12">
-        <div className="col-span-8 p-6 grid grid-cols-2 gap-6 ">
-          <div>
-            <h3 className="text-sm font-semibold text-orange-400 mb-4 flex items-center gap-2">
-              Program <span className="text-orange-400">→</span>
-            </h3>
-            <div className="space-y-3">
-              {programs.map((prog) => (
+      <div className="grid grid-cols-3">
+        {/* Column 1: Program */}
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
+            Program <ArrowRight size={20} className="text-orange-500" />
+          </h3>
+          <div className="space-y-3">
+            {programs.map((prog) => {
+              const isActive = activeProgram === prog.name;
+              return (
                 <button
                   key={prog.name}
-                  onClick={() => setActiveProgram(prog.name as 'Internship' | 'Placement')}
-                  className={getButtonClass(activeProgram === prog.name)}
+                  onClick={() => setActiveProgram(prog.name as 'Internship Program' | 'Placement Provision Program')}
+                  className={`relative w-full p-4 rounded-lg text-left transition-all duration-300 flex items-center gap-4 ${
+                    isActive
+                      ? 'bg-orange-500 text-white shadow-lg font-bold'
+                      : 'text-white/80 hover:bg-white/10'
+                  }`}
                 >
+                  {isActive && <div className="absolute left-0 top-0 h-full w-1.5  rounded-l-lg" />}
                   {prog.icon}
-                  <span className="text-sm">{prog.label}</span>
+                  <span className="text-sm tracking-wide">{prog.label}</span>
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-orange-400 mb-4 flex items-center gap-2">
-              Branch <span className="text-orange-400">→</span>
-            </h3>
-            <div className="space-y-1">
-              {programCategories.map((category) => (
-                <button
-                  key={category.branch}
-                  onMouseEnter={() => setActiveBranch(category.branch)}
-                  onFocus={() => setActiveBranch(category.branch)}
-                  className={getButtonClass(activeBranch === category.branch)}
-                >
-                  <span className='pl-2 text-base'>{category.branch}</span>
-                </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        <div className="col-span-4 p-6">
-          <h3 className="text-sm font-semibold text-orange-400 mb-4 flex items-center gap-2">
-            Domain <span className="text-orange-400">↓</span>
+        {/* Column 2: Topic */}
+        <div className="p-6 ">
+          <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
+            Topic <ArrowRight size={20} className="text-orange-400" />
           </h3>
-          <div className="flex flex-col items-center gap-3">
+          <div className="space-y-2">
+            {programCategories.map((category) => {
+              const isActive = activeTopic === category.branch;
+              return(
+                <button
+                  key={category.branch}
+                  onMouseEnter={() => setActiveTopic(category.branch)}
+                  className={`w-full p-3 rounded-lg text-left transition-colors duration-200 flex items-center justify-between ${
+                    isActive 
+                      ? 'bg-orange-500 text-white font-semibold'
+                      : 'text-white/80 hover:bg-white/10'
+                  }`}
+                >
+                  <span>{category.branch}</span>
+                  {!isActive && <ChevronRight size={16} className="text-white/50" />}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Column 3: Course */}
+        <div className="col-span-1 p-6">
+          <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
+            Course <ArrowDown size={20} className="text-orange-400" />
+          </h3>
+          <div className="flex flex-col gap-1">
             <AnimatePresence mode="wait">
-              {activeDomains.map((item) => (
+              {activeCourses.map((item) => (
                 <MotionLink
                   key={item.name}
                   href={item.href}
-                  className="text-gray-300 h-12 rounded-2xl px-2 flex items-center justify- w-full hover:bg-white hover:text-black text-center text-base transition-colors duration-200"
+                  className="text-white/80 rounded-md px-3 py-2 text-base transition-colors duration-200 hover:text-white hover:bg-white/10"
                   onClick={onClose}
                   variants={domainItemVariants}
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  layout 
+                  layout
                 >
                   {item.name}
                 </MotionLink>
               ))}
             </AnimatePresence>
           </div>
+        </div>
+      </div>
+
+      {/* Footer: Training Partners */}
+      <div className="border-t border-white/10 bg-black/10 px-8 py-4 flex justify-between items-center">
+       
+        <div className="flex items-center gap-2">
+            <span className="text-xs text-white/60">recognized by</span>
+            <div className="w-32 h-8 bg-white/10 rounded flex items-center justify-center font-bold text-orange-800 text-sm">#startupindia</div>
         </div>
       </div>
     </motion.div>

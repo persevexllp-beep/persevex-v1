@@ -116,46 +116,52 @@ export const AnimatedTestimonials = ({
   }, [isMobile]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative h-[350px] w-full mx-auto overflow-hidden"
-    >
-      <motion.div
-        ref={trackRef}
-        className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
-        style={{ x: isMobile ? x : smoothedX }}
-        drag={isMobile ? "x" : false}
-        dragConstraints={isMobile ? constraints : undefined}
-        onDragStart={isMobile ? () => setShowIndicator(false) : undefined}
+    <div className="w-full py-12">
+      <h2 className="lg:mb-12 mb-24 text-center text-5xl font-bold text-white md:text-6xl">
+        Testimonials.
+      </h2>
+      
+      <div
+        ref={containerRef}
+        className="relative h-[350px] w-full mx-auto overflow-hidden"
       >
-        {testimonials.map((t, index) => (
-          <TestimonialCard key={index} testimonial={t} />
-        ))}
-      </motion.div>
+        <motion.div
+          ref={trackRef}
+          className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
+          style={{ x: isMobile ? x : smoothedX }}
+          drag={isMobile ? "x" : false}
+          dragConstraints={isMobile ? constraints : undefined}
+          onDragStart={isMobile ? () => setShowIndicator(false) : undefined}
+        >
+          {testimonials.map((t, index) => (
+            <TestimonialCard key={index} testimonial={t} />
+          ))}
+        </motion.div>
 
-      <AnimatePresence>
-        {showIndicator && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
-          >
-            <div className="flex items-center justify-start w-24 h-7 p-1 overflow-hidden rounded-full border border-neutral-600 bg-black/50 backdrop-blur-sm">
-              <motion.div
-                className="w-8 h-full rounded-full bg-white" 
-                animate={{ x: [0, 56, 0] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showIndicator && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+            >
+              <div className="flex items-center justify-start w-24 h-7 p-1 overflow-hidden rounded-full border border-neutral-600 bg-black/50 backdrop-blur-sm">
+                <motion.div
+                  className="w-8 h-full rounded-full bg-white" 
+                  animate={{ x: [0, 56, 0] }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

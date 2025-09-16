@@ -42,7 +42,7 @@ export default function Stats() {
   return (
     <div className=" py-24   sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-16 text-center sm:grid-cols-2 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-4 text-center sm:grid-cols-2 lg:grid-cols-2">
           {statsData.map((stat) => (
             <StatCard
               key={stat.label}

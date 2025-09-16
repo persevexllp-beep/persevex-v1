@@ -188,7 +188,6 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     }
   }, [activeView, isMobile]);
 
-  // THIS FUNCTION IS NOW THE CORE OF THE FIX
   const handleDomainSwitch = (domain: (typeof allDomains)[0]) => {
     if (domain.view === activeView) {
       return;
@@ -198,12 +197,9 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     if (courseCount === 0) return;
 
     // This formula calculates the progress value needed to center the FIRST card.
-    // The transformation is `animatedProgress = progress * N - 1`. We want `animatedProgress` to be 0 for the first card.
-    // So, `0 = progress * N - 1` -> `progress = 1 / N`.
     const targetProgress = 1 / courseCount;
 
-    // 1. **INSTANTLY SET THE ANIMATION STATE:** This is the crucial fix.
-    // We are directly setting the MotionValue to its new starting point.
+    // 1. **INSTANTLY SET THE ANIMATION STATE:**
     progress.set(targetProgress);
 
     // 2. Tell the parent component to switch the view data.
@@ -227,18 +223,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     const targetProgress = (index + 1) / courseCount;
     onSetProgress(targetProgress);
   };
-
-  const animatedCardProgress = useTransform(
-    smoothedProgress,
-    [0, 1],
-    // The animated value now goes from 0 to N.
-    // This makes calculating the target progress easier.
-    // The first card is at 1, second at 2, etc.
-    [0, (activeDomain?.courses.length || 0) + 1]
-  );
   
-  // To keep the card animation logic the same, we need to adjust the Card component's props slightly
-  // Let's create a new motion value for it.
   const cardAnimationDriver = useTransform(smoothedProgress, (p) => {
       const numCourses = activeDomain?.courses.length || 1;
       return p * numCourses - 1;
@@ -284,7 +269,8 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
               {activeDomain && (
                 <motion.div
                   key={activeDomain.view}
-                  className="absolute inset-0 flex items-center justify-center gap-2 px-2 overflow-x-auto scrollbar-hide"
+                  // THE FIX IS HERE: ADDED whitespace-nowrap
+                  className="absolute inset-0 flex items-center justify-center gap-2 px-2 overflow-x-auto scrollbar-hide whitespace-nowrap"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

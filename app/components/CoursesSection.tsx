@@ -166,8 +166,9 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
         return;
       }
 
-      const animatedValue = latest * courseCount - 1;
-      const cardIndex = Math.round(animatedValue - 0.3);
+      // Logic to determine which card is "active" based on scroll
+      const animatedValue = latest * courseCount;
+      const cardIndex = Math.round(animatedValue - 0.7);
       setActiveCardIndex(Math.max(0, Math.min(cardIndex, courseCount - 1)));
     }
   });
@@ -187,12 +188,40 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
     }
   }, [activeView, isMobile]);
 
+  // THIS FUNCTION IS NOW THE CORE OF THE FIX
+  const handleDomainSwitch = (domain: (typeof allDomains)[0]) => {
+    if (domain.view === activeView) {
+      return;
+    }
+
+    const courseCount = domain.courses.length;
+    if (courseCount === 0) return;
+
+    // This formula calculates the progress value needed to center the FIRST card.
+    // The transformation is `animatedProgress = progress * N - 1`. We want `animatedProgress` to be 0 for the first card.
+    // So, `0 = progress * N - 1` -> `progress = 1 / N`.
+    const targetProgress = 1 / courseCount;
+
+    // 1. **INSTANTLY SET THE ANIMATION STATE:** This is the crucial fix.
+    // We are directly setting the MotionValue to its new starting point.
+    progress.set(targetProgress);
+
+    // 2. Tell the parent component to switch the view data.
+    onSwitchView(domain.view);
+    
+    // 3. Tell the parent component to scroll the page to match the new animation state.
+    onSetProgress(targetProgress);
+
+    // 4. Update local UI state.
+    setActiveCardIndex(0);
+  };
+
   const handleTileClick = (index: number) => {
     setActiveCardIndex(index);
     if (!activeDomain) return;
     const courseCount = activeDomain.courses.length;
     if (courseCount <= 1) {
-      onSetProgress(0.5);
+      onSetProgress(1); // For a single card, progress of 1 centers it.
       return;
     }
     const targetProgress = (index + 1) / courseCount;
@@ -202,8 +231,19 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   const animatedCardProgress = useTransform(
     smoothedProgress,
     [0, 1],
-    [-1, (activeDomain?.courses.length || 1) - 1]
+    // The animated value now goes from 0 to N.
+    // This makes calculating the target progress easier.
+    // The first card is at 1, second at 2, etc.
+    [0, (activeDomain?.courses.length || 0) + 1]
   );
+  
+  // To keep the card animation logic the same, we need to adjust the Card component's props slightly
+  // Let's create a new motion value for it.
+  const cardAnimationDriver = useTransform(smoothedProgress, (p) => {
+      const numCourses = activeDomain?.courses.length || 1;
+      return p * numCourses - 1;
+  });
+
 
   return (
     <div className="lg:relative w-full h-full text-white flex flex-col md:flex-row gap-8 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
@@ -222,7 +262,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                   ref={(el) => {
                     buttonRefs.current[index] = el;
                   }}
-                  onClick={() => domain.enabled && onSwitchView(domain.view)}
+                  onClick={() => domain.enabled && handleDomainSwitch(domain)}
                   disabled={!domain.enabled}
                   className={`relative z-10 cursor-pointer whitespace-nowrap rounded-full py-2 px-4 text-xs md:text-sm font-semibold transition-colors duration-300
                       ${
@@ -306,7 +346,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
             <Card
               key={`${activeDomain.view}-${course.id}`}
               course={course}
-              animatedProgress={animatedCardProgress}
+              animatedProgress={cardAnimationDriver}
               i={i}
               isMobile={isMobile}
             />
@@ -329,7 +369,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
                     ref={(el) => {
                       buttonRefs.current[index] = el;
                     }}
-                    onClick={() => domain.enabled && onSwitchView(domain.view)}
+                    onClick={() => domain.enabled && handleDomainSwitch(domain)}
                     disabled={!domain.enabled}
                     title={domain.name}
                     className={`relative z-10 flex h-10 w-10 items-center justify-center cursor-pointer rounded-full p-2 transition-all duration-300

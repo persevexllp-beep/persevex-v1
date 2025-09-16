@@ -444,7 +444,7 @@ export const managementCourses: CourseType[] = [
   "route": "/courses/stock-market-crypto",
   "slug": "stock-market-crypto",
   "image": "/digitalmar.png",
-  "cardBg_image": "/digital.png",
+  "cardBg_image": "/stockplanet.png",
   "projects": [
     {
       "name": "Equity Research Report",
@@ -1337,7 +1337,7 @@ export const ElectronicsCourses: CourseType[] = [
     route: "/courses/iot",
     slug: "iot",
     image: "/human.png",
-    cardBg_image: "/human.png",
+    cardBg_image: "/iotplanet.png",
     projects: [
       {
         name: "Smart Home Automation",
@@ -1478,7 +1478,7 @@ export const MechanicalCourses: CourseType[] = [
     route: "/courses/autocad",
     slug: "autocad",
     image: "/humanres.png",
-    cardBg_image: "/human.png",
+    cardBg_image: "/embeddedplanet.png",
     projects: [
       {
         name: "Architectural Floor Plan",
@@ -1617,7 +1617,7 @@ export const CivilCourses: CourseType[] = [
     route: "/courses/autocad",
     slug: "autocad",
     image: "/human.png",
-    cardBg_image: "/human.png",
+    cardBg_image: "/autocadplanet.png",
     projects: [
       {
         name: "Architectural Floor Plan",

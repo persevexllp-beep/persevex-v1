@@ -264,13 +264,14 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
               ))}
             </div>
           </div>
-          <div className="relative w-full max-w-8xl h-10 flex items-center justify-center">
+          {/* THE FIX IS HERE: Added overflow-x-auto and scrollbar-hide to THIS container */}
+          <div className="relative w-full max-w-8xl h-10 flex items-center justify-center overflow-x-auto scrollbar-hide">
             <AnimatePresence mode="wait">
               {activeDomain && (
                 <motion.div
                   key={activeDomain.view}
-                  // THE FIX IS HERE: ADDED whitespace-nowrap
-                  className="absolute inset-0 flex items-center justify-center gap-2 px-2 overflow-x-auto scrollbar-hide whitespace-nowrap"
+                  // REMOVED overflow classes from here
+                  className="absolute inset-0 flex items-center justify-center gap-2 px-2 whitespace-nowrap"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

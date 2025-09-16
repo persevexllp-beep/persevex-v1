@@ -1,5 +1,5 @@
 "use client";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
   Suspense,
   useRef,
@@ -11,9 +11,9 @@ import {
   RefObject,
 } from "react";
 import * as THREE from "three";
-import { useMotionValue } from "framer-motion";
+import { useMotionValue } from "framer-motion"; 
 import StarField from "./StarField";
-// import DustPlane from "./DustPlane"; // Removed
+import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
@@ -80,7 +80,46 @@ const AboutUsLetters: FC<{ letters: string[] }> = ({ letters }) => (
   </>
 );
 
-// --- REMOVED DustMaterial interface and DustPlaneController component ---
+interface DustMaterial extends THREE.ShaderMaterial {
+  uniforms: { uOpacity: { value: number } };
+}
+
+const DustPlaneController: FC<{
+  watermarkProgressRef: MutableRefObject<number>;
+}> = ({ watermarkProgressRef }) => {
+  const animatedProgress = useRef<number>(0);
+  const dustPlaneRef =
+    useRef<THREE.Mesh<THREE.BufferGeometry, DustMaterial>>(null);
+
+  useFrame(() => {
+    animatedProgress.current = THREE.MathUtils.lerp(
+      animatedProgress.current,
+      watermarkProgressRef.current,
+      0.05
+    );
+    const currentProgress = animatedProgress.current;
+
+    if (dustPlaneRef.current) {
+      let dustOpacity = 0;
+      if (currentProgress <= 1.0) {
+        dustOpacity = 1.0;
+      } else if (currentProgress > 1.0 && currentProgress < 2.0) {
+        dustOpacity = 1.0 - (currentProgress - 1.0);
+      } else if (currentProgress >= 15.0 && currentProgress < 16.0) {
+        dustOpacity = currentProgress - 15.0;
+      } else if (currentProgress >= 16.0) {
+        dustOpacity = 1.0;
+      }
+
+      const material = dustPlaneRef.current.material as DustMaterial;
+      if (material.uniforms.uOpacity) {
+        material.uniforms.uOpacity.value = clamp(dustOpacity, 0, 1);
+      }
+    }
+  });
+
+  return <DustPlane ref={dustPlaneRef} renderOrder={-2} />;
+};
 
 const LandingPage: FC = () => {
   const { layout, setLayout, setSectionRefs } = useScroll();
@@ -100,8 +139,6 @@ const LandingPage: FC = () => {
   const [cascadingProgress, setCascadingProgress] = useState<number>(0);
   const [faqProgress, setFaqProgress] = useState<number>(0);
   const [contactUsProgress, setContactUsProgress] = useState<number>(0);
-  // --- ADDED STATE FOR DUST IMAGE OPACITY ---
-  const [dustImageOpacity, setDustImageOpacity] = useState<number>(0);
 
   // --- OPTIMIZATION: Use refs to store target scroll values without causing re-renders ---
   const watermarkProgressRef = useRef<number>(0);
@@ -215,6 +252,8 @@ const LandingPage: FC = () => {
     // THE ONLY CHANGE IS HERE: "smooth" is now "auto"
     window.scrollTo({ top: targetScrollPosition, behavior: "auto" });
   };
+
+  
 
   useEffect(() => {
     const calculateLayout = () => {
@@ -332,27 +371,7 @@ const LandingPage: FC = () => {
         lerpFactor
       );
 
-      // --- NEW: Calculate dust image opacity ---
-      const currentSmoothedProgress = smoothedWatermarkProgressRef.current;
-      let newDustOpacity = 0;
-      if (currentSmoothedProgress <= 1.0) {
-        newDustOpacity = 1.0;
-      } else if (
-        currentSmoothedProgress > 1.0 &&
-        currentSmoothedProgress < 2.0
-      ) {
-        newDustOpacity = 1.0 - (currentSmoothedProgress - 1.0);
-      } else if (
-        currentSmoothedProgress >= 15.0 &&
-        currentSmoothedProgress < 16.0
-      ) {
-        newDustOpacity = currentSmoothedProgress - 15.0;
-      } else if (currentSmoothedProgress >= 16.0) {
-        newDustOpacity = 1.0;
-      }
-
       // Set state for all values
-      setDustImageOpacity(clamp(newDustOpacity, 0, 1)); // Set dust opacity
       setEdgeProgress(smoothedEdgeProgressRef.current);
       setPartnersProgress(smoothedPartnersProgressRef.current);
       setTestimonialProgress(smoothedTestimonialProgressRef.current);
@@ -1008,16 +1027,14 @@ const LandingPage: FC = () => {
           className="absolute lg:top-96 top-50 right-28 rotate-2 lg:right-40 transform -translate-y-1/2 translate-x-[28%] w-[90vw] md:w-[65vw] lg:w-[750px] max-w-[750px] pointer-events-none mix-blend-screen opacity-60"
         />
       </div>
-      {/* --- REPLACED DUSTPLANE CANVAS WITH IMAGE --- */}
-      <div
-        className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none"
-        style={{ opacity: dustImageOpacity }}
-      >
-        <img
-          src="/orangegradient.png"
-          alt="Blue cosmic dust"
-          className="w-full h-full object-cover"
-        />
+      <div className="fixed top-0 left-0 w-full h-full z-20 pointer-events-none">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }} gl={{ alpha: true }}>
+          <Suspense fallback={null}>
+            <DustPlaneController
+              watermarkProgressRef={smoothedWatermarkProgressRef}
+            />
+          </Suspense>
+        </Canvas>
       </div>
       <div
         ref={textContainerRef}

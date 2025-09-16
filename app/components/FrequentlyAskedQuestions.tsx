@@ -1,7 +1,42 @@
+import { useState, FormEvent } from 'react'; 
 import { FAQType } from '../constants/faqsData';
 import AccordionItem from './Framer/AccordianItem';
 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAYwB174Qk9X9nJYWIAiRC81NkYJOgLJOjJtu9txvHmeaVlz0HraJdPGfgEQwYRfaToQ/exec"; 
+
 export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQType[] }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      
+      const result = await response.json();
+
+      if (result.result === "success") {
+        alert("Thank you for your question! We will get back to you soon.");
+        e.currentTarget.reset();
+      } else {
+        throw new Error(result.message || "An unknown error occurred.");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to send message. Please try again later.";
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!faqs || faqs.length === 0) {
     return null;
   }
@@ -36,7 +71,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
         ))}
       </div>
 
-      <div id="contact-form" className="mt-20 scroll-mt-24"> {/* Added ID and scroll-margin */}
+      <div id="contact-form" className="mt-20 scroll-mt-24">
         <div className="max-w-5xl mx-auto p-6 sm:p-8 rounded-2xl backdrop-blur-xs border border-gray-700/50 ">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-semibold text-white mb-2">
@@ -47,7 +82,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
             </p>
           </div>
 
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -92,12 +127,14 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
             </div>
 
             <div>
-              <label htmlFor="question" className="block text-sm font-medium text-gray-300 mb-2">
-                Your Question *
+              {/* --- CHANGE 1: Updated label --- */}
+              <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                Your Message / Question *
               </label>
+              {/* --- CHANGE 2: Updated textarea id and name --- */}
               <textarea
-                id="question"
-                name="question"
+                id="message"
+                name="message"
                 required
                 rows={4}
                 className="w-full px-4 py-3 bg-black border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300 resize-none"
@@ -108,9 +145,10 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
             <div className="pt-4 flex items-center justify-center">
               <button
                 type="submit"
-                className="w-fit px-8 py-2 bg-white text-black cursor-pointer font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-orange-500/25 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                disabled={isSubmitting}
+                className="w-fit px-8 py-2 bg-white text-black cursor-pointer font-semibold rounded-xl hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-orange-500/25 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Send Message
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </div>
           </form>

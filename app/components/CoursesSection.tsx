@@ -146,7 +146,7 @@ const Card: React.FC<CardProps> = ({
 
       <button
         onClick={() => router.push(course.route)}
-        className="absolute z-10 w-44 py-2.5 px-5 cursor-pointer  bottom-2 font-medium text-white border bg-black/30 backdrop-blur-sm border-white/50  rounded-lg transition-colors hover:bg-white/10 focus:ring-4 focus:outline-none focus:ring-gray-300"
+        className="absolute z-10 w-40 py-2.5 px-5 cursor-pointer  bottom-2 font-medium text-white border bg-black/30 backdrop-blur-sm border-white/50  rounded-lg transition-colors hover:bg-white/10 focus:ring-4 focus:outline-none focus:ring-gray-300"
       >
         View Course
       </button>
@@ -272,7 +272,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   });
 
   return (
-    <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-6 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
+    <div className="relative w-full h-full text-white flex flex-col lg:flex-row gap-2 justify-start md:justify-center mx-auto px-4 items-center pt-16 md:pt-0 pb-8 md:pb-0">
       {!isMobile && (
         <div className="md:h-28 lg:h-auto lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
@@ -413,7 +413,7 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
       )}
 
       {/* MODIFICATION 4: Conditionally render cards */}
-      <div className="relative w-full md:w-1/2 h-full md:h-full lg:h-[480px] flex items-center justify-center z-10">
+      <div className="relative w-full md:w-1/2 h-full p-2 md:h-full lg:h-[480px] flex items-center justify-center z-10">
         {activeDomain && (
             isMobile ? (
                 // --- MOBILE: FADE ANIMATION ---

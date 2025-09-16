@@ -21,18 +21,15 @@ type Testimonial = {
 
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => {
   return (
-    <div 
-      className="relative flex flex-col w-[90vw] max-w-md flex-shrink-0 rounded-2xl border border-neutral-800 p-8 shadow-2xl overflow-hidden"
-    >
+    <div className="relative flex flex-col w-[90vw] max-w-md h-full flex-shrink-0 rounded-2xl border border-neutral-800 p-8 shadow-2xl overflow-hidden">
       <Image
         src={testimonial.planetImage}
         alt={`Planet for ${testimonial.name}'s testimonial`}
         width={200}
         height={200}
-        
         className="absolute top-35 lg:top-30 right-0.5 left-30 lg:left-40 w-[400px] h-auto opacity-80 pointer-events-none"
       />
-      
+
       <div className="absolute inset-0 bg-black/50 rounded-2xl"></div>
 
       <div className="relative z-10 flex items-center gap-4">
@@ -67,7 +64,8 @@ export const AnimatedTestimonials = ({
 
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
   const [showIndicator, setShowIndicator] = useState(isMobile);
-  
+  const [isAutoFlowActive, setIsAutoFlowActive] = useState(isMobile);
+
   const x = useMotionValue(0);
   const smoothedX = useSpring(x, {
     stiffness: 100,
@@ -86,9 +84,9 @@ export const AnimatedTestimonials = ({
         const cardWidth = firstCard.offsetWidth;
         const right = (containerWidth - cardWidth) / 2;
         const left = -(trackWidth - containerWidth + right);
-        
+
         setConstraints({ left, right });
-        
+
         if (isMobile) {
           x.set(right);
         }
@@ -116,12 +114,23 @@ export const AnimatedTestimonials = ({
     return () => clearTimeout(timer);
   }, [isMobile]);
 
+  const DURATION_PER_CARD = 5;
+  const autoFlowAnimation = {
+    x: constraints.left,
+    transition: {
+      duration: testimonials.length * DURATION_PER_CARD,
+      ease: "linear" as const,
+      repeat: Infinity,
+      repeatType: "loop" as const,
+    },
+  };
+
   return (
     <div className="w-full py-12">
       <h2 className="lg:mb-12 mb-24 text-center text-5xl font-bold text-white md:text-6xl">
         Testimonials.
       </h2>
-      
+
       <div
         ref={containerRef}
         className="relative h-[350px] w-full mx-auto overflow-hidden"
@@ -130,9 +139,17 @@ export const AnimatedTestimonials = ({
           ref={trackRef}
           className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
           style={{ x: isMobile ? x : smoothedX }}
+          animate={isMobile && isAutoFlowActive ? autoFlowAnimation : undefined}
           drag={isMobile ? "x" : false}
           dragConstraints={isMobile ? constraints : undefined}
-          onDragStart={isMobile ? () => setShowIndicator(false) : undefined}
+          onDragStart={
+            isMobile
+              ? () => {
+                  setShowIndicator(false);
+                  setIsAutoFlowActive(false);
+                }
+              : undefined
+          }
         >
           {testimonials.map((t, index) => (
             <TestimonialCard key={index} testimonial={t} />
@@ -140,7 +157,7 @@ export const AnimatedTestimonials = ({
         </motion.div>
 
         <AnimatePresence>
-          {showIndicator && (
+          {showIndicator && isAutoFlowActive && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -149,15 +166,7 @@ export const AnimatedTestimonials = ({
               className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
             >
               <div className="flex items-center justify-start w-24 h-7 p-1 overflow-hidden rounded-full border border-neutral-600 bg-black/50 backdrop-blur-sm">
-                <motion.div
-                  className="w-8 h-full rounded-full bg-white" 
-                  animate={{ x: [0, 56, 0] }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
+                <div className="text-white/70 text-xs pl-2.5">SWIPE</div>
               </div>
             </motion.div>
           )}

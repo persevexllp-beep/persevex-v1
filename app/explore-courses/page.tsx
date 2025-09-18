@@ -4,10 +4,12 @@ import React, { useState, Suspense, useRef, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import StarField from "@/app/components/StarField";
 import { motion, AnimatePresence } from "framer-motion";
+import CourseFooterSection from "../components/CourseFooterSection";
 
 import { allDomains, DomainView } from "../constants/courseConstant";
 import CourseDisplayCard from "../components/CourseDisplayCard";
 import Link from "next/link";
+import FooterSection from "../components/FooterSection";
 
 export default function ExploreCoursesPage() {
   const [activeView, setActiveView] = useState<DomainView>("management");
@@ -111,6 +113,7 @@ export default function ExploreCoursesPage() {
           </motion.div>
         </AnimatePresence>
       </div>
+     
     </main>
   );
 }

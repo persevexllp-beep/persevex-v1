@@ -2,11 +2,13 @@ import { Facebook } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 import { FiMail, FiMapPin, FiInstagram, FiTwitter, FiLinkedin } from 'react-icons/fi';
+import { useScroll, SectionKey } from '../contexts/scrollContext';
 
 type FooterLink = {
   text: string;
   href: string;
   icon?: React.ReactNode;
+   sectionKey?: SectionKey; 
 };
 
 type FooterColumn = {
@@ -32,19 +34,19 @@ const footerLinkColumns: FooterColumn[] = [
   {
     title: 'Our Courses',
     links: [
-      { text: 'Management', href: '/explore-courses' },
-      { text: 'Technical', href: '#' },
-      { text: 'Electronics', href: '#' },
-      { text: 'Mechanical', href: '#' },
-      { text: 'Civil', href: '#' },
-    ],
+{ text: 'Management', href: '/explore-courses' },
+{ text: 'Technical', href: '/explore-courses' },
+{ text: 'Electronics', href: '/explore-courses' },
+{ text: 'Mechanical', href: '/explore-courses' },
+{ text: 'Civil', href: '/explore-courses' },
+],
   },
   {
     title: 'Company',
     links: [
-      { text: 'About Us', href: '#' },
-      { text: 'Careers', href: '#' },
-      { text: 'Contact Us', href: '#' },
+      { text: 'About Us', href: '#', sectionKey: 'aboutUs' },
+      { text: 'Careers', href: '#' }, // No section yet, so no key
+      { text: 'Contact Us', href: '#', sectionKey: 'contactUs' },
     ],
   },
   {
@@ -58,12 +60,15 @@ const footerLinkColumns: FooterColumn[] = [
 
 const socialLinks: SocialLink[] = [
     { name: 'Instagram', href: 'https://www.instagram.com/persevex_llp/', icon: <FiInstagram size={20} /> },
-    // Corrected "Twitter" to "Facebook" to match the icon and link
     { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61574597387622#', icon: <Facebook size={20} /> },
     { name: 'LinkedIn', href: 'https://www.linkedin.com/company/persevex/posts/?feedView=all', icon: <FiLinkedin size={20} /> },
 ];
 
 export default function FooterSection() {
+
+   const { scrollToSection } = useScroll();
+
+
   return (
     <footer className="relative md:min-h-screen top- flex items-center justify-center text-white overflow-hidden py-8 md:py-20">
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8">
@@ -101,6 +106,12 @@ export default function FooterSection() {
                       <a
                       target='_blank'
                         href={link.href}
+                        onClick={(e) => {
+                          if (link.sectionKey) {
+                            e.preventDefault(); // Prevent default anchor behavior
+                            scrollToSection(link.sectionKey);
+                          }
+                        }}
                         // Added `break-all` to prevent text overflow on small screens
                         className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center gap-2 group break-all"
                       >

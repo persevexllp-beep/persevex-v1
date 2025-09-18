@@ -128,7 +128,9 @@ export const AnimatedTestimonials = ({
   const handlePan = (event: any, info: PanInfo) => {
     if (!isMobile || !isDragging) return;
     
-    const newPosition = currentPosition + info.offset.x;
+    // Apply resistance to make dragging feel more natural
+    const resistance = 0.6;
+    const newPosition = currentPosition + (info.offset.x * resistance);
     x.set(newPosition);
   };
 
@@ -140,22 +142,32 @@ export const AnimatedTestimonials = ({
     const velocity = info.velocity.x;
     const offset = info.offset.x;
     
-    // Calculate snap position based on velocity and offset
-    let snapOffset = 0;
-    if (Math.abs(velocity) > 500 || Math.abs(offset) > totalWidth * 0.3) {
-      snapOffset = velocity > 0 || offset > 0 ? totalWidth : -totalWidth;
-    }
+    // More conservative thresholds for card advancement
+    const velocityThreshold = 800; // Higher threshold for velocity-based swipe
+    const distanceThreshold = totalWidth * 0.25; // 25% of card width
     
-    const finalPosition = currentPosition + snapOffset;
+    let cardsToMove = 0;
+    
+    // Determine how many cards to move based on gesture
+    if (Math.abs(velocity) > velocityThreshold) {
+      // Fast swipe - move one card in the direction of velocity
+      cardsToMove = velocity < 0 ? -1 : 1;
+    } else if (Math.abs(offset) > distanceThreshold) {
+      // Slow drag but sufficient distance - move one card
+      cardsToMove = offset < 0 ? -1 : 1;
+    }
+    // If neither threshold is met, snap back to current position (cardsToMove = 0)
+    
+    const finalPosition = currentPosition + (cardsToMove * totalWidth);
     
     // Animate to snap position and then immediately resume auto-scroll
     controls.start({
       x: finalPosition,
       transition: {
         type: "spring",
-        stiffness: 300,
-        damping: 30,
-        duration: 0.3,
+        stiffness: 400,
+        damping: 40,
+        duration: 0.4,
       },
     }).then(() => {
       // Resume auto-scroll immediately after snap animation completes
@@ -174,7 +186,7 @@ export const AnimatedTestimonials = ({
       // Small delay to ensure smooth transition
       const timeoutId = setTimeout(() => {
         startAutoScroll();
-      }, 3000);
+      }, 100);
       return () => clearTimeout(timeoutId);
     }
   }, [isMobile, isAutoScrollActive, isDragging, controls, testimonials.length]);

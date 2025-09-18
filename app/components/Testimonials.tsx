@@ -120,7 +120,7 @@ export const AnimatedTestimonials = ({
   useEffect(() => {
     if (!isMobile || !isAutoScrolling || isTouching) return;
 
-    const interval = setInterval(startMobileAutoScroll, 3000); // 3 seconds per card
+    const interval = setInterval(startMobileAutoScroll, 1000); // 3 seconds per card
     return () => clearInterval(interval);
   }, [isMobile, isAutoScrolling, isTouching, currentIndex]);
 
@@ -151,7 +151,7 @@ export const AnimatedTestimonials = ({
     
     // Get the position when touch started
     const startPosition = -currentIndex * CARD_TOTAL_WIDTH;
-    const newPosition = startPosition + info.offset.x * 0.7; // Add resistance
+    const newPosition = startPosition + info.offset.x * 0.1; // Add resistance
     mobileX.set(newPosition);
   };
 
@@ -191,7 +191,7 @@ export const AnimatedTestimonials = ({
     const timeout = setTimeout(() => {
       setIsAutoScrolling(true);
       setAutoScrollTimeout(null);
-    }, 4000);
+    }, 1000);
     
     setAutoScrollTimeout(timeout);
   };

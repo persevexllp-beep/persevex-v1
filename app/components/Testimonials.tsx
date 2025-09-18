@@ -120,7 +120,7 @@ export const AnimatedTestimonials = ({
   useEffect(() => {
     if (!isMobile || !isAutoScrolling || isTouching) return;
 
-    const interval = setInterval(startMobileAutoScroll, 3000); // 3 seconds per card
+    const interval = setInterval(startMobileAutoScroll, 500); // 3 seconds per card
     return () => clearInterval(interval);
   }, [isMobile, isAutoScrolling, isTouching, currentIndex]);
 

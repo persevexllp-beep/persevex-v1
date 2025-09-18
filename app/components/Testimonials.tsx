@@ -62,13 +62,9 @@ export const AnimatedTestimonials = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const controls = useAnimationControls();
 
+  // Desktop animation states (unchanged)
   const [constraints, setConstraints] = useState({ left: 0, right: 0 });
-  const [isAutoScrollActive, setIsAutoScrollActive] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState(0);
-
   const x = useMotionValue(0);
   const smoothedX = useSpring(x, {
     stiffness: 100,
@@ -76,150 +72,122 @@ export const AnimatedTestimonials = ({
     restDelta: 0.001,
   });
 
-  // For mobile, we create multiple copies for seamless infinite scroll
-  const finalTestimonials = isMobile
-    ? [...testimonials, ...testimonials, ...testimonials] // Triple for smoother infinite loop
+  // Mobile-only states
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const [isTouching, setIsTouching] = useState(false);
+  const [autoScrollTimeout, setAutoScrollTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  const mobileX = useMotionValue(0);
+  const mobileControls = useAnimationControls();
+
+  // Mobile card dimensions
+  const CARD_WIDTH = typeof window !== 'undefined' ? window.innerWidth * 0.9 : 350; // 90vw
+  const GAP = 32; // gap-x-8
+  const CARD_TOTAL_WIDTH = CARD_WIDTH + GAP;
+
+  // Create extended testimonials array for mobile infinite scroll
+  const extendedTestimonials = isMobile 
+    ? [...testimonials, ...testimonials, ...testimonials] 
     : testimonials;
 
-  // Calculate card dimensions for mobile
-  const getCardDimensions = () => {
-    const cardWidth = window.innerWidth * 0.9; // 90vw
-    const gap = 32; // gap-x-8
-    return { cardWidth, gap, totalWidth: cardWidth + gap };
-  };
+  // Mobile auto-scroll function
+  const startMobileAutoScroll = () => {
+    if (!isMobile || isTouching || !isAutoScrolling) return;
 
-  // Start mobile auto-scroll animation
-  const startAutoScroll = () => {
-    if (!isMobile || !isAutoScrollActive) return;
+    const nextIndex = currentIndex + 1;
+    const targetX = -nextIndex * CARD_TOTAL_WIDTH;
 
-    const { totalWidth } = getCardDimensions();
-    const singleSetWidth = testimonials.length * totalWidth;
-    
-    // Calculate current position in the cycle
-    const currentX = x.get();
-    const normalizedPosition = ((currentX % singleSetWidth) + singleSetWidth) % singleSetWidth;
-    
-    controls.start({
-      x: [currentX, currentX - singleSetWidth],
+    mobileControls.start({
+      x: targetX,
       transition: {
-        duration: (testimonials.length * 4) * (singleSetWidth - normalizedPosition) / singleSetWidth,
-        ease: "linear",
-        repeat: Infinity,
-        repeatType: "loop",
-      },
-    });
-  };
-
-  // Stop auto-scroll animation
-  const stopAutoScroll = () => {
-    controls.stop();
-    setCurrentPosition(x.get());
-  };
-
-  // Handle pan start (finger down)
-  const handlePanStart = () => {
-    if (!isMobile) return;
-    setIsDragging(true);
-    setIsAutoScrollActive(false);
-    stopAutoScroll();
-  };
-
-  // Handle pan (finger drag)
-  const handlePan = (event: any, info: PanInfo) => {
-    if (!isMobile || !isDragging) return;
-    
-    // Apply resistance to make dragging feel more natural
-    const resistance = 0.6;
-    const newPosition = currentPosition + (info.offset.x * resistance);
-    x.set(newPosition);
-  };
-
-  // Handle pan end (finger up)
-  const handlePanEnd = (event: any, info: PanInfo) => {
-    if (!isMobile) return;
-    
-    const { totalWidth } = getCardDimensions();
-    const velocity = info.velocity.x;
-    const offset = info.offset.x;
-    
-    // More conservative thresholds for card advancement
-    const velocityThreshold = 800; // Higher threshold for velocity-based swipe
-    const distanceThreshold = totalWidth * 0.25; // 25% of card width
-    
-    let cardsToMove = 0;
-    
-    // Determine how many cards to move based on gesture
-    if (Math.abs(velocity) > velocityThreshold) {
-      // Fast swipe - move one card in the direction of velocity
-      cardsToMove = velocity < 0 ? -1 : 1;
-    } else if (Math.abs(offset) > distanceThreshold) {
-      // Slow drag but sufficient distance - move one card
-      cardsToMove = offset < 0 ? -1 : 1;
-    }
-    // If neither threshold is met, snap back to current position (cardsToMove = 0)
-    
-    const finalPosition = currentPosition + (cardsToMove * totalWidth);
-    
-    // Animate to snap position and then immediately resume auto-scroll
-    controls.start({
-      x: finalPosition,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 40,
-        duration: 0.4,
-      },
+        duration: 0.8,
+        ease: [0.32, 0.72, 0, 1], // Custom easing for smooth feel
+      }
     }).then(() => {
-      // Resume auto-scroll immediately after snap animation completes
-      setCurrentPosition(finalPosition);
-      setIsAutoScrollActive(true);
-    });
-    
-    setIsDragging(false);
-  };
-
-  // Start auto-scroll when component mounts or when auto-scroll is reactivated
-  useEffect(() => {
-    if (!isMobile || isDragging) return;
-    
-    if (isAutoScrollActive) {
-      // Small delay to ensure smooth transition
-      const timeoutId = setTimeout(() => {
-        startAutoScroll();
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isMobile, isAutoScrollActive, isDragging, controls, testimonials.length]);
-
-  // Initialize auto-scroll on mount
-  useEffect(() => {
-    if (!isMobile) return;
-    
-    setIsAutoScrollActive(true);
-    x.set(0);
-    setCurrentPosition(0);
-  }, [isMobile, x]);
-
-  // Handle infinite loop reset for mobile
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const { totalWidth } = getCardDimensions();
-    const singleSetWidth = testimonials.length * totalWidth;
-    
-    const unsubscribe = x.onChange((latest) => {
-      // Reset position when we've scrolled through one complete set
-      if (latest <= -singleSetWidth * 2) {
-        const resetPosition = latest + singleSetWidth;
-        x.set(resetPosition);
-        setCurrentPosition(resetPosition);
+      setCurrentIndex(nextIndex);
+      
+      // Reset position when we've gone through original set
+      if (nextIndex >= testimonials.length) {
+        mobileX.set(0);
+        setCurrentIndex(0);
+        mobileControls.set({ x: 0 });
       }
     });
+  };
 
-    return unsubscribe;
-  }, [isMobile, x, testimonials.length]);
+  // Mobile auto-scroll interval
+  useEffect(() => {
+    if (!isMobile || !isAutoScrolling || isTouching) return;
 
-  // Desktop constraints calculation
+    const interval = setInterval(startMobileAutoScroll, 3000); // 3 seconds per card
+    return () => clearInterval(interval);
+  }, [isMobile, isAutoScrolling, isTouching, currentIndex]);
+
+  // Handle touch start
+  const handleTouchStart = () => {
+    if (!isMobile) return;
+    setIsTouching(true);
+    setIsAutoScrolling(false);
+    
+    // Clear any pending auto-scroll timeout
+    if (autoScrollTimeout) {
+      clearTimeout(autoScrollTimeout);
+      setAutoScrollTimeout(null);
+    }
+  };
+
+  // Handle drag
+  const handleDrag = (event: any, info: PanInfo) => {
+    if (!isMobile || !isTouching) return;
+    
+    const basePosition = -currentIndex * CARD_TOTAL_WIDTH;
+    const newPosition = basePosition + info.offset.x * 0.8; // Add resistance
+    mobileX.set(newPosition);
+  };
+
+  // Handle touch end
+  const handleTouchEnd = (event: any, info: PanInfo) => {
+    if (!isMobile) return;
+    
+    const swipeThreshold = CARD_TOTAL_WIDTH * 0.3; // 30% of card width
+    const velocityThreshold = 500;
+    
+    let newIndex = currentIndex;
+    
+    // Determine swipe direction
+    if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
+      // Swipe left - next card
+      newIndex = Math.min(currentIndex + 1, testimonials.length - 1);
+    } else if (info.offset.x > swipeThreshold || info.velocity.x > velocityThreshold) {
+      // Swipe right - previous card  
+      newIndex = Math.max(currentIndex - 1, 0);
+    }
+    
+    // Animate to final position
+    const targetX = -newIndex * CARD_TOTAL_WIDTH;
+    mobileControls.start({
+      x: targetX,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      }
+    });
+    
+    setCurrentIndex(newIndex);
+    setIsTouching(false);
+    
+    // Resume auto-scroll after 4 seconds
+    const timeout = setTimeout(() => {
+      setIsAutoScrolling(true);
+      setAutoScrollTimeout(null);
+    }, 500);
+    
+    setAutoScrollTimeout(timeout);
+  };
+
+  // Desktop constraints calculation (unchanged)
   useEffect(() => {
     if (isMobile) return;
 
@@ -245,7 +213,7 @@ export const AnimatedTestimonials = ({
     };
   }, [isMobile, testimonials]);
 
-  // Desktop scroll-based animation
+  // Desktop scroll-based animation (unchanged)
   useEffect(() => {
     if (isMobile) return;
 
@@ -254,6 +222,24 @@ export const AnimatedTestimonials = ({
     const targetX = constraints.right - totalRange * progress;
     x.set(targetX);
   }, [progress, constraints, isMobile, x]);
+
+  // Initialize mobile state
+  useEffect(() => {
+    if (isMobile) {
+      setCurrentIndex(0);
+      setIsAutoScrolling(true);
+      mobileX.set(0);
+    }
+  }, [isMobile]);
+
+  // Cleanup timeouts
+  useEffect(() => {
+    return () => {
+      if (autoScrollTimeout) {
+        clearTimeout(autoScrollTimeout);
+      }
+    };
+  }, [autoScrollTimeout]);
 
   return (
     <div className="w-full py-12">
@@ -268,31 +254,50 @@ export const AnimatedTestimonials = ({
         <motion.div
           ref={trackRef}
           className="absolute left-0 top-0 flex h-full items-stretch gap-x-8 px-4 py-4"
-          style={isMobile ? {} : { x: smoothedX }}
-          animate={isMobile ? controls : {}}
-          // Touch event handlers for mobile
-          onPanStart={isMobile ? handlePanStart : undefined}
-          onPan={isMobile ? handlePan : undefined}
-          onPanEnd={isMobile ? handlePanEnd : undefined}
-          // Drag configuration for mobile
+          // Desktop: use smoothed spring motion
+          // Mobile: use direct motion value with controls
+          style={isMobile ? { x: mobileX } : { x: smoothedX }}
+          animate={isMobile ? mobileControls : undefined}
+          // Mobile touch handlers
+          onPanStart={isMobile ? handleTouchStart : undefined}
+          onPan={isMobile ? handleDrag : undefined}
+          onPanEnd={isMobile ? handleTouchEnd : undefined}
+          // Mobile drag config
           drag={isMobile ? "x" : false}
-          dragElastic={0.1}
           dragMomentum={false}
-          // Improved touch responsiveness
-          whileTap={isMobile ? { scale: 0.98 } : undefined}
+          dragElastic={0.1}
         >
-          {finalTestimonials.map((t, index) => (
+          {(isMobile ? extendedTestimonials : testimonials).map((t, index) => (
             <TestimonialCard key={`testimonial-${index}`} testimonial={t} />
           ))}
         </motion.div>
       </div>
       
-      {/* Optional: Visual indicator for mobile users */}
+      {/* Mobile status indicator */}
       {isMobile && (
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 space-x-4">
           <p className="text-neutral-400 text-sm">
-            {isDragging ? "Swiping..." : "Auto-scrolling"}
+            {isTouching 
+              ? "Swiping..." 
+              : isAutoScrolling 
+                ? "Auto-scrolling" 
+                : "Resuming in 4s"
+            }
           </p>
+          
+          {/* Card indicators */}
+          <div className="flex space-x-2">
+            {testimonials.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                  index === currentIndex % testimonials.length
+                    ? "bg-white" 
+                    : "bg-neutral-600"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

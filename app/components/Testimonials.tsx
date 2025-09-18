@@ -174,7 +174,7 @@ export const AnimatedTestimonials = ({
       // Small delay to ensure smooth transition
       const timeoutId = setTimeout(() => {
         startAutoScroll();
-      }, 100);
+      }, 3000);
       return () => clearTimeout(timeoutId);
     }
   }, [isMobile, isAutoScrollActive, isDragging, controls, testimonials.length]);

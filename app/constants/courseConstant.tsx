@@ -1336,7 +1336,7 @@ export const ElectronicsCourses: CourseType[] = [
     icon: Network,
     route: "/courses/iot",
     slug: "iot",
-    image: "/human.png",
+    image: "/iotcourse.png",
     cardBg_image: "/iotplanet.png",
     projects: [
       {
@@ -1464,12 +1464,131 @@ export const ElectronicsCourses: CourseType[] = [
       "IoT Security and Project Deployment",
     ],
   },
+  {
+    "id": "e2",
+    "title": "Embedded Systems Design",
+    "shortTitle": "Embedded Systems",
+    "description": "From bare-metal programming to RTOS, master the core of smart devices.",
+  "icon": Network, 
+    "route": "/courses/embedded-systems",
+    "slug": "embedded-systems",
+    "image": "/embeddedcourse.png", 
+    "cardBg_image": "/embeddedplanet.png",
+    "projects": [
+      {
+        "name": "Digital Thermometer with LCD",
+        "description": "Interface with a temperature sensor and display real-time readings on a character LCD.",
+        "image": "https://images.unsplash.com/photo-1614769709322-281816738162?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        "name": "Motor Speed Controller (PWM)",
+        "description": "Control the speed of a DC motor with precision using Pulse Width Modulation (PWM) signals.",
+        "image": "https://images.unsplash.com/photo-1599736179333-f3a3739d48b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        "name": "Bluetooth Low Energy (BLE) Beacon",
+        "description": "Build a low-power device that broadcasts data wirelessly to a smartphone or other BLE device.",
+        "image": "https://images.unsplash.com/photo-1616786018449-3c7a1b9a9e3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        "name": "Real-Time Clock Alarm System",
+        "description": "Use an RTC module to build a persistent alarm clock that can trigger an event at a specific time.",
+        "image": "https://images.unsplash.com/photo-1595493972828-56272535a81e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        "name": "Data Logger with SD Card",
+        "description": "Create a system that logs sensor data over time and saves it to a file on an SD card via SPI.",
+        "image": "https://images.unsplash.com/photo-1544535538-b9a3d46fd3a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        "name": "Basic RTOS Task Scheduler",
+        "description": "Implement a simple multi-tasking system using a Real-Time Operating System like FreeRTOS.",
+        "image": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+      }
+    ],
+    "modules": [
+      {
+        "title": "Intro to Microcontrollers & C",
+        "duration": "2 weeks",
+        "lessons": 6,
+        "description": "Understand microcontroller architecture and master C programming for resource-constrained environments.",
+        "topics": [
+          "Microcontroller Architecture (ARM Cortex-M)",
+          "Setting up the Development Toolchain (GCC, Make)",
+          "Data Types, Pointers, and Bit Manipulation in C",
+          "Memory Layout: Stack, Heap, and Globals",
+          "Reading Schematics and Datasheets",
+          "Debugging with GDB and a Hardware Debugger"
+        ]
+      },
+      {
+        "title": "Interfacing with Peripherals",
+        "duration": "2 weeks",
+        "lessons": 5,
+        "description": "Learn to configure and use the core peripherals found on modern microcontrollers.",
+        "topics": [
+          "General Purpose I/O (GPIO) for LEDs and Buttons",
+          "UART for Serial Communication",
+          "I2C for Inter-chip Communication",
+          "SPI for High-Speed Peripherals (e.g., SD Cards)",
+          "Analog-to-Digital Converters (ADC) for Sensors"
+        ]
+      },
+      {
+        "title": "Timers, Interrupts, and Power",
+        "duration": "2 weeks",
+        "lessons": 5,
+        "description": "Master time-critical operations, event-driven programming, and low-power design.",
+        "topics": [
+          "Hardware Timers for Delays and Events",
+          "Generating PWM Signals for Motor/LED Control",
+          "Interrupt Service Routines (ISRs)",
+          "Handling Concurrency and Race Conditions",
+          "Low-Power Modes and Wake-up Sources"
+        ]
+      },
+      {
+        "title": "Real-Time Operating Systems (RTOS)",
+        "duration": "2 weeks",
+        "lessons": 5,
+        "description": "Learn the fundamentals of RTOS to manage complex, multi-tasking embedded applications.",
+        "topics": [
+          "RTOS Concepts: Tasks, Schedulers, and Kernels",
+          "Introduction to FreeRTOS",
+          "Synchronization Primitives: Mutexes and Semaphores",
+          "Inter-Task Communication with Queues",
+          "Memory Management in an RTOS"
+        ]
+      },
+      {
+        "title": "Firmware Development & Best Practices",
+        "duration": "1 week",
+        "lessons": 4,
+        "description": "Learn professional firmware development techniques for creating robust and maintainable code.",
+        "topics": [
+          "Bare-metal vs. RTOS-based Design",
+          "Writing Modular and Portable Drivers",
+          "Unit Testing for Embedded Systems",
+          "Bootloaders and Over-the-Air (OTA) Updates"
+        ]
+      }
+    ],
+    "large_description": "This course takes you deep into the world of embedded systems, where software meets hardware. You will learn to write low-level C code to control microcontrollers like the STM32, interface with a wide array of sensors and peripherals, and manage real-time constraints using interrupts and an RTOS. From blinking an LED to building complex, multi-threaded applications, you'll gain the hands-on skills needed to develop the firmware that powers modern electronics.",
+    "programCardsHeading": [
+      "Intro to Microcontrollers & C",
+      "Interfacing with Peripherals",
+      "Timers, Interrupts, and Power",
+      "Real-Time Operating Systems (RTOS)",
+      "Firmware Development & Best Practices"
+    ]
+  }
+
 ];
 
 
 export const MechanicalCourses: CourseType[] = [
   {
-    id: "mechanical1",
+    id: "a1",
     title: "AutoCAD: 2D & 3D Design",
     shortTitle: 'AutoCAD',
     description:
@@ -1477,8 +1596,8 @@ export const MechanicalCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/humanres.png",
-    cardBg_image: "/embeddedplanet.png",
+    image: "/autocadcourse.png",
+    cardBg_image: "/autocadplanet.png",
     projects: [
       {
         name: "Architectural Floor Plan",
@@ -1616,7 +1735,7 @@ export const CivilCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/human.png",
+    image: "/autocadcourse.png",
     cardBg_image: "/autocadplanet.png",
     projects: [
       {

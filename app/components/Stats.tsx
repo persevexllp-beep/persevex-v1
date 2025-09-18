@@ -9,9 +9,9 @@ interface Stat {
 }
 
 const statsData: Stat[] = [
-  { number: 1500, suffix: '+', label: 'Students Enrolled' },
-  { number: 8, suffix: '+', label: 'Expert-Led Courses' },
-  { number: 98, suffix: '%', label: 'Satisfaction Rate' },
+  { number: 15000, suffix: '+', label: 'Students Enrolled' },
+  { number: 10, suffix: '+', label: 'Expert-Led Courses' },
+  { number: 99, suffix: '%', label: 'Satisfaction Rate' },
   { number: 10, suffix: '+', label: 'Global Presence' },
 ];
 

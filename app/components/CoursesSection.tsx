@@ -114,7 +114,7 @@ const Card: React.FC<CardProps> = ({
         
         exit: "exit",
          transition: { duration: 0.3, ease: "easeInOut" as const },
-        className: `relative  overflow-hidden border-2 border-[rgba(255,255,255,0.3)] w-full max-w- rounded-2xl flex flex-col bg-black items-center justify-center shadow-xl h-full `
+        className: `relative  overflow-hidden border-2 border-[rgba(255,255,255,0.3)] w-full max-w- rounded-2xl flex flex-col bg-black items-center justify-center shadow-xl   h-full `
       }
     : {
         style: {
@@ -126,7 +126,8 @@ const Card: React.FC<CardProps> = ({
           backgroundSize: "cover",
           backgroundPosition: "center",
         },
-        className: `absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[420px] p-8`
+        // FIX: Reduced padding from p-8 to p-6 to prevent horizontal cropping of the background image text.
+        className: `absolute overflow-hidden border-2 border-[rgba(255,255,255,0.3)] top-0 w-full max-w-sm rounded-2xl flex flex-col bg-black items-center justify-end shadow-xl h-[420px]`
       };
 
   return (
@@ -134,13 +135,13 @@ const Card: React.FC<CardProps> = ({
       key={course.id}
       {...motionProps}
     >
-      <div className="absolute inset-0 w-full h-full ">
+      <div className="absolute inset-0 w- h-full ">
         <Image
           src={course.cardBg_image}
           alt={course.title}
           fill
           sizes="(max-width: 427px) 80vw, 304px"
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "contain" }}
         />
       </div>
 

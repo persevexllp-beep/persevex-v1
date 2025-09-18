@@ -204,8 +204,96 @@ export const faqsData: Record<string, FAQType[]> = {
     {
       "question": "What kind of projects will I work on during the internship?",
       "answer": "During the internship, you'll work on a variety of hands-on projects that reflect real-world data science applications. These include customer segmentation, sales forecasting, interactive dashboards, social media analysis, fraud detection systems, and a comprehensive capstone project. All projects use real-world datasets and are designed to build your portfolio and demonstrate your data science skills to potential employers. You'll have the opportunity to work both individually and in teams, simulating the collaborative environment found in the data science industry."
+    },
+    
+  ],
+  
+  "iot": [
+    {
+      "question": "Why is the Internet of Things (IoT) important?",
+      "answer": "The Internet of Things (IoT) is crucial because it bridges the gap between the physical and digital worlds. By connecting everyday objects to the internet, we can gather data, automate processes, and control devices remotely. This technology is the backbone of smart homes, wearable tech, smart cities, and industrial automation. Learning IoT empowers you to build innovative solutions that improve efficiency, safety, and convenience in virtually every industry."
+    },
+    {
+      "question": "What are the career prospects in IoT?",
+      "answer": "Career prospects in IoT are rapidly expanding. Roles include IoT Developer, IoT Solutions Architect, Firmware Engineer, and IoT Data Analyst. Professionals in this field work on everything from hardware design to cloud data processing. The average salary for IoT professionals in India ranges from ₹5-25 lakhs per annum, depending on experience and the complexity of the projects. The demand is high across sectors like manufacturing, healthcare, agriculture, and consumer electronics."
+    },
+    {
+      "question": "Do I need prior experience in electronics or programming?",
+      "answer": "While a background in basic programming (like C++ or Python) or electronics is helpful, our program is designed to guide you from the fundamentals. We cover the necessary electronics concepts and programming skills to build IoT devices. A passion for building tangible products and a curious mindset are the most important prerequisites."
+    },
+    {
+      "question": "Will I receive a certificate after completing the internship?",
+      "answer": "Yes, upon successful completion of the internship program, you will receive three certificates: a course completion certificate, an internship certificate, and an outstanding performance certificate (based on your performance during the program). These certificates will showcase your practical skills in the IoT domain."
+    },
+    {
+      "question": "What kind of projects will I work on during the internship?",
+      "answer": "You will work on hands-on projects that mirror real-world applications, such as building a smart home automation system, a weather monitoring station that sends data to the cloud, and a wearable health tracker. These projects are designed to give you practical experience with sensors, microcontrollers, communication protocols like MQTT, and cloud platforms, building a strong portfolio for your career."
     }
   ],
-
-
+  "embedded-systems": [
+    {
+      "question": "Why are Embedded Systems important?",
+      "answer": "Embedded systems are the hidden brains inside almost every electronic device we use, from microwaves and washing machines to cars, medical equipment, and industrial robots. They are designed for specific tasks and are crucial for the functioning of modern technology. Learning embedded systems gives you the fundamental skill to program hardware directly, control physical processes, and build reliable and efficient devices that form the foundation of the entire tech ecosystem, including IoT."
+    },
+    {
+      "question": "What are the career prospects in Embedded Systems?",
+      "answer": "The career prospects in embedded systems are excellent and stable, as it is a core engineering field. Key roles include Embedded Systems Engineer, Firmware Developer, and RTOS (Real-Time Operating System) Engineer. These professionals are highly sought after in the automotive, aerospace, consumer electronics, and medical device industries. The average salary ranges from ₹6-30 lakhs per annum, with experienced engineers commanding high compensation due to the specialized nature of the work."
+    },
+    {
+      "question": "Do I need prior experience in programming?",
+      "answer": "A foundational knowledge of the C or C++ programming language is highly beneficial for this field, as it is the industry standard. Our program is structured to reinforce these concepts in the context of hardware, but coming in with some programming experience will help you progress faster. An interest in how software controls hardware is the most critical requirement."
+    },
+    {
+      "question": "Will I receive a certificate after completing the internship?",
+      "answer": "Yes, upon successful completion of the internship program, you will receive three certificates: a course completion certificate, an internship certificate, and an outstanding performance certificate (based on your performance during the program). These certificates validate your skills in low-level programming and hardware interfacing."
+    },
+    {
+      "question": "What kind of projects will I work on during the internship?",
+      "answer": "You will engage in projects that teach you to control hardware at a low level. Examples include writing drivers for peripherals using I2C and SPI communication, controlling motor speed with PWM signals, and implementing a multi-tasking application using a Real-Time Operating System (RTOS). These projects focus on building robust, efficient, and reliable firmware—the core skills of an embedded engineer."
+    }
+  ],
+  "autocad": [
+    {
+      "question": "Why is learning AutoCAD important?",
+      "answer": "AutoCAD is the industry-standard software for computer-aided design (CAD) and drafting. It is an essential tool for architects, engineers (civil, mechanical, electrical), and designers to create precise 2D and 3D drawings. Mastering AutoCAD means you can speak the universal language of technical design, enabling you to draft everything from architectural floor plans and mechanical parts to electrical schematics and site layouts. This skill is fundamental to turning an idea into a detailed, manufacturable, or buildable plan."
+    },
+    {
+      "question": "What are the career prospects for AutoCAD professionals?",
+      "answer": "Proficiency in AutoCAD opens up numerous career paths. Common roles include CAD Drafter, AutoCAD Designer, Architectural Technologist, Mechanical Designer, and Civil Drafter. Every engineering, construction, and manufacturing project requires technical drawings, ensuring a stable and consistent demand for skilled professionals. Depending on the industry and experience, salaries in India typically range from ₹3-12 lakhs per annum, with significant opportunities for growth into design and project management roles."
+    },
+    {
+      "question": "Do I need any prior experience to learn AutoCAD?",
+      "answer": "No prior experience with AutoCAD or any other design software is required. Our program is designed for absolute beginners. We start with the basic interface and drawing tools and progressively build your skills to cover advanced 2D drafting and 3D modeling techniques. An interest in design, a good sense of spatial awareness, and attention to detail are all you need to get started."
+    },
+    {
+      "question": "Will I receive a certificate after completing the internship?",
+      "answer": "Yes, upon successful completion of the internship program, you will receive three certificates: a course completion certificate, an internship certificate, and an outstanding performance certificate (based on your performance during the program). These certificates will serve as a strong credential of your proficiency in AutoCAD."
+    },
+    {
+      "question": "What kind of projects will I work on during the internship?",
+      "answer": "You will work on a portfolio of projects that showcase your skills across different disciplines. This includes creating a detailed architectural floor plan, modeling a complex 3D mechanical part for manufacturing, designing a site layout for a civil engineering project, and producing a complete set of assembly drawings. These projects ensure you are job-ready and can demonstrate practical expertise to potential employers."
+    }
+  ],
+  "stock-market-crypto": [
+    {
+      "question": "Why is learning about the stock market and crypto important?",
+      "answer": "In today's economy, financial literacy is no longer optional—it's essential for building wealth and securing your future. Learning to invest in stocks and cryptocurrencies empowers you to make your money work for you, grow your savings beyond inflation, and achieve financial independence. This course demystifies the financial markets, giving you the knowledge to navigate both traditional investments and the emerging world of digital assets confidently."
+    },
+    {
+      "question": "What are the career prospects in financial markets?",
+      "answer": "This field offers highly lucrative career paths. You can become an Equity Research Analyst, Portfolio Manager, Financial Advisor, Quantitative Analyst (Quant), or a full-time trader. With the rise of digital assets, new roles like Crypto Analyst and DeFi Strategist are in high demand. Even if you don't pursue a direct career in finance, these skills are invaluable for managing your personal wealth and making informed investment decisions."
+    },
+    {
+      "question": "Do I need a background in finance or economics?",
+      "answer": "Absolutely not. Our program is designed from the ground up for beginners. We start with the core concepts—what a stock is, how markets operate—and progressively build up to advanced topics like technical analysis, options trading, and DeFi protocols. All you need is an analytical mindset and a desire to take control of your financial future."
+    },
+    {
+      "question": "Will I receive a certificate after completing the internship?",
+      "answer": "Yes, upon successful completion of the internship program, you will receive three certificates: a course completion certificate, an internship certificate, and an outstanding performance certificate (based on your performance during the program). These certificates will validate your expertise in market analysis and investment strategies."
+    },
+    {
+      "question": "What kind of projects will I work on during the internship?",
+      "answer": "You will engage in practical, hands-on projects that simulate real-world investing. This includes conducting a fundamental analysis to create a professional equity research report, building a diversified crypto portfolio based on tokenomics, creating and backtesting a trading plan using technical indicators, and designing an options trading strategy. These projects will build a strong portfolio showcasing your analytical and strategic skills."
+    }
+  ],
 };

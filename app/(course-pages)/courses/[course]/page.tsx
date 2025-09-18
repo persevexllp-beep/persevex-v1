@@ -8,6 +8,7 @@ import { faqsData } from '@/app/constants/faqsData';
 import { managementCourses, technicalCourses } from '@/app/constants/courseConstant';
 import { Canvas } from '@react-three/fiber';
 import StarField from '@/app/components/StarField';
+import { allDomains, CourseType } from '@/app/constants/courseConstant'; 
 import AboutProgramSection from '@/app/components/AboutProgramSection';
 import CurriculumSection from '@/app/components/CurriculumSection';
 import ProjectsSection from '@/app/components/ProjectsSection';
@@ -51,8 +52,9 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
   const resolvedParams = use(params);
   const { setSectionRefs } = useCourseScroll(); 
   
-  const allCourses = [...managementCourses, ...technicalCourses];
+   const allCourses: CourseType[] = allDomains.flatMap(domain => domain.courses);
   const course = allCourses.find(c => c.slug === resolvedParams.course);
+
 
   const aboutRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
   const curriculumRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;

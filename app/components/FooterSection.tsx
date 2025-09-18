@@ -25,7 +25,7 @@ const footerLinkColumns: FooterColumn[] = [
     title: 'Quick Links',
     links: [
       { text: 'Certificate Verification', href: '#' },
-      { text: 'Pre-registration', href: '#' },
+      { text: 'Pre-registration', href: 'https://forms.gle/s9nYdQAtr5Qs1YfB6' },
       { text: 'LMS', href: '#' },
       { text: 'Blogs', href: '#' },
     ],
@@ -99,8 +99,9 @@ export default function FooterSection() {
                   {column.links.map((link) => (
                     <li key={link.text}>
                       <a
+                      target='_blank'
                         href={link.href}
-                        className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center gap-2 group"
+                        className="text-gray-300  hover:text-white transition-colors duration-300 flex items-center gap-2 group"
                       >
                         {link.icon && <span className="group-hover:text-[#F9C47D] transition-colors">{link.icon}</span>}
                         <span className="group-hover:translate-x-1 transition-transform duration-300 ease-out inline-block">
@@ -121,7 +122,7 @@ export default function FooterSection() {
           </p>
           <div className="flex items-center space-x-4">
             {socialLinks.map((social) => (
-                <a target='_blank' key={social.name} href={social.href} aria-label={social.name} className="text-gray-200 hover:text-white transition-colors duration-300">
+                <a target='_blank' key={social.name} href={social.href} aria-label={social.name} className="text-gray-200 hover:text-[#F9C47D] transition-colors duration-300">
                     {social.icon}
                 </a>
             ))}

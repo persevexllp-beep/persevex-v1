@@ -9,7 +9,7 @@ import { managementCourses, technicalCourses } from '../constants/courseConstant
 import CourseDisplayCard from '../components/CourseDisplayCard';
 
 export default function ExploreCoursesPage() {
-    const [activeView, setActiveView] = useState<'management' | 'technical'>('management');
+    const [activeView, setActiveView] = useState<'management' | 'technical' | 'mechanical' | 'electronics' | 'civil'>('management');
 
     const coursesToShow = activeView === 'management' ? managementCourses : technicalCourses;
 

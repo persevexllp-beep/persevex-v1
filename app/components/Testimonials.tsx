@@ -306,14 +306,7 @@ export const AnimatedTestimonials = ({
       {/* Mobile status indicator */}
       {isMobile && (
         <div className="flex justify-center mt-4 space-x-4">
-          <p className="text-neutral-400 text-sm">
-            {isTouching 
-              ? "Swiping..." 
-              : isAutoScrolling 
-                ? "Auto-flowing" 
-                : "Resuming flow in 4s"
-            }
-          </p>
+        
           
           {/* Card indicators */}
           <div className="flex space-x-2">

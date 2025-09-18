@@ -148,7 +148,7 @@ export const AnimatedTestimonials = ({
     
     const finalPosition = currentPosition + snapOffset;
     
-    // Animate to snap position
+    // Animate to snap position and then immediately resume auto-scroll
     controls.start({
       x: finalPosition,
       transition: {
@@ -157,16 +157,13 @@ export const AnimatedTestimonials = ({
         damping: 30,
         duration: 0.3,
       },
+    }).then(() => {
+      // Resume auto-scroll immediately after snap animation completes
+      setCurrentPosition(finalPosition);
+      setIsAutoScrollActive(true);
     });
     
-    // Update current position and resume auto-scroll after a delay
-    setCurrentPosition(finalPosition);
     setIsDragging(false);
-    
-    // Resume auto-scroll after 2 seconds of inactivity
-    setTimeout(() => {
-      setIsAutoScrollActive(true);
-    }, 2000);
   };
 
   // Start auto-scroll when component mounts or when auto-scroll is reactivated
@@ -282,7 +279,7 @@ export const AnimatedTestimonials = ({
       {isMobile && (
         <div className="flex justify-center mt-4">
           <p className="text-neutral-400 text-sm">
-            {isDragging ? "Release to continue auto-scroll" : "Touch and drag to navigate"}
+            {isDragging ? "Swiping..." : "Auto-scrolling"}
           </p>
         </div>
       )}

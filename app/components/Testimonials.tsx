@@ -120,7 +120,7 @@ export const AnimatedTestimonials = ({
   useEffect(() => {
     if (!isMobile || !isAutoScrolling || isTouching) return;
 
-    const interval = setInterval(startMobileAutoScroll, 500); // 3 seconds per card
+    const interval = setInterval(startMobileAutoScroll, 3000); // 3 seconds per card
     return () => clearInterval(interval);
   }, [isMobile, isAutoScrolling, isTouching, currentIndex]);
 
@@ -129,6 +129,14 @@ export const AnimatedTestimonials = ({
     if (!isMobile) return;
     setIsTouching(true);
     setIsAutoScrolling(false);
+    
+    // Stop the continuous animation and capture current position
+    mobileControls.stop();
+    const currentPos = mobileX.get();
+    
+    // Calculate which card we're closest to
+    const closestIndex = Math.round(Math.abs(currentPos) / CARD_TOTAL_WIDTH) % testimonials.length;
+    setCurrentIndex(closestIndex);
     
     // Clear any pending auto-scroll timeout
     if (autoScrollTimeout) {
@@ -141,8 +149,9 @@ export const AnimatedTestimonials = ({
   const handleDrag = (event: any, info: PanInfo) => {
     if (!isMobile || !isTouching) return;
     
-    const basePosition = -currentIndex * CARD_TOTAL_WIDTH;
-    const newPosition = basePosition + info.offset.x * 0.8; // Add resistance
+    // Get the position when touch started
+    const startPosition = -currentIndex * CARD_TOTAL_WIDTH;
+    const newPosition = startPosition + info.offset.x * 0.7; // Add resistance
     mobileX.set(newPosition);
   };
 
@@ -182,7 +191,7 @@ export const AnimatedTestimonials = ({
     const timeout = setTimeout(() => {
       setIsAutoScrolling(true);
       setAutoScrollTimeout(null);
-    }, 500);
+    }, 4000);
     
     setAutoScrollTimeout(timeout);
   };
@@ -222,6 +231,27 @@ export const AnimatedTestimonials = ({
     const targetX = constraints.right - totalRange * progress;
     x.set(targetX);
   }, [progress, constraints, isMobile, x]);
+
+  // Handle infinite loop reset for continuous flow
+  useEffect(() => {
+    if (!isMobile || isTouching) return;
+
+    const singleSetWidth = testimonials.length * CARD_TOTAL_WIDTH;
+    
+    const unsubscribe = mobileX.onChange((latest) => {
+      // Reset position when we've scrolled through one complete set
+      if (latest <= -singleSetWidth * 2) {
+        const resetPosition = latest + singleSetWidth;
+        mobileX.set(resetPosition);
+        
+        // Update current index relative to reset
+        const newIndex = Math.abs(Math.round(resetPosition / CARD_TOTAL_WIDTH)) % testimonials.length;
+        setCurrentIndex(newIndex);
+      }
+    });
+
+    return unsubscribe;
+  }, [isMobile, isTouching, mobileX, testimonials.length]);
 
   // Initialize mobile state
   useEffect(() => {
@@ -280,8 +310,8 @@ export const AnimatedTestimonials = ({
             {isTouching 
               ? "Swiping..." 
               : isAutoScrolling 
-                ? "Auto-scrolling" 
-                : "Resuming in 4s"
+                ? "Auto-flowing" 
+                : "Resuming flow in 4s"
             }
           </p>
           

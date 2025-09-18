@@ -436,8 +436,8 @@ export const managementCourses: CourseType[] = [
   },
   {
   "id": "m4",
-  "title": "Stock Market & Crypto Investing",
-  "shortTitle": 'Stocks & Crypto',
+  "title": "Stock Market & Cryptocurrency",
+  "shortTitle": 'Stocks & Cryptocurrency',
   "description":
     "Master the art of investing in both traditional stock markets and the emerging world of cryptocurrencies.",
   "icon": ChartCandlestick,

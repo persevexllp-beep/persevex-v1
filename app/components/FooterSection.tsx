@@ -24,16 +24,15 @@ const footerLinkColumns: FooterColumn[] = [
   {
     title: 'Quick Links',
     links: [
-      { text: 'Certificate Verification', href: '#' },
       { text: 'Pre-registration', href: 'https://forms.gle/s9nYdQAtr5Qs1YfB6' },
-      { text: 'LMS', href: '#' },
-      { text: 'Blogs', href: '#' },
+      { text: 'LMS', href: 'https://lms.persevex.com/login/index.php' },
+      { text: 'Blogs', href: '/blogs' },
     ],
   },
   {
     title: 'Our Courses',
     links: [
-      { text: 'Management', href: '#' },
+      { text: 'Management', href: '/explore-courses' },
       { text: 'Technical', href: '#' },
       { text: 'Electronics', href: '#' },
       { text: 'Mechanical', href: '#' },
@@ -59,7 +58,8 @@ const footerLinkColumns: FooterColumn[] = [
 
 const socialLinks: SocialLink[] = [
     { name: 'Instagram', href: 'https://www.instagram.com/persevex_llp/', icon: <FiInstagram size={20} /> },
-    { name: 'Twitter', href: 'https://www.facebook.com/profile.php?id=61574597387622#', icon: <Facebook size={20} /> },
+    // Corrected "Twitter" to "Facebook" to match the icon and link
+    { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61574597387622#', icon: <Facebook size={20} /> },
     { name: 'LinkedIn', href: 'https://www.linkedin.com/company/persevex/posts/?feedView=all', icon: <FiLinkedin size={20} /> },
 ];
 
@@ -101,7 +101,8 @@ export default function FooterSection() {
                       <a
                       target='_blank'
                         href={link.href}
-                        className="text-gray-300  hover:text-white transition-colors duration-300 flex items-center gap-2 group"
+                        // Added `break-all` to prevent text overflow on small screens
+                        className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center gap-2 group break-all"
                       >
                         {link.icon && <span className="group-hover:text-[#F9C47D] transition-colors">{link.icon}</span>}
                         <span className="group-hover:translate-x-1 transition-transform duration-300 ease-out inline-block">

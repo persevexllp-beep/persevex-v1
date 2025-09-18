@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './CertificateVerifier.module.css'; 
 
-// --- Type Definitions for better code quality ---
 interface CertificateData {
   studentName: string;
   domain: string;
@@ -25,7 +24,6 @@ interface LoadingState {
   headline: string;
 }
 
-// --- SVG Icon Components for clarity ---
 const CheckIcon = () => (
   <svg fill="currentColor" viewBox="0 0 20 20">
     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
@@ -39,7 +37,6 @@ const CrossIcon = () => (
 );
 
 
-// --- Main Verification Logic Component ---
 function Verifier() {
   const searchParams = useSearchParams();
   const ENDPOINT = "https://script.google.com/macros/s/AKfycbxqa4m-IpuY43y18oCM2MAyygwO0n9t3pqpjpH58NmuOdA-ylbRAfqmYDRIVnXwqh1o/exec";
@@ -51,7 +48,6 @@ function Verifier() {
     headline: 'Verifying Certificate' 
   });
   
-  // A simple helper for async delays
   const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 
   useEffect(() => {
@@ -165,8 +161,6 @@ function Verifier() {
   );
 }
 
-// --- Wrapper component to handle Suspense ---
-// useSearchParams requires a Suspense boundary in Next.js
 export default function CertificateVerifier() {
     return (
         <Suspense fallback={<LoadingFallback />}>
@@ -175,7 +169,6 @@ export default function CertificateVerifier() {
     );
 }
 
-// A simple fallback for when search params are loading
 const LoadingFallback = () => (
     <div className={styles.loadingOverlay}>
         <div className={styles.loadingCard}>

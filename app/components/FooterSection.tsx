@@ -1,32 +1,77 @@
+import { Facebook } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
+import { FiMail, FiMapPin, FiInstagram, FiTwitter, FiLinkedin } from 'react-icons/fi';
 
-const footerLinks = [
+type FooterLink = {
+  text: string;
+  href: string;
+  icon?: React.ReactNode;
+};
+
+type FooterColumn = {
+  title: string;
+  links: FooterLink[];
+};
+
+type SocialLink = {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+};
+
+const footerLinkColumns: FooterColumn[] = [
   {
     title: 'Quick Links',
-    links: ['Certificate Verification', 'Pre-registration', 'LMS', 'Careers', 'Blogs'],
+    links: [
+      { text: 'Certificate Verification', href: '#' },
+      { text: 'Pre-registration', href: '#' },
+      { text: 'LMS', href: '#' },
+      { text: 'Blogs', href: '#' },
+    ],
   },
   {
-    title: 'Contact Info',
-    links: ['support@persevex.com', 'Bengaluru, India'],
+    title: 'Our Courses',
+    links: [
+      { text: 'Management', href: '#' },
+      { text: 'Technical', href: '#' },
+      { text: 'Electronics', href: '#' },
+      { text: 'Mechanical', href: '#' },
+      { text: 'Civil', href: '#' },
+    ],
   },
   {
-    title: 'Career',
-    links: ['Our commitments', 'Job openings', 'Contact us'],
+    title: 'Company',
+    links: [
+      { text: 'About Us', href: '#' },
+      { text: 'Careers', href: '#' },
+      { text: 'Contact Us', href: '#' },
+    ],
   },
+  {
+    title: 'Get in Touch',
+    links: [
+      { text: 'support@persevex.com', href: 'mailto:support@persevex.com', icon: <FiMail /> },
+      { text: 'Bengaluru, India', href: '#', icon: <FiMapPin /> },
+    ],
+  },
+];
+
+const socialLinks: SocialLink[] = [
+    { name: 'Instagram', href: 'https://www.instagram.com/persevex_llp/', icon: <FiInstagram size={20} /> },
+    { name: 'Twitter', href: 'https://www.facebook.com/profile.php?id=61574597387622#', icon: <Facebook size={20} /> },
+    { name: 'LinkedIn', href: 'https://www.linkedin.com/company/persevex/posts/?feedView=all', icon: <FiLinkedin size={20} /> },
 ];
 
 export default function FooterSection() {
   return (
-    <footer className="relative h-auto md:min-h-screen mt-24 lg:mt-0 text-white overflow-hidden flex items-center justify-center py-20 md:py-24">
-  
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8">
-          
-          <div className="flex flex-col items-start gap-4 w-full">
-            <div className='flex gap-6 items-center'>
+    <footer className="relative md:min-h-screen top- flex items-center justify-center text-white overflow-hidden py-8 md:py-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-1">
+            <div className='flex items-center gap-4 mb-4'>
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
+                <div className="w-16 h-16 bg-white rounded-xl p-2 shadow-xl flex items-center justify-center">
                   <Image 
                     className="w-full h-full object-contain" 
                     src='/whitelogo.png' 
@@ -36,47 +81,49 @@ export default function FooterSection() {
                   />
                 </div>
               </div>
-              
-              <div className="flex flex-col justify-center">
-                <h2 className="text-3xl md:text-4xl font-serif text-white leading-tight">
-                  Persevex
-                </h2>
-                <p className="mt-1 text-white leading-relaxed">
-                  Empowering careers through practical education.
-                </p>
+              <div>
+                <h2 className="text-3xl font-serif text-white">Persevex</h2>
+                <p className="text-gray-100">Empowering careers.</p>
               </div>
             </div>
-            <div className='pr-8'>
-              <p className="text-gray-300">Elevate your career with our cutting-edge courses in financial modeling, digital marketing strategies, human resource management, data science, artificial intelligence and machine learning.</p>
-            </div>
+            <p className="text-gray-200 max-w-sm">
+              Elevate your career with our cutting-edge courses in financial modeling, digital marketing, data science, and more.
+            </p>
           </div>
 
-          <div className="md:col-span-1 grid grid-cols-2 sm:grid-cols-3 gap-8 mt-12 md:mt-0 md:ml-auto text-center sm:text-left">
-            {footerLinks.map((column) => (
+          <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-8">
+            {footerLinkColumns.map((column) => (
               <div key={column.title}>
-                <h3 className="font-bold text-white mb-4 text-lg">{column.title}</h3>
+                <h3 className="font-bold text-sm uppercase tracking-wider text-[#F9C47D] mb-5">{column.title}</h3>
                 <ul className="space-y-3">
                   {column.links.map((link) => (
-                    <li key={link}>
-                      {link.includes('@') ? (
-                        <a
-                          href={`mailto:${link}`}
-                          className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out text-sm inline-block"
-                        >
-                          {link}
-                        </a>
-                      ) : (
-                        <a
-                          href="#"
-                          className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out text-sm inline-block"
-                        >
-                          {link}
-                        </a>
-                      )}
+                    <li key={link.text}>
+                      <a
+                        href={link.href}
+                        className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center gap-2 group"
+                      >
+                        {link.icon && <span className="group-hover:text-[#F9C47D] transition-colors">{link.icon}</span>}
+                        <span className="group-hover:translate-x-1 transition-transform duration-300 ease-out inline-block">
+                          {link.text}
+                        </span>
+                      </a>
                     </li>
                   ))}
                 </ul>
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-gray-200">
+            &copy; {new Date().getFullYear()} Persevex. All Rights Reserved.
+          </p>
+          <div className="flex items-center space-x-4">
+            {socialLinks.map((social) => (
+                <a target='_blank' key={social.name} href={social.href} aria-label={social.name} className="text-gray-200 hover:text-white transition-colors duration-300">
+                    {social.icon}
+                </a>
             ))}
           </div>
         </div>

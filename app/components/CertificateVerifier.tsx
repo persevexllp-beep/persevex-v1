@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import styles from './CertificateVerifier.module.css'; 
+import Link from 'next/link';
 
 interface CertificateData {
   studentName: string;
@@ -24,14 +24,14 @@ interface LoadingState {
   headline: string;
 }
 
-const CheckIcon = () => (
-  <svg fill="currentColor" viewBox="0 0 20 20">
+const CheckIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
   </svg>
 );
 
-const CrossIcon = () => (
-  <svg fill="currentColor" viewBox="0 0 20 20">
+const CrossIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"></path>
   </svg>
 );
@@ -47,6 +47,7 @@ function Verifier() {
     message: 'Initializing...', 
     headline: 'Verifying Certificate' 
   });
+  const [showResult, setShowResult] = useState(false);
   
   const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 
@@ -94,19 +95,25 @@ function Verifier() {
         setResult({ status: 'error', message: 'Could not connect to the verification service.' });
       }
     };
-
     verifyCertificate();
   }, [searchParams]);
 
+  useEffect(() => {
+    if (result.status !== 'verifying') {
+      const timer = setTimeout(() => setShowResult(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [result.status]);
+
   if (result.status === 'verifying') {
     return (
-      <div className={styles.loadingOverlay}>
-        <div className={styles.loadingCard}>
-          <h2 className={styles.headline}>{loadingState.headline}</h2>
-          <p className={styles.subhead}>{loadingState.message}</p>
-          <div className={styles.progressBar}>
+      <div className="w-full max-w-md mx-4 text-center">
+        <div className="bg-gray-900/50 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-gray-700">
+          <h2 className="text-2xl font-bold text-white mb-2">{loadingState.headline}</h2>
+          <p className="text-gray-300 mb-6">{loadingState.message}</p>
+          <div className="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
             <div 
-              className={styles.progressBarInner} 
+              className="bg-green-500 h-2.5 rounded-full transition-all duration-500 ease-in-out" 
               style={{ width: `${loadingState.percent}%` }}
             />
           </div>
@@ -124,39 +131,42 @@ function Verifier() {
   }[result.status];
 
   return (
-    <main className={`${styles.container} ${styles.show}`}>
-      <header className={styles.brandHeader}>
-        <div className={styles.brandLogo} aria-hidden="true">
-          <CheckIcon />
-        </div>
-        <div>
-          <div className={styles.brandTitle}>Persevex CertiCheck</div>
-          <div className={styles.brandSub}>Official Certificate Verification</div>
-        </div>
-      </header>
+    <main className={`w-full max-w-2xl mx-4 transition-opacity duration-500 ${showResult ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="bg-gray-900/60 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-10 border border-gray-700 text-white">
+        
+        <header className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 flex items-center justify-center bg-gray-700 rounded-full">
+            <img src="/whitelogo.png" alt="Persevex Logo" className="w-8 h-8"/>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-white">Persevex CertiCheck</div>
+            <div className="text-sm text-gray-400">Official Certificate Verification</div>
+          </div>
+        </header>
 
-      <div className={`${styles.resultPanel} ${styles.show}`}>
-        <div className={`${styles.statusBadge} ${isSuccess ? styles.verified : styles.notFound}`}>
-          {isSuccess ? <CheckIcon /> : <CrossIcon />}
-          <span>{badgeTitle}</span>
+        <div className="bg-gray-800/70 rounded-lg p-6 border border-gray-700">
+          <div className={`flex items-center gap-2 font-bold text-sm px-4 py-2 rounded-full mb-6 w-fit ${isSuccess ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+            {isSuccess ? <CheckIcon className="w-5 h-5"/> : <CrossIcon className="w-5 h-5"/>}
+            <span>{badgeTitle}</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 text-left">
+            <div>
+              <div className="text-xs uppercase font-semibold text-gray-400 tracking-wider">Student</div>
+              <div className="text-lg font-medium text-white mt-1 break-words">{result.data?.studentName ?? '—'}</div>
+            </div>
+            <div>
+              <div className="text-xs uppercase font-semibold text-gray-400 tracking-wider">Program / Domain</div>
+              <div className="text-lg font-medium text-white mt-1 break-words">{result.data?.domain ?? '—'}</div>
+            </div>
+            <div>
+              <div className="text-xs uppercase font-semibold text-gray-400 tracking-wider">Date of Issue</div>
+              <div className="text-lg font-medium text-white mt-1 break-words">{result.data?.issueDate ?? result.message ?? '—'}</div>
+            </div>
+          </div>
         </div>
-        <div className={styles.detailsGrid}>
-          <div>
-            <div className={styles.detailsLabel}>Student</div>
-            <div className={styles.detailsValue}>{result.data?.studentName ?? '—'}</div>
-          </div>
-          <div>
-            <div className={styles.detailsLabel}>Program / Domain</div>
-            <div className={styles.detailsValue}>{result.data?.domain ?? '—'}</div>
-          </div>
-          <div>
-            <div className={styles.detailsLabel}>Date of Issue</div>
-            <div className={styles.detailsValue}>{result.data?.issueDate ?? result.message ?? '—'}</div>
-          </div>
-        </div>
+
+        <p className="text-center text-xs text-gray-500 mt-8">Verification data is sourced directly from our secure registry.</p>
       </div>
-
-      <p className={styles.footnote}>Verification data is sourced directly from our secure registry.</p>
     </main>
   );
 }
@@ -170,9 +180,21 @@ export default function CertificateVerifier() {
 }
 
 const LoadingFallback = () => (
-    <div className={styles.loadingOverlay}>
-        <div className={styles.loadingCard}>
-            <h2 className={styles.headline}>Loading Verifier...</h2>
+    <div className="w-full max-w-md mx-4 text-center">
+        <div className=" p-8 rounded-2xl shadow-2xl border border-gray-700">
+            <h2 className="text-2xl font-bold text-white">Loading Verifier...</h2>
+            <p className="text-gray-400 mt-2">Please wait a moment.</p>
         </div>
     </div>
 );
+
+
+function ExploreAppbar() {
+  return (
+    <div className="flex items-start justify-start w-full ">
+      <Link href={"/"} className="text-2xl md:text-3xl font-bold">
+        PERSEVEX
+      </Link>
+    </div>
+  );
+}

@@ -34,6 +34,13 @@ const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
 
+// --- NEW: Helper function to check for meaningful changes ---
+// This prevents updates for tiny floating-point differences.
+const hasChanged = (a: number | undefined, b: number, threshold = 0.001) => {
+    if (a === undefined) return true; // Always update on the first run
+    return Math.abs(a - b) > threshold;
+};
+
 const useIsMobile = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -140,7 +147,6 @@ const LandingPage: FC = () => {
   const [faqProgress, setFaqProgress] = useState<number>(0);
   const [contactUsProgress, setContactUsProgress] = useState<number>(0);
 
-  // --- OPTIMIZATION: Use refs to store target scroll values without causing re-renders ---
   const watermarkProgressRef = useRef<number>(0);
   const targetEdgeProgressRef = useRef(0);
   const targetPartnersProgressRef = useRef(0);
@@ -151,7 +157,6 @@ const LandingPage: FC = () => {
   const targetFaqProgressRef = useRef(0);
   const targetContactUsProgressRef = useRef(0);
 
-  // --- OPTIMIZATION: Refs for smoothed values, to be updated in the animation loop ---
   const smoothedWatermarkProgressRef = useRef(0);
   const smoothedEdgeProgressRef = useRef(0);
   const smoothedPartnersProgressRef = useRef(0);
@@ -161,6 +166,9 @@ const LandingPage: FC = () => {
   const smoothedCascadingProgressRef = useRef(0);
   const smoothedFaqProgressRef = useRef(0);
   const smoothedContactUsProgressRef = useRef(0);
+
+  // --- NEW: Ref to store the last rendered values ---
+  const lastRenderedValuesRef = useRef<Record<string, number>>({});
 
   const textContainerRef = useRef<HTMLDivElement>(null);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
@@ -172,39 +180,19 @@ const LandingPage: FC = () => {
   const contentWrapperRef = useRef<HTMLDivElement>(null);
   const fadeOverlayRef = useRef<HTMLDivElement>(null);
 
-  const coursesSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const partnersSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
+  const coursesSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const ourEdgeSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const partnersSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const testimonialsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const recognizedBySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const aboutUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
   const cardStackingWrapperRef = useRef<HTMLDivElement>(null);
   const aboutUsToFaqTransitionRef = useRef<HTMLDivElement>(null);
-  const faqSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
+  const faqSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
   const faqToContactTransitionRef = useRef<HTMLDivElement>(null);
-  const contactUsSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const policySectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
-  const footerSectionWrapperRef = useRef<HTMLDivElement>(
-    null
-  ) as RefObject<HTMLDivElement>;
+  const contactUsSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const policySectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
+  const footerSectionWrapperRef = useRef<HTMLDivElement>(null) as RefObject<HTMLDivElement>;
 
   const aboutUsWord = "ABOUT US";
   const lettersWithSpaces = useMemo(() => aboutUsWord.split(""), []);
@@ -226,12 +214,10 @@ const LandingPage: FC = () => {
   const testimonialsAnimationDurationVh = isMobile ? 10 : 300;
   const testimonialsSectionHeightVh = testimonialsAnimationDurationVh + 100;
 
-  // ---------- THIS IS THE MODIFIED CODE BLOCK ----------
   const coursesSectionHeight = useMemo(() => {
     if (isMobile) {
-      return 100; // Return a standard 100vh height for mobile
+      return 100;
     }
-    // Keep the original calculation for desktop
     const maxCourses = Math.max(
       ...allDomains.filter((d) => d.enabled).map((d) => d.courses.length)
     );
@@ -241,8 +227,7 @@ const LandingPage: FC = () => {
     const animationDuration =
       numCourses > 1 ? (numCourses - 1) * heightPerCard : heightPerCard;
     return baseHeight + animationDuration;
-  }, [isMobile]); // Add isMobile to the dependency array
-  // ----------------------------------------------------
+  }, [isMobile]);
 
   const handleSetCourseProgress = (targetProgress: number) => {
     if (!coursesSectionWrapperRef.current || !layout) return;
@@ -324,70 +309,32 @@ const LandingPage: FC = () => {
   useEffect(() => {
     let animationFrameId: number;
     const animationLoop = () => {
-      // --- OPTIMIZATION: All state updates are batched here, once per frame ---
       const lerpFactor = 0.075;
+      const last = lastRenderedValuesRef.current;
 
-      // Smooth all progress values
-      smoothedWatermarkProgressRef.current = THREE.MathUtils.lerp(
-        smoothedWatermarkProgressRef.current,
-        watermarkProgressRef.current,
-        lerpFactor
-      );
-      smoothedEdgeProgressRef.current = THREE.MathUtils.lerp(
-        smoothedEdgeProgressRef.current,
-        targetEdgeProgressRef.current,
-        lerpFactor
-      );
-      smoothedPartnersProgressRef.current = THREE.MathUtils.lerp(
-        smoothedPartnersProgressRef.current,
-        targetPartnersProgressRef.current,
-        lerpFactor
-      );
-      smoothedTestimonialProgressRef.current = THREE.MathUtils.lerp(
-        smoothedTestimonialProgressRef.current,
-        targetTestimonialProgressRef.current,
-        lerpFactor
-      );
-      smoothedAboutUsProgressRef.current = THREE.MathUtils.lerp(
-        smoothedAboutUsProgressRef.current,
-        targetAboutUsProgressRef.current,
-        lerpFactor
-      );
-      smoothedStackingProgressRef.current = THREE.MathUtils.lerp(
-        smoothedStackingProgressRef.current,
-        targetStackingProgressRef.current,
-        lerpFactor
-      );
-      smoothedCascadingProgressRef.current = THREE.MathUtils.lerp(
-        smoothedCascadingProgressRef.current,
-        targetCascadingProgressRef.current,
-        lerpFactor
-      );
-      smoothedFaqProgressRef.current = THREE.MathUtils.lerp(
-        smoothedFaqProgressRef.current,
-        targetFaqProgressRef.current,
-        lerpFactor
-      );
-      smoothedContactUsProgressRef.current = THREE.MathUtils.lerp(
-        smoothedContactUsProgressRef.current,
-        targetContactUsProgressRef.current,
-        lerpFactor
-      );
+      smoothedWatermarkProgressRef.current = THREE.MathUtils.lerp(smoothedWatermarkProgressRef.current, watermarkProgressRef.current, lerpFactor);
+      smoothedEdgeProgressRef.current = THREE.MathUtils.lerp(smoothedEdgeProgressRef.current, targetEdgeProgressRef.current, lerpFactor);
+      smoothedPartnersProgressRef.current = THREE.MathUtils.lerp(smoothedPartnersProgressRef.current, targetPartnersProgressRef.current, lerpFactor);
+      smoothedTestimonialProgressRef.current = THREE.MathUtils.lerp(smoothedTestimonialProgressRef.current, targetTestimonialProgressRef.current, lerpFactor);
+      smoothedAboutUsProgressRef.current = THREE.MathUtils.lerp(smoothedAboutUsProgressRef.current, targetAboutUsProgressRef.current, lerpFactor);
+      smoothedStackingProgressRef.current = THREE.MathUtils.lerp(smoothedStackingProgressRef.current, targetStackingProgressRef.current, lerpFactor);
+      smoothedCascadingProgressRef.current = THREE.MathUtils.lerp(smoothedCascadingProgressRef.current, targetCascadingProgressRef.current, lerpFactor);
+      smoothedFaqProgressRef.current = THREE.MathUtils.lerp(smoothedFaqProgressRef.current, targetFaqProgressRef.current, lerpFactor);
+      smoothedContactUsProgressRef.current = THREE.MathUtils.lerp(smoothedContactUsProgressRef.current, targetContactUsProgressRef.current, lerpFactor);
 
-      // Set state for all values
-      setEdgeProgress(smoothedEdgeProgressRef.current);
-      setPartnersProgress(smoothedPartnersProgressRef.current);
-      setTestimonialProgress(smoothedTestimonialProgressRef.current);
-      setAboutUsProgress(smoothedAboutUsProgressRef.current);
-      setStackingProgress(smoothedStackingProgressRef.current);
-      setCascadingProgress(smoothedCascadingProgressRef.current);
-      setFaqProgress(smoothedFaqProgressRef.current);
-      setContactUsProgress(smoothedContactUsProgressRef.current);
+      // --- MODIFIED: Only set state if the value has meaningfully changed ---
+      if (hasChanged(last.edgeProgress, smoothedEdgeProgressRef.current)) { setEdgeProgress(smoothedEdgeProgressRef.current); last.edgeProgress = smoothedEdgeProgressRef.current; }
+      if (hasChanged(last.partnersProgress, smoothedPartnersProgressRef.current)) { setPartnersProgress(smoothedPartnersProgressRef.current); last.partnersProgress = smoothedPartnersProgressRef.current; }
+      if (hasChanged(last.testimonialProgress, smoothedTestimonialProgressRef.current)) { setTestimonialProgress(smoothedTestimonialProgressRef.current); last.testimonialProgress = smoothedTestimonialProgressRef.current; }
+      if (hasChanged(last.aboutUsProgress, smoothedAboutUsProgressRef.current)) { setAboutUsProgress(smoothedAboutUsProgressRef.current); last.aboutUsProgress = smoothedAboutUsProgressRef.current; }
+      if (hasChanged(last.stackingProgress, smoothedStackingProgressRef.current)) { setStackingProgress(smoothedStackingProgressRef.current); last.stackingProgress = smoothedStackingProgressRef.current; }
+      if (hasChanged(last.cascadingProgress, smoothedCascadingProgressRef.current)) { setCascadingProgress(smoothedCascadingProgressRef.current); last.cascadingProgress = smoothedCascadingProgressRef.current; }
+      if (hasChanged(last.faqProgress, smoothedFaqProgressRef.current)) { setFaqProgress(smoothedFaqProgressRef.current); last.faqProgress = smoothedFaqProgressRef.current; }
+      if (hasChanged(last.contactUsProgress, smoothedContactUsProgressRef.current)) { setContactUsProgress(smoothedContactUsProgressRef.current); last.contactUsProgress = smoothedContactUsProgressRef.current; }
+      if (hasChanged(last.headerProgress, smoothedWatermarkProgressRef.current)) { setHeaderProgress(smoothedWatermarkProgressRef.current); last.headerProgress = smoothedWatermarkProgressRef.current; }
 
       const currentProgress = smoothedWatermarkProgressRef.current;
-      setHeaderProgress(currentProgress);
-
-      // The rest of the animation logic remains the same
+      
       if (textContainerRef.current && window.innerHeight) {
         let persevexOpacity = 0,
           coursesOpacity = 0,
@@ -579,37 +526,19 @@ const LandingPage: FC = () => {
               clamp((currentProgress - fadeOutStart) / fadeOutDuration, 0, 1);
             animatedTextOpacity = Math.min(fadeInProgress, fadeOutOpacity);
           }
-
-          textContainerRef.current.style.setProperty(
-            "--animated-text-opacity",
-            `${animatedTextOpacity}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--about-us-container-transform",
-            `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`
-          );
+          
+          textContainerRef.current.style.setProperty("--animated-text-opacity", `${animatedTextOpacity}`);
+          textContainerRef.current.style.setProperty("--about-us-container-transform", `translateX(-50%) translateY(${containerTranslateY}px) scale(${containerScale})`);
           if (textMaskContainerRef.current) {
-            (textMaskContainerRef.current.style as any).mixBlendMode =
-              textContainerMixBlendMode;
-            textMaskContainerRef.current.style.background =
-              textContainerBackground;
-            textMaskContainerRef.current.style.boxShadow =
-              textContainerBoxShadow;
+            (textMaskContainerRef.current.style as any).mixBlendMode = textContainerMixBlendMode;
+            textMaskContainerRef.current.style.background = textContainerBackground;
+            textMaskContainerRef.current.style.boxShadow = textContainerBoxShadow;
           }
-          textContainerRef.current.style.setProperty(
-            "--about-us-fill-color",
-            fillColor
-          );
-          textContainerRef.current.style.setProperty(
-            "--about-us-stroke",
-            stroke
-          );
-          if (videoRef.current)
-            videoRef.current.style.opacity = `${videoOpacity}`;
-          if (starfieldOverlayRef.current)
-            starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
-          if (whiteOverlayRef.current)
-            whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
+          textContainerRef.current.style.setProperty("--about-us-fill-color", fillColor);
+          textContainerRef.current.style.setProperty("--about-us-stroke", stroke);
+          if (videoRef.current) videoRef.current.style.opacity = `${videoOpacity}`;
+          if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = `${starfieldOpacity}`;
+          if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = `${whiteOverlayOpacity}`;
 
           const numLetters = aboutUsWord.replace(/ /g, "").length;
           const numSpaces = aboutUsWord.split(" ").length - 1;
@@ -617,12 +546,8 @@ const LandingPage: FC = () => {
           const totalAnimationUnits = numLetters + numSpaces * spacePauseFactor;
           const unitDuration = 1.0 / totalAnimationUnits;
           const animationWindow = unitDuration * 5;
-          const totalStaggerDuration =
-            (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
-          const compressionFactor =
-            totalStaggerDuration > 0
-              ? (1.0 - animationWindow) / totalStaggerDuration
-              : 1;
+          const totalStaggerDuration = (numLetters - 1 + numSpaces * spacePauseFactor) * unitDuration;
+          const compressionFactor = totalStaggerDuration > 0 ? (1.0 - animationWindow) / totalStaggerDuration : 1;
           let timeCursor = 0;
           lettersWithSpaces.forEach((char, index) => {
             if (char === " ") {
@@ -630,84 +555,45 @@ const LandingPage: FC = () => {
               return;
             }
             const start = timeCursor * compressionFactor;
-            const letterProgress = clamp(
-              (assemblyProgress - start) / animationWindow,
-              0,
-              1
-            );
+            const letterProgress = clamp((assemblyProgress - start) / animationWindow, 0, 1);
             const translateY = (1 - letterProgress) * 20;
             const scale = 0.5 + letterProgress * 0.5;
             if (textContainerRef.current) {
-              textContainerRef.current.style.setProperty(
-                `--about-us-letter-${index}-transform`,
-                `translateY(${translateY}vh) scale(${scale})`
-              );
+              textContainerRef.current.style.setProperty(`--about-us-letter-${index}-transform`, `translateY(${translateY}vh) scale(${scale})`);
             }
             timeCursor += unitDuration;
           });
         } else {
           if (videoRef.current) videoRef.current.style.opacity = "0";
-          if (starfieldOverlayRef.current)
-            starfieldOverlayRef.current.style.opacity = "0";
-          if (whiteOverlayRef.current)
-            whiteOverlayRef.current.style.opacity = "0";
-          if (textContainerRef.current)
-            textContainerRef.current.style.setProperty(
-              "--animated-text-opacity",
-              "0"
-            );
+          if (starfieldOverlayRef.current) starfieldOverlayRef.current.style.opacity = "0";
+          if (whiteOverlayRef.current) whiteOverlayRef.current.style.opacity = "0";
+          if (textContainerRef.current) textContainerRef.current.style.setProperty("--animated-text-opacity", "0");
           aboutUsOpacity = 0;
         }
-
+        
+        // --- MODIFIED: Only set CSS properties if the values have meaningfully changed ---
         if (textContainerRef.current) {
-          textContainerRef.current.style.setProperty(
-            "--persevex-opacity",
-            `${clamp(persevexOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--courses-opacity",
-            `${clamp(coursesOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--our-edge-opacity",
-            `${clamp(ourEdgeOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--partners-opacity",
-            `${clamp(partnersOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--trust-opacity",
-            `${clamp(trustOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--recognized-by-opacity",
-            `${clamp(recognizedByOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--about-us-opacity",
-            `${clamp(aboutUsOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--questions-opacity",
-            `${clamp(questionsOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--contact-us-opacity",
-            `${clamp(contactUsOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--policy-opacity",
-            `${clamp(policyOpacity, 0, 0.4)}`
-          );
-          textContainerRef.current.style.setProperty(
-            "--footer-opacity",
-            `${clamp(footerOpacity, 0, 1.0)}`
-          );
+            const setVar = (name: string, value: number, max = 0.4) => {
+                const clampedValue = clamp(value, 0, max);
+                if (hasChanged(last[name], clampedValue)) {
+                    textContainerRef.current!.style.setProperty(`--${name}`, `${clampedValue}`);
+                    last[name] = clampedValue;
+                }
+            };
+            setVar("persevex-opacity", persevexOpacity);
+            setVar("courses-opacity", coursesOpacity);
+            setVar("our-edge-opacity", ourEdgeOpacity);
+            setVar("partners-opacity", partnersOpacity);
+            setVar("trust-opacity", trustOpacity);
+            setVar("recognized-by-opacity", recognizedByOpacity);
+            setVar("about-us-opacity", aboutUsOpacity);
+            setVar("questions-opacity", questionsOpacity);
+            setVar("contact-us-opacity", contactUsOpacity);
+            setVar("policy-opacity", policyOpacity);
+            setVar("footer-opacity", footerOpacity, 1.0); // Footer goes up to 1.0
         }
 
-        const inAboutUsContentSection =
-          currentProgress >= 10.0 && currentProgress < 13.0;
+        const inAboutUsContentSection = currentProgress >= 10.0 && currentProgress < 13.0;
         if (contentWrapperRef.current) {
           if (isMobile && inAboutUsContentSection) {
             contentWrapperRef.current.style.zIndex = "5";
@@ -737,22 +623,10 @@ const LandingPage: FC = () => {
       const currentScroll = window.scrollY;
       const viewportHeight = window.innerHeight;
       const {
-        coursesTop,
-        edgeTop,
-        partnersTop,
-        testimonialsTop,
-        recognizedByTop,
-        aboutUsTop,
-        cardStackingTop,
-        aboutUsToFaqTransitionTop,
-        faqTop,
-        faqToContactTransitionTop,
-        contactUsTop,
-        policyTop,
-        footerTop,
+        coursesTop, edgeTop, partnersTop, testimonialsTop, recognizedByTop,
+        aboutUsTop, cardStackingTop, aboutUsToFaqTransitionTop, faqTop,
+        faqToContactTransitionTop, contactUsTop, policyTop, footerTop,
       } = layout;
-
-      // --- OPTIMIZATION: Removed all setState calls. Only update refs. ---
 
       const aboutUsWatermarkAnimStart = aboutUsTop - viewportHeight;
       const aboutUsWatermarkAnimDuration = viewportHeight * 6;
@@ -764,85 +638,44 @@ const LandingPage: FC = () => {
       const policyTransitionDuration = viewportHeight;
       const contactUsStart = contactUsTop - viewportHeight;
       const contactUsDuration = viewportHeight;
-      const faqToContactTransitionStart =
-        faqToContactTransitionTop - viewportHeight;
+      const faqToContactTransitionStart = faqToContactTransitionTop - viewportHeight;
       const faqToContactTransitionDuration = viewportHeight;
       const faqScrollStart = faqTop - viewportHeight;
-      const aboutUsToFaqTransitionStart =
-        aboutUsToFaqTransitionTop - viewportHeight;
+      const aboutUsToFaqTransitionStart = aboutUsToFaqTransitionTop - viewportHeight;
       const aboutUsToFaqTransitionDuration = viewportHeight;
       const validationToStoryTransitionDuration = viewportHeight;
 
       if (currentScroll >= footerTransitionStart) {
-        const progress = clamp(
-          (currentScroll - footerTransitionStart) / footerTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - footerTransitionStart) / footerTransitionDuration, 0, 1);
         newWatermarkProgress = 16 + progress;
       } else if (currentScroll >= policyTransitionStart) {
-        const progress = clamp(
-          (currentScroll - policyTransitionStart) / policyTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - policyTransitionStart) / policyTransitionDuration, 0, 1);
         newWatermarkProgress = 15 + progress;
       } else if (currentScroll >= contactUsStart) {
-        const progress = clamp(
-          (currentScroll - contactUsStart) / contactUsDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - contactUsStart) / contactUsDuration, 0, 1);
         newWatermarkProgress = 14 + progress;
       } else if (currentScroll >= faqToContactTransitionStart) {
-        const progress = clamp(
-          (currentScroll - faqToContactTransitionStart) /
-            faqToContactTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - faqToContactTransitionStart) / faqToContactTransitionDuration, 0, 1);
         newWatermarkProgress = 13 + progress;
       } else if (currentScroll >= faqScrollStart) {
         newWatermarkProgress = 13;
       } else if (currentScroll >= aboutUsToFaqTransitionStart) {
-        const progress = clamp(
-          (currentScroll - aboutUsToFaqTransitionStart) /
-            aboutUsToFaqTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - aboutUsToFaqTransitionStart) / aboutUsToFaqTransitionDuration, 0, 1);
         newWatermarkProgress = 12 + progress;
-      } else if (
-        currentScroll >=
-        aboutUsWatermarkAnimStart + validationToStoryTransitionDuration
-      ) {
-        const animStart =
-          aboutUsWatermarkAnimStart + validationToStoryTransitionDuration;
+      } else if (currentScroll >= aboutUsWatermarkAnimStart + validationToStoryTransitionDuration) {
+        const animStart = aboutUsWatermarkAnimStart + validationToStoryTransitionDuration;
         if (isMobile) {
           const mobileAnimDuration = viewportHeight * 2.5;
-          const progress = clamp(
-            (currentScroll - animStart) / mobileAnimDuration,
-            0,
-            1
-          );
+          const progress = clamp((currentScroll - animStart) / mobileAnimDuration, 0, 1);
           newWatermarkProgress = 6.0 + progress * 5;
         } else {
-          const animDuration =
-            aboutUsWatermarkAnimDuration - validationToStoryTransitionDuration;
-          const progress = clamp(
-            (currentScroll - animStart) / animDuration,
-            0,
-            1
-          );
+          const animDuration = aboutUsWatermarkAnimDuration - validationToStoryTransitionDuration;
+          const progress = clamp((currentScroll - animStart) / animDuration, 0, 1);
           newWatermarkProgress = 6.0 + progress * 5;
         }
       } else if (currentScroll >= aboutUsWatermarkAnimStart) {
         const animStart = aboutUsWatermarkAnimStart;
-        const progress = clamp(
-          (currentScroll - animStart) / validationToStoryTransitionDuration,
-          0,
-          1
-        );
+        const progress = clamp((currentScroll - animStart) / validationToStoryTransitionDuration, 0, 1);
         newWatermarkProgress = 5.0 + progress;
       } else if (currentScroll >= recognizedByTop - viewportHeight / 2) {
         newWatermarkProgress = 5.0;
@@ -855,42 +688,20 @@ const LandingPage: FC = () => {
         newWatermarkProgress = 4.0;
       } else if (currentScroll >= testimonialsTop - viewportHeight) {
         const transitionDuration = viewportHeight / 2;
-        newWatermarkProgress =
-          3 +
-          Math.min(
-            1,
-            (currentScroll - (testimonialsTop - viewportHeight)) /
-              transitionDuration
-          );
+        newWatermarkProgress = 3 + Math.min(1, (currentScroll - (testimonialsTop - viewportHeight)) / transitionDuration);
       } else if (currentScroll >= partnersTop) {
-        newWatermarkProgress =
-          2 +
-          Math.min(
-            1,
-            (currentScroll - partnersTop) /
-              (testimonialsTop - viewportHeight - partnersTop)
-          );
+        newWatermarkProgress = 2 + Math.min(1, (currentScroll - partnersTop) / (testimonialsTop - viewportHeight - partnersTop));
       } else if (currentScroll >= edgeTop - viewportHeight) {
-        newWatermarkProgress =
-          1 +
-          Math.min(
-            1,
-            (currentScroll - (edgeTop - viewportHeight)) / viewportHeight
-          );
+        newWatermarkProgress = 1 + Math.min(1, (currentScroll - (edgeTop - viewportHeight)) / viewportHeight);
       } else if (currentScroll >= coursesTop - viewportHeight) {
-        newWatermarkProgress = Math.min(
-          1,
-          (currentScroll - (coursesTop - viewportHeight)) / viewportHeight
-        );
+        newWatermarkProgress = Math.min(1, (currentScroll - (coursesTop - viewportHeight)) / viewportHeight);
       }
       watermarkProgressRef.current = newWatermarkProgress;
 
       const heroProgress = Math.min(1, currentScroll / (viewportHeight * 0.8));
       if (heroWrapperRef.current) {
         heroWrapperRef.current.style.opacity = `${1 - heroProgress}`;
-        heroWrapperRef.current.style.transform = `translateY(${
-          heroProgress * -250
-        }px)`;
+        heroWrapperRef.current.style.transform = `translateY(${heroProgress * -250}px)`;
       }
       if (saturnWrapperRef.current) {
         saturnWrapperRef.current.style.opacity = `${1 - heroProgress}`;
@@ -902,10 +713,7 @@ const LandingPage: FC = () => {
         const coursesStartZone = coursesTop - viewportHeight * 0.8;
         const coursesEndZone = coursesTop + sectionHeight - viewportHeight;
         let newCoursesProgress = 0;
-        if (
-          currentScroll >= coursesStartZone &&
-          currentScroll <= coursesEndZone
-        ) {
+        if (currentScroll >= coursesStartZone && currentScroll <= coursesEndZone) {
           const totalZoneHeight = coursesEndZone - coursesStartZone;
           const progressInZone = currentScroll - coursesStartZone;
           newCoursesProgress = progressInZone / totalZoneHeight;
@@ -916,41 +724,19 @@ const LandingPage: FC = () => {
       }
 
       const edgeAnimationDurationFactor = isMobile ? 3 : NUM_CARDS;
-      targetEdgeProgressRef.current = Math.min(
-        1,
-        Math.max(0, currentScroll - edgeTop) /
-          (viewportHeight * edgeAnimationDurationFactor)
-      );
+      targetEdgeProgressRef.current = Math.min(1, Math.max(0, currentScroll - edgeTop) / (viewportHeight * edgeAnimationDurationFactor));
 
       if (partnersSectionWrapperRef.current && partnersTop > 0) {
-        const partnersSectionHeight =
-          partnersSectionWrapperRef.current.offsetHeight;
-        const animationDuration = isMobile
-          ? partnersSectionHeight * 0.75
-          : partnersSectionHeight / 2;
-        targetPartnersProgressRef.current = clamp(
-          (currentScroll - partnersTop) / animationDuration,
-          0,
-          1
-        );
+        const partnersSectionHeight = partnersSectionWrapperRef.current.offsetHeight;
+        const animationDuration = isMobile ? partnersSectionHeight * 0.75 : partnersSectionHeight / 2;
+        targetPartnersProgressRef.current = clamp((currentScroll - partnersTop) / animationDuration, 0, 1);
       }
 
-      targetTestimonialProgressRef.current = Math.min(
-        1,
-        Math.max(
-          0,
-          (currentScroll - testimonialsTop) /
-            ((testimonialsAnimationDurationVh / 100) * viewportHeight)
-        )
-      );
+      targetTestimonialProgressRef.current = Math.min(1, Math.max(0, (currentScroll - testimonialsTop) / ((testimonialsAnimationDurationVh / 100) * viewportHeight)));
 
       const aboutUsContentAnimStart = aboutUsTop + viewportHeight;
       const aboutUsContentAnimDuration = viewportHeight * 4;
-      targetAboutUsProgressRef.current = clamp(
-        (currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration,
-        0,
-        1
-      );
+      targetAboutUsProgressRef.current = clamp((currentScroll - aboutUsContentAnimStart) / aboutUsContentAnimDuration, 0, 1);
 
       if (cardStackingWrapperRef.current && cardStackingTop > 0) {
         const start = cardStackingTop;
@@ -959,20 +745,11 @@ const LandingPage: FC = () => {
         const cascadingDuration = 400 * vh;
         const stackingStart = start;
         const cascadeStart = stackingStart + stackingDuration;
-        targetStackingProgressRef.current = clamp(
-          (currentScroll - stackingStart) / stackingDuration,
-          0,
-          1
-        );
+        targetStackingProgressRef.current = clamp((currentScroll - stackingStart) / stackingDuration, 0, 1);
         const CASCADING_MAX_PROGRESS = 4.0;
         if (currentScroll > cascadeStart) {
-          const progressWithinCascade =
-            (currentScroll - cascadeStart) / cascadingDuration;
-          targetCascadingProgressRef.current = clamp(
-            progressWithinCascade * CASCADING_MAX_PROGRESS,
-            0,
-            CASCADING_MAX_PROGRESS
-          );
+          const progressWithinCascade = (currentScroll - cascadeStart) / cascadingDuration;
+          targetCascadingProgressRef.current = clamp(progressWithinCascade * CASCADING_MAX_PROGRESS, 0, CASCADING_MAX_PROGRESS);
         } else {
           targetCascadingProgressRef.current = 0;
         }
@@ -981,21 +758,13 @@ const LandingPage: FC = () => {
       if (faqSectionWrapperRef.current && faqTop > 0) {
         const animationStart = faqTop - viewportHeight;
         const animationDuration = viewportHeight;
-        targetFaqProgressRef.current = clamp(
-          (currentScroll - animationStart) / animationDuration,
-          0,
-          1
-        );
+        targetFaqProgressRef.current = clamp((currentScroll - animationStart) / animationDuration, 0, 1);
       }
 
       if (contactUsTop > 0) {
         const animationStart = contactUsTop - viewportHeight;
         const animationDuration = viewportHeight * 2;
-        targetContactUsProgressRef.current = clamp(
-          (currentScroll - animationStart) / animationDuration,
-          0,
-          1
-        );
+        targetContactUsProgressRef.current = clamp((currentScroll - animationStart) / animationDuration, 0, 1);
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -1044,7 +813,6 @@ const LandingPage: FC = () => {
         className="fixed top-0 left-0 w-full h-full z-40 pointer-events-none overflow-hidden"
       >
         <div className="hidden md:block">
-          {/* Watermark text rendering remains the same */}
           <h2
             className="absolute bottom-0 left-1/2 z-[2] text-[24vw] md:text-[20vw] lg:text-[18rem] font-black uppercase text-transparent select-none leading-none"
             style={{

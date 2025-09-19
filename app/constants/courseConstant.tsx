@@ -444,7 +444,7 @@ export const managementCourses: CourseType[] = [
   "route": "/courses/stock-market-crypto",
   "slug": "stock-market-crypto",
   "image": "/digitalmar.png",
-  "cardBg_image": "/stockplanet.png",
+  "cardBg_image": "/stockplanet.webp",
   "projects": [
     {
       "name": "Equity Research Report",
@@ -1337,7 +1337,7 @@ export const ElectronicsCourses: CourseType[] = [
     route: "/courses/iot",
     slug: "iot",
     image: "/iotcourse.png",
-    cardBg_image: "/iotplanet.png",
+    cardBg_image: "/iotplanet.webp",
     projects: [
       {
         name: "Smart Home Automation",
@@ -1473,7 +1473,7 @@ export const ElectronicsCourses: CourseType[] = [
     "route": "/courses/embedded-systems",
     "slug": "embedded-systems",
     "image": "/embeddedcourse.png", 
-    "cardBg_image": "/embeddedplanet.png",
+    "cardBg_image": "/embeddedplanet.webp",
     "projects": [
       {
         "name": "Digital Thermometer with LCD",
@@ -1597,7 +1597,7 @@ export const MechanicalCourses: CourseType[] = [
     route: "/courses/autocad",
     slug: "autocad",
     image: "/autocadcourse.png",
-    cardBg_image: "/autocadplanet.png",
+    cardBg_image: "/autocadplanet.webp",
     projects: [
       {
         name: "Architectural Floor Plan",
@@ -1736,7 +1736,7 @@ export const CivilCourses: CourseType[] = [
     route: "/courses/autocad",
     slug: "autocad",
     image: "/autocadcourse.png",
-    cardBg_image: "/autocadplanet.png",
+    cardBg_image: "/autocadplanet.webp",
     projects: [
       {
         name: "Architectural Floor Plan",

@@ -4,61 +4,68 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { CourseSectionKey, useCourseScroll } from '../(course-pages)/contexts/courseScrollContext';
+import ProgramsMegaMenu from './ProgramsMegaMenu';
+
+type ProgramItem = { name: string; href: string; };
+type ProgramCategory = { branch: string; items: ProgramItem[]; };
 
 export default function CoursePageNavbar() {
-     const { scrollToSection } = useCourseScroll();
+  const { scrollToSection } = useCourseScroll();
   const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
 
-  const programCategories = [
+  const programCategories: ProgramCategory[] = [
     {
-      title: 'Technology',
+      branch: 'CSE / IT',
       items: [
-        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
-        { name: 'Web Development', href: '/courses/web-development' },
-        { name: 'Data Science', href: '/courses/data-science' },
-        { name: 'Cyber Security', href: '/courses/cyber-security' },
-        { name: 'Cloud Computing', href: '/courses/cloud-computing' },
         { name: 'Machine Learning', href: '/courses/machine-learning' },
+        { name: 'Web Development', href: '/courses/web-development' },
+        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
+        { name: 'Cyber Security', href: '/courses/cyber-security' },
+        { name: 'Data Science', href: '/courses/data-science' },
+        { name: 'Cloud Computing', href: '/courses/cloud-computing' },
       ],
     },
     {
-      title: 'Management', 
+      branch: 'Business & Finance',
       items: [
-        { name: 'Finance for Managers', href: '/courses/finance' },
+        { name: 'Finance', href: '/courses/finance' },
         { name: 'Digital Marketing', href: '/courses/digital-marketing' },
-        { name: 'Modern Human Resources', href: '/courses/human-resource' },
+        { name: 'Modern Human Resourse', href: '/courses/human-resource' },
       ],
     },
+     {
+      branch: 'ECE / EEE',
+      items: [
+        { name: 'Embedded Systems', href: '/courses/embedded-systems' },
+        {name: 'Internet of Things(IOT)', href: '/courses/iot'}
+      ],
+    },
+    {
+      branch: 'Mechanical',
+      items: [
+        {name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocard'}
+      ]
+    },
+    {
+      branch: 'Civil',
+      items: [
+        {name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
+      ]
+    }
   ];
 
-   const scrollLinks: { name: string; key: CourseSectionKey }[] = [
+  const scrollLinks: { name: string; key: CourseSectionKey }[] = [
     { name: 'Curriculum', key: 'curriculum' },
     { name: 'Projects', key: 'projects' },
     { name: 'Certification', key: 'certification' },
     { name: 'FAQs', key: 'faqs' },
   ];
 
-  // --- Handlers ---
   const handleMobileLinkClick = (key: CourseSectionKey) => {
     scrollToSection(key);
     setIsMobileMenuOpen(false);
-  };
-
-  const mainNavLinks = [
-    { name: 'About Us', href: '/about' },
-    { name: 'Contact Us', href: '/contact' }, 
-  ];
-
-  const desktopDropdownVariants: Variants = {
-    hidden: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.2, ease: "easeOut" } },
-    visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25, staggerChildren: 0.05 } },
-  };
-
-  const desktopItemVariants: Variants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
   };
 
   const mobileMenuVariants: Variants = {
@@ -88,32 +95,16 @@ export default function CoursePageNavbar() {
             onMouseEnter={() => setIsDesktopDropdownOpen(true)}
             onMouseLeave={() => setIsDesktopDropdownOpen(false)}
           >
-            <button className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer flex items-center gap-1">
+            <Link href="/explore-courses" className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer flex items-center gap-1">
               Programs
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
+            </Link>
             <AnimatePresence>
               {isDesktopDropdownOpen && (
-                <motion.div 
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl shadow-lg bg-zinc-900 ring-1 ring-white/10 z-10"
-                  initial="hidden" animate="visible" exit="hidden" variants={desktopDropdownVariants}
-                >
-                  <div className="py-2">
-                    {programCategories.map((category, index) => (
-                      <React.Fragment key={category.title}>
-                        {index > 0 && <div className="my-2 border-t border-white/10 mx-2"></div>}
-                        <p className="px-4 pt-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-wider">{category.title}</p>
-                        {category.items.map((item) => (
-                          <motion.div key={item.name} variants={desktopItemVariants}>
-                            <Link href={item.href} className="block px-4 py-2 text-sm text-gray-300 hover:bg-zinc-800 hover:text-white rounded-md mx-2 transition-colors duration-200" onClick={() => setIsDesktopDropdownOpen(false)}>
-                              {item.name}
-                            </Link>
-                          </motion.div>
-                        ))}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </motion.div>
+                 <ProgramsMegaMenu
+                  programCategories={programCategories}
+                  onClose={() => setIsDesktopDropdownOpen(false)}
+                />
               )}
             </AnimatePresence>
           </div>
@@ -143,7 +134,7 @@ export default function CoursePageNavbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-center text-white"
+            className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-start pt-24 text-white overflow-y-auto"
             variants={mobileMenuVariants}
             initial="hidden"
             animate="visible"
@@ -152,7 +143,7 @@ export default function CoursePageNavbar() {
             <motion.div variants={mobileLinkVariants} className="text-center w-full">
               <button
                 onClick={() => setIsMobileProgramsOpen(!isMobileProgramsOpen)}
-                className="text-2xl font-semibold py-4 flex items-center justify-center w-full gap-2"
+                className="text-xl font-semibold py-3 flex items-center justify-center w-full gap-2"
               >
                 Programs
                 <motion.svg animate={{ rotate: isMobileProgramsOpen ? 180 : 0 }} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></motion.svg>
@@ -166,9 +157,14 @@ export default function CoursePageNavbar() {
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="pt-2 pb-4 flex flex-col gap-3">
+                    <div className="pt-2 pb-4 flex flex-col gap-1">
                       {programCategories.flatMap(cat => cat.items).map(item => (
-                        <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)} className="text-base text-gray-300 hover:text-white">
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="py-2 text-base text-gray-300 hover:text-white"
+                        >
                           {item.name}
                         </Link>
                       ))}
@@ -183,7 +179,7 @@ export default function CoursePageNavbar() {
                 key={link.name}
                 variants={mobileLinkVariants}
                 onClick={() => handleMobileLinkClick(link.key)}
-                className="text-2xl font-semibold py-4"
+                className="text-xl font-semibold py-3"
               >
                 {link.name}
               </motion.button>

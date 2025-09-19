@@ -16,8 +16,8 @@ export default function PrivacyPolicyPage() {
         </Canvas>
       </div>
 
-      <div className=" z-10 w-full max-w-6xl mx-auto px-6 py- sm:py-32">
-        <div className="bg-transparent backdrop-blur-xs border border-white/10 rounded-2xl p-8 md:p-12">
+      <div className=" z-10 w-full max-w-6xl mx-auto px-2 md:px-6 py- sm:py-32">
+        <div className="bg-transparent backdrop-blur-xs border border-white/10 rounded-2xl p-4 md:p-12">
           
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">

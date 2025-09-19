@@ -16,8 +16,8 @@ export default function TermsAndConditionsPage() {
         </Canvas>
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 py-24 sm:py-32">
-        <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-2 md:px-6 py-24 sm:py-32">
+        <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-2xl p-4 md:p-12">
           
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">

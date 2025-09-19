@@ -68,8 +68,8 @@ export const managementCourses: CourseType[] = [
     icon: MarketingIcon,
     route: "/courses/digital-marketing",
     slug: "digital-marketing",
-    image: "/digitalmar.png",
-    cardBg_image: "/digital.png",
+    image: "/digitalmar.webp",
+    cardBg_image: "/digital.webp",
     projects:  [
             {
                 name: 'Email Marketing',
@@ -195,8 +195,8 @@ export const managementCourses: CourseType[] = [
     icon: HRIcon,
     route: "/courses/human-resource",
     slug: "human-resource",
-    image: "/humanres.png",
-    cardBg_image: "/human.png",
+    image: "/humanres.webp",
+    cardBg_image: "/human.webp",
     projects: [
             {
                 name: 'Recruitment Strategy',
@@ -319,8 +319,8 @@ export const managementCourses: CourseType[] = [
     icon: FinanceIcon,
     route: "/courses/finance",
     slug: "finance",
-    image: "/finan.png",
-    cardBg_image: "/financepng.png",
+    image: "/finan.webp",
+    cardBg_image: "/financepng.webp",
     projects: [
             {
                 name: 'Financial Modeling',
@@ -443,7 +443,7 @@ export const managementCourses: CourseType[] = [
   "icon": ChartCandlestick,
   "route": "/courses/stock-market-crypto",
   "slug": "stock-market-crypto",
-  "image": "/digitalmar.png",
+  "image": "/stockmarketcourse.webp",
   "cardBg_image": "/stockplanet.webp",
   "projects": [
     {
@@ -584,8 +584,8 @@ export const technicalCourses: CourseType[] = [
     icon: WebDevIcon,
     route: "/courses/web-development",
     slug: "web-development",
-    image: "/webdevl.png",
-    cardBg_image: "/web.png",
+    image: "/webdevl.webp",
+    cardBg_image: "/web.webp",
     projects: [
             {
                 name: 'Responsive Portfolio Website',
@@ -689,8 +689,8 @@ export const technicalCourses: CourseType[] = [
     icon: AIIcon,
     route: "/courses/artificial-intelligence",
     slug: "artificial-intelligence",
-    image: "/artificialint.png",
-    cardBg_image: "/artifi.png",
+    image: "/artificialint.webp",
+    cardBg_image: "/artifi.webp",
     projects:[
             {
                 name: 'Image Recognition System',
@@ -821,8 +821,8 @@ export const technicalCourses: CourseType[] = [
     icon: MLIcon,
     route: "/courses/machine-learning",
     slug: "machine-learning",
-    image: "/machinelearn.png",
-    cardBg_image: "/machine.png",
+    image: "/machinelearn.webp",
+    cardBg_image: "/machine.webp",
     projects: [
             {
                 name: 'Product Recommendation System',
@@ -950,8 +950,8 @@ export const technicalCourses: CourseType[] = [
     icon: CloudIcon,
     route: "/courses/cloud-computing",
     slug: "cloud-computing",
-    image: "/cloudcomp.png",
-    cardBg_image: "/cloud.png",
+    image: "/cloudcomp.webp",
+    cardBg_image: "/cloud.webp",
     projects:[
             {
                 name: 'Deploy a 3-Tier Web Application',
@@ -1074,8 +1074,8 @@ export const technicalCourses: CourseType[] = [
     icon: CybersecurityIcon,
     route: "/courses/cyber-security",
     slug: "cyber-security",
-    image: "/cybersec.png",
-    cardBg_image: "/cyber.png",
+    image: "/cybersec.webp",
+    cardBg_image: "/cyber.webp",
     projects: [
             {
                 name: 'Network Security Assessment',
@@ -1202,8 +1202,8 @@ export const technicalCourses: CourseType[] = [
     icon: CybersecurityIcon,
     route: "/courses/data-science",
     slug: "data-science",
-    image: "/datasci.png",
-    cardBg_image: "/data.png",
+    image: "/datasci.webp",
+    cardBg_image: "/data.webp",
     projects:[
             {
                 name: 'Customer Segmentation',
@@ -1336,7 +1336,7 @@ export const ElectronicsCourses: CourseType[] = [
     icon: Network,
     route: "/courses/iot",
     slug: "iot",
-    image: "/iotcourse.png",
+    image: "/iotcourse.webp",
     cardBg_image: "/iotplanet.webp",
     projects: [
       {
@@ -1472,7 +1472,7 @@ export const ElectronicsCourses: CourseType[] = [
   "icon": Network, 
     "route": "/courses/embedded-systems",
     "slug": "embedded-systems",
-    "image": "/embeddedcourse.png", 
+    "image": "/embeddedcourse.webp", 
     "cardBg_image": "/embeddedplanet.webp",
     "projects": [
       {
@@ -1596,7 +1596,7 @@ export const MechanicalCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/autocadcourse.png",
+    image: "/autocadcourse.webp",
     cardBg_image: "/autocadplanet.webp",
     projects: [
       {
@@ -1735,7 +1735,7 @@ export const CivilCourses: CourseType[] = [
     icon: Search,
     route: "/courses/autocad",
     slug: "autocad",
-    image: "/autocadcourse.png",
+    image: "/autocadcourse.webp",
     cardBg_image: "/autocadplanet.webp",
     projects: [
       {

@@ -17,6 +17,7 @@ import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
 import CourseFooterSection from '@/app/components/CourseFooterSection';
 import { useCourseScroll } from '../../contexts/courseScrollContext';
+import Link from 'next/link';
 
 const managementFooterLinks = [
   {
@@ -117,9 +118,9 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
               </p>
               <div className="mt-6">
                 <div className="relative w-fit">
-                  <button className="relative z-10 px-10 py-3 bg-orange-500 rounded-full font-semibold text-lg shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-colors duration-300">
+                  <Link href='/fees' className="relative z-10 px-10 py-3 bg-orange-500 rounded-full font-semibold text-lg shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition-colors duration-300">
                     Enroll Now
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

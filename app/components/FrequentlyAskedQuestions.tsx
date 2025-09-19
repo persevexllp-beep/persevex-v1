@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'; 
+import { useState, FormEvent, useRef } from 'react'; 
 import { FAQType } from '../constants/faqsData';
 import AccordionItem from './Framer/AccordianItem';
 
@@ -6,12 +6,15 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAYwB174Qk9X9nJYWIA
 
 export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQType[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!formRef.current) return;
+    
     setIsSubmitting(true);
     
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData.entries());
 
     try {
@@ -24,7 +27,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
 
       if (result.result === "success") {
         alert("Thank you for your question! We will get back to you soon.");
-        e.currentTarget.reset();
+        formRef.current?.reset();
       } else {
         throw new Error(result.message || "An unknown error occurred.");
       }
@@ -82,7 +85,7 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
@@ -127,11 +130,9 @@ export default function FrequentlyAskedQuestionsSection({ faqs }: { faqs: FAQTyp
             </div>
 
             <div>
-              {/* --- CHANGE 1: Updated label --- */}
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
                 Your Message / Question *
               </label>
-              {/* --- CHANGE 2: Updated textarea id and name --- */}
               <textarea
                 id="message"
                 name="message"

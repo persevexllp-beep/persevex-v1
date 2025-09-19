@@ -18,9 +18,9 @@ export const testimonialsData: Testimonial[] = [
     name: "David K.",
     title: "Goldman Sachs",
     image: "/c1.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'top 40% right 50%',
-    planetImage: '/artificialint.png' // New
+    planetImage: '/artificialint.webp' // New
   },
   {
     headline: "Choosing Brandby was one of the best decisions",
@@ -28,9 +28,9 @@ export const testimonialsData: Testimonial[] = [
     name: "Ravi K.",
     title: "Xaviers",
     image: "/c2.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'bottom 40% left 10%',
-    planetImage: '/machine.png' // New
+    planetImage: '/machine.webp' // New
   },
   {
     headline: "Right balance of beautiful design",
@@ -38,9 +38,9 @@ export const testimonialsData: Testimonial[] = [
     name: "Virat S R.",
     title: "PurpleMerit",
     image: "/c3.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'bottom 50% left 80%',
-    planetImage: '/cybersec.png' // New
+    planetImage: '/cybersec.webp' // New
   },
   {
     headline: "One of the most talented design teams",
@@ -48,9 +48,9 @@ export const testimonialsData: Testimonial[] = [
     name: "Pramod C A.",
     title: "Infosys",
     image: "/c4.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'top 15% left 15%',
-    planetImage: '/finan.png' // New
+    planetImage: '/finan.webp' // New
   },
   {
     headline: "Amazing to work with",
@@ -58,9 +58,9 @@ export const testimonialsData: Testimonial[] = [
     name: "Samarth M N.",
     title: "Cognizant",
     image: "/c5.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'center right 10%',
-    planetImage: '/digitalmar.png' // New
+    planetImage: '/digitalmar.webp' // New
   },
   {
     headline: "Outstanding product design",
@@ -68,9 +68,9 @@ export const testimonialsData: Testimonial[] = [
     name: "Aryan.",
     title: "EY",
     image: "/c6.webp",
-    bgImage: '/hat.png',
+    bgImage: '/hat.webp',
     bgPosition: 'bottom center',
-    planetImage: '/webdevl.png' // New
+    planetImage: '/webdevl.webp' // New
   },
 
 ];

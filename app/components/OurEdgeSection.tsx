@@ -27,37 +27,37 @@ const edgeData = [
     icon: <BrainCircuit size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Expert-Led Curriculum', 
     description: 'Our courses are designed and taught by industry veterans with years of real-world experience.',
-    planetImage: '/machinelearn.png' // Added image path
+    planetImage: '/machinelearn.webp' // Added image path
   },
   { 
     icon: <Zap size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Hands-On Projects', 
     description: 'Learn by doing. Build a portfolio of impressive projects that showcase your skills to employers.',
-    planetImage: '/artificialint.png' // Added image path
+    planetImage: '/artificialint.webp' // Added image path
   },
   { 
     icon: <Users size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Community & Support', 
     description: 'Join a thriving community of learners and mentors. Get help when you need it, 24/7.',
-    planetImage: '/webdevl.png' // Added image path
+    planetImage: '/webdevl.webp' // Added image path
   },
   { 
     icon: <Code size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Cutting-Edge Tech', 
     description: 'Stay ahead of the curve with courses on the latest technologies and industry best practices.',
-    planetImage: '/finan.png' // Added image path
+    planetImage: '/finan.webp' // Added image path
   },
   { 
     icon: <ShieldCheck size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Career Focused', 
     description: 'We focus on the skills that matter, providing career services to help you land your dream job.',
-    planetImage: '/datasci.png' // Added image path
+    planetImage: '/datasci.webp' // Added image path
   },
   { 
     icon: <Rocket size={48} className="text-orange-500 flex-shrink-0" />, 
     title: 'Flexible Learning', 
     description: 'Learn at your own pace with lifetime access to course materials and a flexible schedule.',
-    planetImage: '/cybersec.png' // Added image path
+    planetImage: '/cybersec.webp' // Added image path
   },
 ];
 

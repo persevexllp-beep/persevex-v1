@@ -312,7 +312,7 @@ export const managementCourses: CourseType[] = [
   },
     {
     id: "m1",
-    title: "Finance for Managers",
+    title: "Finance",
     shortTitle: 'Finance',
     description:
       "Understand key financial principles to make better business decisions.",
@@ -963,10 +963,10 @@ export const technicalCourses: CourseType[] = [
   },
   {
     id: "t4",
-    title: "Cloud Computing (AWS)",
+    title: "Cloud Computing",
     shortTitle: 'Cloud Computing',
     description:
-      "Architect and deploy scalable, fault-tolerant applications on AWS.",
+      "Architect and deploy scalable, fault-tolerant applications on AWS, Azure or GCP.",
     icon: CloudIcon,
     route: "/courses/cloud-computing",
     slug: "cloud-computing",

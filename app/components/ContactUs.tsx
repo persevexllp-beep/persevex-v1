@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, FormEvent, useMemo, useEffect, useState } from "react";
+import React, { FC, FormEvent, useMemo, useEffect, useState, useRef } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 
@@ -35,16 +35,19 @@ interface ContactUsSectionProps {
 }
 
 const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
+  const formRef = useRef<HTMLFormElement>(null);
   const isMobile = useIsMobile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!formRef.current) return;
+
     setIsSubmitting(true);
     setFormStatus(null);
     
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(formRef.current);
     const data = Object.fromEntries(formData.entries());
 
     try {
@@ -58,7 +61,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
       if (result.result === "success") {
         setFormStatus("Thank you! Your message has been sent.");
         alert("Thank you for your message! We will get back to you soon.");
-        e.currentTarget.reset();
+        formRef.current?.reset();
       } else {
         throw new Error(result.message || "An unknown error occurred.");
       }
@@ -139,8 +142,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
           variants={itemVariants}
           className="w-full max-w-lg bg-black/40 border-white/20 border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden"
         >
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Form fields remain the same */}
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col space-y-6">
               <div className="w-full">
                 <label htmlFor="name-mobile" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
@@ -170,7 +172,6 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
     );
   }
 
-  
   return (
     <div className="relative flex items-center justify-center h-screen px-4 sm:px-6 lg:px-8 text-white">
       <div style={textStyle} className="absolute top-1/2 left-1/2  w-full max-w-lg flex flex-col gap-4 text-center md:text-left">
@@ -182,8 +183,7 @@ const ContactUsSection: FC<ContactUsSectionProps> = ({ progress }) => {
       </div>
      
       <div style={formStyle} className="absolute top-1/2 left-1/2 w-full max-w-4xl bg-black/40 border border-white rounded-2xl p-8 backdrop-blur-sm overflow-hidden">
-        <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Form fields remain the same */}
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-6 sm:space-y-0">
                 <div className="w-full">
                 <label htmlFor="name-desktop" className="block text-xl font-medium text-gray-300 mb-2">Full Name</label>

@@ -26,7 +26,6 @@ const footerLinkColumns: FooterColumn[] = [
   {
     title: 'Quick Links',
     links: [
-      { text: 'Pre-registration', href: 'https://forms.gle/s9nYdQAtr5Qs1YfB6' },
       { text: 'LMS', href: 'https://lms.persevex.com/login/index.php' },
       { text: 'Blogs', href: '/blogs' },
     ],

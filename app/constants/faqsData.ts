@@ -162,7 +162,7 @@ export const faqsData: Record<string, FAQType[]> = {
       "answer": "During the internship, you'll work on a variety of hands-on projects that reflect real-world cloud computing challenges. These include deploying scalable web applications, building serverless backends, automating infrastructure with code, setting up CI/CD pipelines, and a comprehensive capstone project. All projects use real-world scenarios and are designed to build your portfolio and demonstrate your cloud skills to potential employers. You'll have the opportunity to work both individually and in teams, simulating the collaborative environment found in modern tech companies."
     }
   ],
-   "cyber-security": [
+   "cybersecurity": [
     {
       "question": "Why is cyber security important?",
       "answer": "Cyber security has become crucial in today's digital world as organizations face increasing threats from hackers, malware, and data breaches. With the rise in cyber attacks targeting businesses of all sizes, protecting sensitive information, intellectual property, and customer data is essential. Cyber security professionals help organizations implement protective measures, detect threats, and respond to incidents effectively. Learning cyber security skills now positions you at the forefront of this critical field, opening doors to lucrative career opportunities and the ability to make a significant impact in protecting digital assets."

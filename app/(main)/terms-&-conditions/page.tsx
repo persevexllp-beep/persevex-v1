@@ -71,7 +71,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </div>
            <div className="w-full flex items-center justify-center">
-            <Link href='/' className="bg-orange-400 hover:bg-orange-500 text-xl cursor-pointer rounded-2xl px-4 py-2 text-black mt-24">Back to policies</Link>
+            <Link href='/?scrollTo=policy'  className="bg-orange-400 hover:bg-orange-500 text-xl cursor-pointer rounded-2xl px-4 py-2 text-black mt-24">Back to policies</Link>
         </div>
         </div>
        

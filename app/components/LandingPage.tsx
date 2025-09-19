@@ -36,10 +36,8 @@ const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
   Math.min(Math.max(num, min), max);
 
-// --- NEW: Helper function to check for meaningful changes ---
-// This prevents updates for tiny floating-point differences.
 const hasChanged = (a: number | undefined, b: number, threshold = 0.001) => {
-    if (a === undefined) return true; // Always update on the first run
+    if (a === undefined) return true;
     return Math.abs(a - b) > threshold;
 };
 
@@ -131,27 +129,28 @@ const DustPlaneController: FC<{
 };
 
 const LandingPage: FC = () => {
-  const { layout, setLayout, setSectionRefs } = useScroll();
+  const { layout, setLayout, setSectionRefs, scrollToSection } = useScroll();
   const isMobile = useIsMobile();
   const coursesProgress = useMotionValue(0);
   const [activeCourseView, setActiveCourseView] = useState<DomainView>(
     allDomains.find((d) => d.enabled)?.view || "management"
   );
-    const searchParams = useSearchParams();
-    const {  scrollToSection } = useScroll();
-     const router = useRouter();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isPageReady, setIsPageReady] = useState(false);
 
-
-   useEffect(() => {
+  useEffect(() => {
     const sectionToScrollTo = searchParams.get('scrollTo') as SectionKey | null;
     
     if (sectionToScrollTo && layout) {
-      const timer = setTimeout(() => {
-        scrollToSection(sectionToScrollTo);
-        router.replace('/', { scroll: false });
-      }, 100);
-
-      return () => clearTimeout(timer); 
+      scrollToSection(sectionToScrollTo, { behavior: 'instant' }); 
+      router.replace('/', { scroll: false }); 
+      
+      requestAnimationFrame(() => {
+        setIsPageReady(true);
+      });
+    } else if (!sectionToScrollTo) {
+      setIsPageReady(true);
     }
   }, [searchParams, layout, scrollToSection, router]);
 
@@ -340,7 +339,6 @@ const LandingPage: FC = () => {
       smoothedFaqProgressRef.current = THREE.MathUtils.lerp(smoothedFaqProgressRef.current, targetFaqProgressRef.current, lerpFactor);
       smoothedContactUsProgressRef.current = THREE.MathUtils.lerp(smoothedContactUsProgressRef.current, targetContactUsProgressRef.current, lerpFactor);
 
-      // --- MODIFIED: Only set state if the value has meaningfully changed ---
       if (hasChanged(last.edgeProgress, smoothedEdgeProgressRef.current)) { setEdgeProgress(smoothedEdgeProgressRef.current); last.edgeProgress = smoothedEdgeProgressRef.current; }
       if (hasChanged(last.partnersProgress, smoothedPartnersProgressRef.current)) { setPartnersProgress(smoothedPartnersProgressRef.current); last.partnersProgress = smoothedPartnersProgressRef.current; }
       if (hasChanged(last.testimonialProgress, smoothedTestimonialProgressRef.current)) { setTestimonialProgress(smoothedTestimonialProgressRef.current); last.testimonialProgress = smoothedTestimonialProgressRef.current; }
@@ -589,7 +587,6 @@ const LandingPage: FC = () => {
           aboutUsOpacity = 0;
         }
         
-        // --- MODIFIED: Only set CSS properties if the values have meaningfully changed ---
         if (textContainerRef.current) {
             const setVar = (name: string, value: number, max = 0.4) => {
                 const clampedValue = clamp(value, 0, max);
@@ -608,7 +605,7 @@ const LandingPage: FC = () => {
             setVar("questions-opacity", questionsOpacity);
             setVar("contact-us-opacity", contactUsOpacity);
             setVar("policy-opacity", policyOpacity);
-            setVar("footer-opacity", footerOpacity, 1.0); // Footer goes up to 1.0
+            setVar("footer-opacity", footerOpacity, 1.0);
         }
 
         const inAboutUsContentSection = currentProgress >= 10.0 && currentProgress < 13.0;
@@ -1001,7 +998,7 @@ const LandingPage: FC = () => {
         </div>
       </div>
 
-      <main className="relative z-30">
+      <main className={`relative z-30 transition-opacity duration-300 ${isPageReady ? 'opacity-100' : 'opacity-0'}`}>
         <div
           ref={fadeOverlayRef}
           className="fixed top-0 left-0 w-full h-[35vh] z-[7] pointer-events-none"

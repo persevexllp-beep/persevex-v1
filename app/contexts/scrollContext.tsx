@@ -27,7 +27,7 @@ interface ScrollContextType {
   layout: LayoutState | null;
   setSectionRefs: (refs: Partial<Record<SectionKey, RefObject<HTMLDivElement>>>) => void;
   setLayout: (layout: LayoutState) => void;
-  scrollToSection: (key: SectionKey) => void;
+  scrollToSection: (key: SectionKey, options?: { behavior?: ScrollBehavior }) => void;
 }
 
 const ScrollContext = createContext<ScrollContextType | undefined>(undefined);
@@ -36,23 +36,21 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const [sectionRefs, setSectionRefs] = useState<Partial<Record<SectionKey, RefObject<HTMLDivElement>>>>({});
   const [layout, setLayout] = useState<LayoutState | null>(null);
 
-  const scrollToSection = (key: SectionKey) => {
+  const scrollToSection = (key: SectionKey, options?: { behavior?: ScrollBehavior }) => {
+    const behavior = options?.behavior || 'smooth';
     const ref = sectionRefs[key];
-    // --- FIX: Check for mobile screen size (same breakpoint as useIsMobile hook) ---
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     
     switch (key) {
       case 'ourEdge':
         if (isMobile) {
-          // On mobile, use standard scrollIntoView which is more reliable.
           if (ref?.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            ref.current.scrollIntoView({ behavior, block: 'start' });
           }
         } else {
-          // On desktop, keep the existing custom scroll logic.
           if (layout) {
             const targetY = layout.edgeTop + (window.innerHeight * NUM_CARDS);
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
+            window.scrollTo({ top: targetY, behavior });
           }
         }
         break;
@@ -60,35 +58,33 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
       case 'partners':
         if (layout) {
           const targetY = layout.partnersTop + window.innerHeight;
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
+          window.scrollTo({ top: targetY, behavior });
         }
         break;
       
       case 'aboutUs':
         if (isMobile) {
-          // On mobile, the ref points to a zero-height div right before the content, so this works perfectly.
           if (ref?.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            ref.current.scrollIntoView({ behavior, block: 'start' });
           }
         } else {
-           // On desktop, keep the existing custom scroll logic.
           if (layout) {
             const targetY = layout.aboutUsTop + (window.innerHeight * 2.6);
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
+            window.scrollTo({ top: targetY, behavior });
           }
         }
         break;
 
       case 'footer':
         if (layout) {
-          window.scrollTo({ top: layout.footerTop, behavior: 'smooth' });
+          window.scrollTo({ top: layout.footerTop, behavior });
         }
         break;
 
       default:
         if (ref?.current) {
           ref.current.scrollIntoView({
-            behavior: 'smooth',
+            behavior,
             block: 'start',
           });
         } else {

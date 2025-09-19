@@ -15,7 +15,7 @@ const partnersList = [
 export default function TrainingPartners() {
   return (
     <section className="bg- h-[80vh]  py-20 overflow-hidden">
-      <div className="max-w-7xl flex flex-col items-center justify-center mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl flex flex-col items-center justify-center mx-auto md:px-4 sm:px-6 lg:px-8">
         
         <div className="text-center mb-16">
             <div className="inline-flex mb-4 items-center px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
@@ -31,8 +31,8 @@ export default function TrainingPartners() {
         </div>
 
         <div 
-          className="w-full inline-flex flex-nowrap 
-                     [mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)]"
+          className="w-full inline-flex flex-nowrap bg-white
+                     md:[mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)]"
         >
           <div className="flex items-center justify-center animate-scroll-partners">
             
@@ -54,7 +54,7 @@ export default function TrainingPartners() {
                   alt={partner.alt}
                   width={160}
                   height={80}
-                  className="max-h-[70px] w-auto"
+                  className="max-h-[200px] w-auto"
                 />
               </div>
             ))}

@@ -21,7 +21,7 @@ import { useCourseScroll } from '../../contexts/courseScrollContext';
 const managementFooterLinks = [
   {
     title: "Quick Links",
-    links: ["Home", "Digital Marketing", "Finance", "Human Resource", "Contact Us"],
+    links: ["Home", "Digital Marketing", "Finance", "Human Resource", ],
   },
   {
     title: "Our Programs",
@@ -36,7 +36,7 @@ const managementFooterLinks = [
 const technicalFooterLinks = [
   {
     title: "Quick Links",
-    links: ["Home", "Web Development", "Artificial Intelligence", "Machine Learning", "Contact Us"],
+    links: ["Home", "Web Development", "Artificial Intelligence", "Machine Learning", ],
   },
   {
     title: "Our Programs",

@@ -18,16 +18,16 @@ const ProjectCard = ({ name, description, image }: { name: string; description: 
                     className="object-cover transition-transform duration-500 
                               group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20" />
+                <div className="absolute inset-0 bg-gradient-t to-black/20" />
             </div>
             
-            <div className="relative p-6 h-48 flex flex-col justify-between">
+            <div className="relative p-6 h-48 bg-white/5 flex flex-col justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-3 
                                    line-clamp-2 leading-tight">
                         {name}
                     </h3>
-                    <p className="text-sm text-gray-300 leading-relaxed 
+                    <p className="text-sm text-gray-300  leading-relaxed 
                                   line-clamp-4">
                         {description}
                     </p>

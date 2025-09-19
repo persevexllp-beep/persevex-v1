@@ -22,7 +22,7 @@ export default function CoursePageNavbar() {
         { name: 'Machine Learning', href: '/courses/machine-learning' },
         { name: 'Web Development', href: '/courses/web-development' },
         { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
-        { name: 'Cyber Security', href: '/courses/cyber-security' },
+        { name: 'Cyber Security', href: '/courses/cybersecurity' },
         { name: 'Data Science', href: '/courses/data-science' },
         { name: 'Cloud Computing', href: '/courses/cloud-computing' },
       ],
@@ -45,7 +45,7 @@ export default function CoursePageNavbar() {
     {
       branch: 'Mechanical',
       items: [
-        {name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocard'}
+        {name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocad'}
       ]
     },
     {

@@ -590,12 +590,32 @@ export const technicalCourses: CourseType[] = [
             {
                 name: 'Responsive Portfolio Website',
                 description: 'Build a modern, responsive portfolio website using HTML, CSS, and JavaScript.',
-                image: '/machinelearning.png'
+                image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
             },
             {
                 name: 'Social Media Application',
                 description: 'Build a complete Twitter clone from scratch with ReactJS, NodeJS and ExpressJS.',
-                image: '/webdevelopment.png'
+                image: '/social-media-project-image.jpg'
+            },
+            {
+              name: 'Admin Dashboard',
+              description: 'Create an interactive admin dashboard with data visualization, user management, and analytics.',
+              image: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+            },
+            {
+              name: 'Content Management System',
+              description : 'Develop a custom CMS for managing website content, users, and media files.',
+              image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+            },
+            {
+              name: 'Restful API service',
+              description: 'Create a robust API service with authentication, data validation, and comprehensive documentation.',
+              image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
+            },
+            {
+              name: 'E-commerce Platform',
+              description: 'Develop a full-featured e-commerce website with product listings, cart functionality, and checkout process.',
+              image: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'
             }
         ],
     modules: [
@@ -1072,8 +1092,8 @@ export const technicalCourses: CourseType[] = [
     shortTitle: 'CyberSecurity',
     description: "Protect networks, systems, and data from cyber threats.",
     icon: CybersecurityIcon,
-    route: "/courses/cyber-security",
-    slug: "cyber-security",
+    route: "/courses/cybersecurity",
+    slug: "cybersecurity",
     image: "/cybersec.webp",
     cardBg_image: "/cyber.webp",
     projects: [
@@ -1344,21 +1364,21 @@ export const ElectronicsCourses: CourseType[] = [
         description:
           "Build a system to control lights, fans, and other appliances remotely via a web dashboard.",
         image:
-          "https://images.unsplash.com/photo-1596248924036-d24778028a4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1727107463183-e54b0dbfc260?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c21hcnQlMjBob21lJTIwYXV0b21hdG9ufGVufDB8fDB8fHww",
       },
       {
         name: "Weather Monitoring Station",
         description:
           "Create a device that collects temperature, humidity, and pressure data and sends it to the cloud.",
         image:
-          "https://images.unsplash.com/photo-1561553594-87db31828f8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1548824049-12fcd2c576a3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8d2VhdGhlciUyMG1vbml0b3JpbmclMjBzdGF0aW9ufGVufDB8fDB8fHww",
       },
       {
         name: "Wearable Health Tracker",
         description:
           "Design a prototype for a wearable device to monitor vital signs like heart rate and steps.",
         image:
-          "https://images.unsplash.com/photo-1517838277531-412e46251d2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1510017803434-a899398421b3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHdlYXJhYmxlJTIwaGVhbHRoJTIwdHJhY2tlcnxlbnwwfHwwfHx8MA%3D%3D",
       },
       {
         name: "Smart Agriculture System",
@@ -1372,14 +1392,14 @@ export const ElectronicsCourses: CourseType[] = [
         description:
           "Build a GPS-based tracker to monitor the real-time location of a vehicle or package.",
         image:
-          "https://images.unsplash.com/photo-1567684014761-b65e2e59b2eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1584254520678-31fe4dce5306?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGFzc2V0JTIwdHJhY2tpbmclMjBzeXN0ZW18ZW58MHx8MHx8fDA%3D",
       },
       {
         name: "Home Security System",
         description:
           "Create a motion-activated security camera that sends alerts and images to a user's phone.",
         image:
-          "https://images.unsplash.com/photo-1589935447037-38b439c0b115?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1558002038-1055907df827?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aG9tZSUyMHNlY3VyaXR5JTIwc3lzdGVtfGVufDB8fDB8fHww",
       },
     ],
     modules: [
@@ -1478,27 +1498,27 @@ export const ElectronicsCourses: CourseType[] = [
       {
         "name": "Digital Thermometer with LCD",
         "description": "Interface with a temperature sensor and display real-time readings on a character LCD.",
-        "image": "https://images.unsplash.com/photo-1614769709322-281816738162?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "image": "https://images.unsplash.com/photo-1685660477683-11321882c1e0?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGRpZ2l0YWwlMjB0aGVybW9tZXRlciUyMHdpdGglMjBsY2R8ZW58MHx8MHx8fDA%3D"
       },
       {
         "name": "Motor Speed Controller (PWM)",
         "description": "Control the speed of a DC motor with precision using Pulse Width Modulation (PWM) signals.",
-        "image": "https://images.unsplash.com/photo-1599736179333-f3a3739d48b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "image": "https://images.unsplash.com/photo-1674827560853-aa388b5db770?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fG1vdG9yJTIwc3BlZWQlMjBjb250cm9sbGVyfGVufDB8fDB8fHww"
       },
       {
         "name": "Bluetooth Low Energy (BLE) Beacon",
         "description": "Build a low-power device that broadcasts data wirelessly to a smartphone or other BLE device.",
-        "image": "https://images.unsplash.com/photo-1616786018449-3c7a1b9a9e3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "image": "https://images.unsplash.com/photo-1592323360850-e317605f0526?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Ymx1ZXRvb3RoJTIwbG93JTIwZW5lcmd5fGVufDB8fDB8fHww"
       },
       {
         "name": "Real-Time Clock Alarm System",
         "description": "Use an RTC module to build a persistent alarm clock that can trigger an event at a specific time.",
-        "image": "https://images.unsplash.com/photo-1595493972828-56272535a81e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "image": "https://images.unsplash.com/photo-1754487436530-11d3140ec634?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cmVhbHRpbWUlMjBjbG9jayUyMGFsYXJtJTIwc3lzdGVtfGVufDB8fDB8fHww"
       },
       {
         "name": "Data Logger with SD Card",
         "description": "Create a system that logs sensor data over time and saves it to a file on an SD card via SPI.",
-        "image": "https://images.unsplash.com/photo-1544535538-b9a3d46fd3a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "image": "https://images.unsplash.com/photo-1649959188721-5ca7aeec6450?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGRhdGElMjBsb2dnZXIlMjB3aXRoJTIwc2QlMjBjYXJkfGVufDB8fDB8fHww"
       },
       {
         "name": "Basic RTOS Task Scheduler",
@@ -1604,14 +1624,14 @@ export const MechanicalCourses: CourseType[] = [
         description:
           "Design a detailed 2D floor plan for a house, including walls, doors, windows, and dimensions.",
         image:
-          "https://images.unsplash.com/photo-1581362678913-9154f982390b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721244654210-a505a99661e9?q=80&w=2052&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "Mechanical Part Modeling",
         description:
           "Create a precise 3D model of a mechanical component, like a gear or bracket, ready for manufacturing.",
         image:
-          "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1735665096798-0249c9c0f194?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "3D Interior Design Scene",
@@ -1625,21 +1645,21 @@ export const MechanicalCourses: CourseType[] = [
         description:
           "Create an exploded view of a multi-part assembly and automatically generate a bill of materials.",
         image:
-          "https://images.unsplash.com/photo-1628198495111-a83151368531?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1629118938047-0f28bbe5af7a?q=80&w=3133&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "Site Plan Layout",
         description:
           "Develop a 2D site plan for a construction project, showing property lines, building footprints, and landscaping.",
         image:
-          "https://images.unsplash.com/photo-1599493356244-a7b68a18357a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721244654392-9c912a6eb236?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHNpdGUlMjBwbGFuJTIwbGF5b3V0fGVufDB8fDB8fHww",
       },
       {
         name: "Piping and Instrumentation Diagram",
         description:
           "Draft a professional P&ID schematic for an industrial process using standard symbols and annotations.",
         image:
-          "https://images.unsplash.com/photo-1614361324261-1b78b05615f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721561286225-0823b5c72e20?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
     ],
     modules: [
@@ -1737,20 +1757,20 @@ export const CivilCourses: CourseType[] = [
     slug: "autocad",
     image: "/autocadcourse.webp",
     cardBg_image: "/autocadplanet.webp",
-    projects: [
+     projects: [
       {
         name: "Architectural Floor Plan",
         description:
           "Design a detailed 2D floor plan for a house, including walls, doors, windows, and dimensions.",
         image:
-          "https://images.unsplash.com/photo-1581362678913-9154f982390b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721244654210-a505a99661e9?q=80&w=2052&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "Mechanical Part Modeling",
         description:
           "Create a precise 3D model of a mechanical component, like a gear or bracket, ready for manufacturing.",
         image:
-          "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1735665096798-0249c9c0f194?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "3D Interior Design Scene",
@@ -1764,21 +1784,21 @@ export const CivilCourses: CourseType[] = [
         description:
           "Create an exploded view of a multi-part assembly and automatically generate a bill of materials.",
         image:
-          "https://images.unsplash.com/photo-1628198495111-a83151368531?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1629118938047-0f28bbe5af7a?q=80&w=3133&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
       {
         name: "Site Plan Layout",
         description:
           "Develop a 2D site plan for a construction project, showing property lines, building footprints, and landscaping.",
         image:
-          "https://images.unsplash.com/photo-1599493356244-a7b68a18357a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721244654392-9c912a6eb236?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHNpdGUlMjBwbGFuJTIwbGF5b3V0fGVufDB8fDB8fHww",
       },
       {
         name: "Piping and Instrumentation Diagram",
         description:
           "Draft a professional P&ID schematic for an industrial process using standard symbols and annotations.",
         image:
-          "https://images.unsplash.com/photo-1614361324261-1b78b05615f7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1721561286225-0823b5c72e20?q=80&w=2024&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
     ],
     modules: [

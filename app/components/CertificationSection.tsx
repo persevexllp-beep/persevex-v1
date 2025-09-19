@@ -1,4 +1,6 @@
-import React from 'react';
+"use client"; // <-- Add this line at the top
+
+import React, { useState } from 'react'; // <-- Import useState
 import Image from 'next/image';
 
 const certificateData = [
@@ -13,13 +15,22 @@ const certificateData = [
         description: 'Awarded after gaining practical work experience by successful completion of the capstone projects.'
     },
     {
-        imgSrc: '/outstandingsvg.svg',
+        imgSrc: '/outstanding.svg',
         title: 'Outstanding Performance Certificate',
         description: 'Awarded to recognize exceptional performance and contributions during the program.'
     },
 ];
 
 export default function CertificationSection() {
+    // State to track the active (clicked) certificate index
+    const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+    // Function to handle click/tap on a card
+    const handleCardClick = (index: number) => {
+        // If the clicked card is already active, close it. Otherwise, make it active.
+        setActiveIndex(activeIndex === index ? null : index);
+    };
+
     return (
         <div className="min-h-screen text-white flex flex-col items-center justify-center py-20 px-4">
             
@@ -38,7 +49,10 @@ export default function CertificationSection() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 w-full max-w-7xl px-4 sm:px-6 lg:px-12">
                 {certificateData.map((cert, index) => (
                     <div key={index} className="w-full max-w-md mx-auto">
-                        <div className="group relative cursor-pointer overflow-hidden rounded-xl border-4 border-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-105">
+                        <div 
+                            className="group relative cursor-pointer overflow-hidden rounded-xl border-4 border-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
+                            onClick={() => handleCardClick(index)} // <-- Add onClick handler
+                        >
                             <Image
                                 src={cert.imgSrc}
                                 alt={cert.title}
@@ -47,7 +61,12 @@ export default function CertificationSection() {
                                 layout="responsive" 
                                 className="object-contain rounded-lg"
                             />
-                            <div className="absolute inset-0 flex flex-col backdrop-blur-sm bg-white/80 items-center justify-center text-center p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            {/* --- MODIFIED LINE --- */}
+                            <div 
+                                className={`absolute inset-0 flex flex-col backdrop-blur-sm bg-white/80 items-center justify-center text-center p-6 transition-opacity duration-300 ${
+                                    activeIndex === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                }`}
+                            >
                                 <h3 className="text-black text-xl md:text-2xl font-semibold">
                                     {cert.title}
                                 </h3>

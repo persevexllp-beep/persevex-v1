@@ -38,12 +38,22 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
 
   const scrollToSection = (key: SectionKey) => {
     const ref = sectionRefs[key];
+    // --- FIX: Check for mobile screen size (same breakpoint as useIsMobile hook) ---
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     
     switch (key) {
       case 'ourEdge':
-        if (layout) {
-          const targetY = layout.edgeTop + (window.innerHeight * NUM_CARDS);
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        if (isMobile) {
+          // On mobile, use standard scrollIntoView which is more reliable.
+          if (ref?.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else {
+          // On desktop, keep the existing custom scroll logic.
+          if (layout) {
+            const targetY = layout.edgeTop + (window.innerHeight * NUM_CARDS);
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
         }
         break;
 
@@ -55,9 +65,17 @@ export const ScrollProvider = ({ children }: { children: React.ReactNode }) => {
         break;
       
       case 'aboutUs':
-        if (layout) {
-          const targetY = layout.aboutUsTop + (window.innerHeight * 2.6);
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        if (isMobile) {
+          // On mobile, the ref points to a zero-height div right before the content, so this works perfectly.
+          if (ref?.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else {
+           // On desktop, keep the existing custom scroll logic.
+          if (layout) {
+            const targetY = layout.aboutUsTop + (window.innerHeight * 2.6);
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+          }
         }
         break;
 

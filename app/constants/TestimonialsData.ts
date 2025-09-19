@@ -17,7 +17,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "The Portfolio Management course provided me with a structured approach to asset allocation and risk management. My clients have seen consistent returns even in volatile markets.",
     name: "David K.",
     title: "Goldman Sachs",
-    image: "/c1.webp",
+    image: "/davidk.jpg",
     bgImage: '/hat.webp',
     bgPosition: 'top 40% right 50%',
     planetImage: '/artificialint.webp' // New
@@ -27,7 +27,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "The Finance program at Persevex helped me land a role as an Analyst. The learning was top-notch, the internship was valuable, and the support was great throughout. Highly recommended for anyone serious about finance.",
     name: "Ravi K.",
     title: "Xaviers",
-    image: "/c2.webp",
+    image: "/c3.webp",
     bgImage: '/hat.webp',
     bgPosition: 'bottom 40% left 10%',
     planetImage: '/machine.webp' // New
@@ -37,7 +37,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's HR course helped me improve my understanding of people management and workplace dynamics. Their structured content and helpful mentors gave me a clear path to grow in my HR career.",
     name: "Virat S R.",
     title: "PurpleMerit",
-    image: "/c3.webp",
+    image: "/c5.webp",
     bgImage: '/hat.webp',
     bgPosition: 'bottom 50% left 80%',
     planetImage: '/cybersec.webp' // New
@@ -47,7 +47,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's Artificial Intelligence course helped me shift careers confidently. The hands-on projects, live sessions, and mentor support made learning enjoyable and effective. I now build and deploy AI models independently.",
     name: "Pramod C A.",
     title: "Infosys",
-    image: "/c4.webp",
+    image: "/c2.webp",
     bgImage: '/hat.webp',
     bgPosition: 'top 15% left 15%',
     planetImage: '/finan.webp' // New
@@ -57,7 +57,7 @@ export const testimonialsData: Testimonial[] = [
     quote: "Persevex's internship and training in data science gave me hands-on experience and the technical skills needed to succeed in the field. If you're aiming to upskill and gain real-world exposure, this is the place to start.",
     name: "Samarth M N.",
     title: "Cognizant",
-    image: "/c5.webp",
+    image: "/c4.webp",
     bgImage: '/hat.webp',
     bgPosition: 'center right 10%',
     planetImage: '/digitalmar.webp' // New

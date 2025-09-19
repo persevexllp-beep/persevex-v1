@@ -17,18 +17,20 @@ import DustPlane from "./DustPlane";
 import Hero from "./Hero";
 import CoursesSection from "./CoursesSection";
 import OurEdgeSection from "./OurEdgeSection";
+
 import PartnersSection from "./PartnersSection";
 import { AnimatedTestimonials } from "./Testimonials";
 import { testimonialsData } from "../constants/TestimonialsData";
 import RecognizedBySection from "./RecognizedBySection";
 import SimpleStars from "./SimpleStars";
 import AboutUsExtendedComp from "./AboutUsExtendedComp";
-import { useScroll } from "../contexts/scrollContext";
+import { useScroll, SectionKey } from "../contexts/scrollContext";
 import { allDomains, DomainView } from "../constants/courseConstant";
 import ContactUsSection from "./ContactUs";
 import PolicySection from "./Policy";
 import FooterSection from "./FooterSection";
 import FaqSection from "./FaqSection";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const NUM_CARDS = 6;
 const clamp = (num: number, min: number, max: number): number =>
@@ -135,6 +137,23 @@ const LandingPage: FC = () => {
   const [activeCourseView, setActiveCourseView] = useState<DomainView>(
     allDomains.find((d) => d.enabled)?.view || "management"
   );
+    const searchParams = useSearchParams();
+    const {  scrollToSection } = useScroll();
+     const router = useRouter();
+
+
+   useEffect(() => {
+    const sectionToScrollTo = searchParams.get('scrollTo') as SectionKey | null;
+    
+    if (sectionToScrollTo && layout) {
+      const timer = setTimeout(() => {
+        scrollToSection(sectionToScrollTo);
+        router.replace('/', { scroll: false });
+      }, 100);
+
+      return () => clearTimeout(timer); 
+    }
+  }, [searchParams, layout, scrollToSection, router]);
 
   const [headerProgress, setHeaderProgress] = useState<number>(0);
   const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
@@ -167,7 +186,6 @@ const LandingPage: FC = () => {
   const smoothedFaqProgressRef = useRef(0);
   const smoothedContactUsProgressRef = useRef(0);
 
-  // --- NEW: Ref to store the last rendered values ---
   const lastRenderedValuesRef = useRef<Record<string, number>>({});
 
   const textContainerRef = useRef<HTMLDivElement>(null);

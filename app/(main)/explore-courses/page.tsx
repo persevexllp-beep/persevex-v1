@@ -4,12 +4,9 @@ import React, { useState, Suspense, useRef, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import StarField from "@/app/components/StarField";
 import { motion, AnimatePresence } from "framer-motion";
-import CourseFooterSection from "../components/CourseFooterSection";
 
-import { allDomains, DomainView } from "../constants/courseConstant";
-import CourseDisplayCard from "../components/CourseDisplayCard";
-import Link from "next/link";
-import FooterSection from "../components/FooterSection";
+import { allDomains, DomainView } from "../../constants/courseConstant";
+import CourseDisplayCard from "../../components/CourseDisplayCard";
 
 export default function ExploreCoursesPage() {
   const [activeView, setActiveView] = useState<DomainView>("management");
@@ -37,7 +34,13 @@ export default function ExploreCoursesPage() {
   };
 
   return (
-    <main className="relative min-h-screen w-full text-white overflow-x-hidden">
+    <main 
+      className="relative min-h-screen w-full text-white overflow-x-hidden"
+      style={{
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none' 
+      }}
+    >
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         <Canvas camera={{ position: [0, 0, 5] }}>
           <color attach="background" args={["#000000"]} />
@@ -47,15 +50,15 @@ export default function ExploreCoursesPage() {
         </Canvas>
       </div>
 
-      <div className="flex flex-col items-center justify-start pt-4 min-h-screen w-full px-4 sm:px-8">
-        <ExploreAppbar />
-        <h1 className="text-4xl md:text-5xl md:mt-12 font-bold text-center">
+      <div className="flex flex-col items-center justify-start pt-24 min-h-screen w-full px-4 sm:px-8">
+        
+        <h1 className="text-4xl md:text-5xl font-bold text-center">
           Explore our Trending Courses
         </h1>
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeView}
+            key={activeView} 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -72,7 +75,7 @@ export default function ExploreCoursesPage() {
         <div className="mt-12 z-20">
           <div className="relative flex w-fit items-center rounded-full bg-gray-900/50 p-1 backdrop-blur-sm flex-wrap justify-center">
             <motion.div
-              className="absolute h-[calc(100%-0.5rem)] rounded-full bg-white"
+              className="absolute h-[calc(100%-0.5rem)] rounded-full bg-orange-500/20"
               animate={sliderStyle}
               transition={{ type: "spring", stiffness: 350, damping: 30 }}
             />
@@ -87,7 +90,7 @@ export default function ExploreCoursesPage() {
                     onClick={() => setActiveView(domain.view)}
                     className={`relative z-10 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 whitespace-nowrap ${
                       activeView === domain.view
-                        ? "text-gray-900"
+                        ? "text-orange-400"
                         : "text-white hover:text-gray-200"
                     }`}
                   >
@@ -98,32 +101,23 @@ export default function ExploreCoursesPage() {
           </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeView}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-7xl mx-auto mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-16 pb-24"
-          >
-            {coursesToShow.map((course) => (
-              <CourseDisplayCard key={course.id} course={course} />
-            ))}
-          </motion.div>
-        </AnimatePresence>
+        <div className="w-full max-w-7xl mx-auto mt-16 pb-24 min-h-[600px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-16 justify-items-center"
+            >
+              {coursesToShow.map((course) => (
+                <CourseDisplayCard key={course.id} course={course} />
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
-     
     </main>
-  );
-}
-
-function ExploreAppbar() {
-  return (
-    <div className="flex items-start justify-start w-full ">
-      <Link href={"/"} className="text-2xl md:text-3xl font-bold">
-        PERSEVEX
-      </Link>
-    </div>
   );
 }

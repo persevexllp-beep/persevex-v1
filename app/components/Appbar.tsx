@@ -2,6 +2,7 @@
 
 import React, {useState} from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { useScroll, SectionKey } from '../contexts/scrollContext';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import ProgramsMegaMenu from './ProgramsMegaMenu';
@@ -11,24 +12,37 @@ type ProgramCategory = { branch: string; items: ProgramItem[]; };
 
 export default function Navbar() {
   const { scrollToSection } = useScroll();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
+  
+  const isHomePage = pathname === '/';
 
-  const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault(); 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-    setIsMobileMenuOpen(false);
-  };
+  const handleNavigationAndScroll = (key: SectionKey) => {
+    setIsMobileMenuOpen(false); 
 
-  const handleMobileLinkClick = (key: SectionKey) => {
-    scrollToSection(key);
-    setIsMobileMenuOpen(false);
+    if (isHomePage) {
+      scrollToSection(key);
+    } else {
+      router.push(`/?scrollTo=${key}`);
+    }
   };
   
+  const handleGoHome = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsMobileMenuOpen(false);
+    if (isHomePage) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        router.push('/');
+    }
+  };
+
+  // --- Data for Navigation & Menus ---
+
   const programCategories: ProgramCategory[] = [
     {
       branch: 'CSE / IT',
@@ -77,7 +91,7 @@ export default function Navbar() {
     { name: "Testimonials", key: "testimonials" },
     { name: "About Us", key: "aboutUs" },
   ];
-
+  
   const mobileMenuVariants: Variants = {
     hidden: { opacity: 0, transition: { duration: 0.3, ease: "easeOut" } },
     visible: { opacity: 1, transition: { duration: 0.3, ease: "easeIn", staggerChildren: 0.07 } },
@@ -91,25 +105,24 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 left-0 right-0 z-50 h-16 flex items-center justify-between p-6 md:p-8 text-white ">
-       <div className='flex items-center justify-center gap-4'>
         <Link 
           href="/" 
           className="text-2xl cursor-pointer md:text-3xl font-bold tracking-wider"
-          onClick={handleScrollToTop}
+          onClick={handleGoHome}
         >
           PERSEVEX
         </Link>
-       </div>
+       
         <nav className="hidden md:flex items-center gap-8 lg:gap-12">
           <div 
             className="relative"
             onMouseEnter={() => setIsDesktopDropdownOpen(true)}
             onMouseLeave={() => setIsDesktopDropdownOpen(false)}
           >
-            <button className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer flex items-center gap-1">
+            <Link href="/explore-courses" className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer flex items-center gap-1">
               Programs
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
+            </Link>
             <AnimatePresence>
               {isDesktopDropdownOpen && (
                 <ProgramsMegaMenu
@@ -128,7 +141,7 @@ export default function Navbar() {
             LMS
           </Link>
           {scrollButtons.map((button) => (
-            <button key={button.name} onClick={() => scrollToSection(button.key)} className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer">
+            <button key={button.name} onClick={() => handleNavigationAndScroll(button.key)} className="text-base font-medium hover:text-gray-300 transition-colors duration-300 cursor-pointer">
               {button.name}
             </button>
           ))}
@@ -201,7 +214,7 @@ export default function Navbar() {
               <motion.button
                 key={button.name}
                 variants={mobileLinkVariants}
-                onClick={() => handleMobileLinkClick(button.key)}
+                onClick={() => handleNavigationAndScroll(button.key)}
                 className="text-xl font-semibold py-3"
               >
                 {button.name}

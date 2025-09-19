@@ -1,10 +1,27 @@
 import Image from "next/image";
+import Link from "next/link"; 
 import React from "react";
 
 interface FooterLinkColumn {
   title: string;
   links: string[];
 }
+
+const getLinkPath = (linkText: string): string => {
+  const slug = linkText.toLowerCase().replace(/\s+/g, '-');
+  switch (slug) {
+    case 'home':
+      return '/';
+    case 'contact-us':
+      return '/contact';
+    case 'who-we-are':
+    case 'founder-ethos':
+    case 'work-life-balance':
+      return `/about#${slug}`;
+    default:
+      return `/courses/${slug}`;
+  }
+};
 
 export default function CourseFooterSection({ links }: { links: FooterLinkColumn[] }) {
   return (
@@ -43,12 +60,12 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
                 <ul className="space-y-3">
                   {column.links.map((link) => (
                     <li key={link}>
-                      <a
-                        href="#"
+                      <Link
+                        href={getLinkPath(link)}
                         className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out text-sm inline-block"
                       >
                         {link}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -62,9 +79,9 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
           <div className="flex flex-col sm:flex-row justify-between items-center mx-auto sm:mx-0 w-full gap-4 mt-8">
             <p className="text-sm text-gray-400">© 2025 Persevex. All rights reserved.</p>
             <div className="flex gap-6">
-              <a href="#" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">Facebook</a>
-              <a href="#" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">LinkedIn</a>
-              <a href="#" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">Instagram</a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/profile.php?id=61574597387622#" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">Facebook</a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/company/persevex/posts/?feedView=all" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">LinkedIn</a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/persevex_llp/" className="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out inline-block">Instagram</a>
             </div>
           </div>
         </div>

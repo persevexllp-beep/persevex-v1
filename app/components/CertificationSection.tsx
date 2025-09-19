@@ -1,19 +1,19 @@
 import React from 'react';
-import Image from 'next/image'; // Import the Next.js Image component
+import Image from 'next/image';
 
 const certificateData = [
     {
-        imgSrc: '/coursecompletion.png',
+        imgSrc: '/certificatesvg.svg',
         title: 'Course Completion Certificate',
         description: 'Awarded upon successful completion of the course curriculum.'
     },
     {
-        imgSrc: '/internshipcomp.png',
+        imgSrc: '/internshipsvg..svg',
         title: 'Internship Certificate',
         description: 'Awarded after gaining practical work experience by successful completion of the capstone projects.'
     },
     {
-        imgSrc: '/performancecertificate.png',
+        imgSrc: '/outstandingsvg.svg',
         title: 'Outstanding Performance Certificate',
         description: 'Awarded to recognize exceptional performance and contributions during the program.'
     },
@@ -35,18 +35,16 @@ export default function CertificationSection() {
                 </p>
             </div>
 
-            {/* Responsive Grid Container */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 w-full max-w-7xl px-4 sm:px-6 lg:px-12">
                 {certificateData.map((cert, index) => (
-                    <div key={index} className="w-full max-w-md mx-auto"> {/* Centered card on mobile */}
+                    <div key={index} className="w-full max-w-md mx-auto">
                         <div className="group relative cursor-pointer overflow-hidden rounded-xl border-4 border-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-105">
-                            {/* Using Next.js Image component for optimization */}
                             <Image
                                 src={cert.imgSrc}
                                 alt={cert.title}
-                                width={1275} // Original image width
-                                height={1755} // Original image height
-                                layout="responsive" // Makes the image scale with its container
+                                width={1275} 
+                                height={1755}
+                                layout="responsive" 
                                 className="object-contain rounded-lg"
                             />
                             <div className="absolute inset-0 flex flex-col backdrop-blur-sm bg-white/80 items-center justify-center text-center p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

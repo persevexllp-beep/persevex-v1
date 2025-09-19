@@ -5,10 +5,10 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { faqsData } from '@/app/constants/faqsData';
-import { managementCourses, technicalCourses } from '@/app/constants/courseConstant';
+import { managementCourses } from '@/app/constants/courseConstant';
 import { Canvas } from '@react-three/fiber';
 import StarField from '@/app/components/StarField';
-import { allDomains, CourseType } from '@/app/constants/courseConstant'; 
+import { allDomains, CourseType } from '@/app/constants/courseConstant';
 import AboutProgramSection from '@/app/components/AboutProgramSection';
 import CurriculumSection from '@/app/components/CurriculumSection';
 import ProjectsSection from '@/app/components/ProjectsSection';
@@ -17,7 +17,7 @@ import TrainingPartners from '@/app/components/TrainingPartners';
 import FrequentlyAskedQuestionsSection from '@/app/components/FrequentlyAskedQuestions';
 import CourseFooterSection from '@/app/components/CourseFooterSection';
 import { useCourseScroll } from '../../contexts/courseScrollContext';
-  
+
 const managementFooterLinks = [
   {
     title: "Quick Links",
@@ -27,9 +27,9 @@ const managementFooterLinks = [
     title: "Our Programs",
     links: ["Digital Marketing", "Finance", "Human Resource"],
   },
-  {
-    title: "About Us",
-    links: ["Who we are", "Founder ethos", "Work life balance"],
+ {
+    title: "Get in touch",
+    links: ["support@persevex.com", "Bengaluru, India"],
   },
 ];
 
@@ -43,18 +43,17 @@ const technicalFooterLinks = [
     links: ["Web Development", "Artificial Intelligence", "Machine Learning", "Cloud Computing", "Cybersecurity"],
   },
   {
-    title: "About Us",
-    links: ["Who we are", "Founder ethos", "Work life balance"],
+    title: "Get in touch",
+    links: ["support@persevex.com", "Bengaluru, India"],
   },
 ];
 
 export default function CoursePage({ params }: { params: Promise<{ course: string }> }) {
   const resolvedParams = use(params);
-  const { setSectionRefs } = useCourseScroll(); 
-  
-   const allCourses: CourseType[] = allDomains.flatMap(domain => domain.courses);
-  const course = allCourses.find(c => c.slug === resolvedParams.course);
+  const { setSectionRefs } = useCourseScroll();
 
+  const allCourses: CourseType[] = allDomains.flatMap(domain => domain.courses);
+  const course = allCourses.find(c => c.slug === resolvedParams.course);
 
   const aboutRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
   const curriculumRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;;
@@ -126,7 +125,7 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
             </div>
           </div>
         </div>
-        
+
         <div ref={aboutRef}>
           <AboutProgramSection course={course} />
         </div>
@@ -136,7 +135,7 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
             <CurriculumSection modules={course.modules} />
           </div>
         )}
-        
+
         {course.projects && course.projects.length > 0 && (
           <div ref={projectsRef}>
             <ProjectsSection projects={course.projects} />
@@ -162,3 +161,8 @@ export default function CoursePage({ params }: { params: Promise<{ course: strin
     </main>
   );
 }
+
+
+
+
+

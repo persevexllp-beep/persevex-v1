@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link"; 
+import Link from "next/link";
 import React from "react";
 
 interface FooterLinkColumn {
@@ -23,6 +23,33 @@ const getLinkPath = (linkText: string): string => {
   }
 };
 
+const renderFooterLink = (link: string) => {
+  const commonClasses = "text-gray-300 hover:text-white transition-all duration-300 ease-out text-sm inline-block";
+
+  if (link.includes('@')) {
+    return (
+      <a href={`mailto:${link}`} className={`${commonClasses} hover:translate-x-1`}>
+        {link}
+      </a>
+    );
+  }
+
+  const isStaticText = link.toLowerCase().includes('india');
+  if (isStaticText) {
+    return (
+      <span className="text-gray-300 text-sm">
+        {link}
+      </span>
+    );
+  }
+
+  return (
+    <Link href={getLinkPath(link)} className={`${commonClasses} hover:translate-x-1`}>
+      {link}
+    </Link>
+  );
+};
+
 export default function CourseFooterSection({ links }: { links: FooterLinkColumn[] }) {
   return (
     <footer className="relative mt-24 text-white overflow-hidden flex items-center justify-center py-20 md:py-12">
@@ -31,16 +58,16 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
           <div className="flex items-start gap-6 w-full">
             <div className="flex-shrink-0">
               <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl p-2 shadow-lg flex items-center justify-center">
-                <Image 
-                  className="w-full h-full object-contain" 
-                  src='/whitelogo.png' 
-                  alt="Persevex logo" 
-                  height={80} 
-                  width={80} 
+                <Image
+                  className="w-full h-full object-contain"
+                  src='/whitelogo.png'
+                  alt="Persevex logo"
+                  height={80}
+                  width={80}
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-col justify-center min-h-[4rem] md:min-h-[5rem]">
               <h2 className="text-3xl md:text-4xl font-serif text-gray-200 leading-tight">
                 Persevex
@@ -60,12 +87,7 @@ export default function CourseFooterSection({ links }: { links: FooterLinkColumn
                 <ul className="space-y-3">
                   {column.links.map((link) => (
                     <li key={link}>
-                      <Link
-                        href={getLinkPath(link)}
-                        className="text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-300 ease-out text-sm inline-block"
-                      >
-                        {link}
-                      </Link>
+                      {renderFooterLink(link)}
                     </li>
                   ))}
                 </ul>

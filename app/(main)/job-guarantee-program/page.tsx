@@ -54,7 +54,7 @@ export default function JobGuaranteeProgramPage() {
             icon: <Code size={28} />,
             title: "Fullstack Development",
             description: "Master both front-end and back-end technologies to build complete web applications from scratch. Become a versatile and in-demand developer.",
-            href: "/job-guarantee-program/fullstack-development"
+            href: "/job-guarantee-program/web-development"
         },
         {
             icon: <Users size={28} />,

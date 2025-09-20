@@ -5,6 +5,7 @@ import { ScrollProvider } from "../contexts/scrollContext";
 export const metadata: Metadata = {
   title: "Persevex",
   description: "Empowering careers",
+  
 };
 
 export default function MainLayout({

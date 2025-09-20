@@ -5,13 +5,14 @@ import { motion, Variants, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Briefcase, FileBadge, ChevronRight, ArrowRight, ArrowDown } from 'lucide-react';
 
-const MotionLink = motion.create(Link);
+const MotionLink = motion(Link);
 
 type ProgramItem = { name: string; href: string; };
 type ProgramCategory = { branch: string; items: ProgramItem[]; };
 
 interface ProgramsMegaMenuProps {
-  programCategories: ProgramCategory[];
+  internshipData: ProgramCategory[];
+  placementData: ProgramCategory[];
   onClose: () => void;
 }
 
@@ -26,17 +27,30 @@ const domainItemVariants: Variants = {
   exit: { opacity: 0, x: -20, transition: { duration: 0.15, ease: 'easeIn' } },
 };
 
-export default function ProgramsMegaMenu({ programCategories, onClose }: ProgramsMegaMenuProps) {
-  // Set default active states to match the provided image
+export default function ProgramsMegaMenu({ internshipData, placementData, onClose }: ProgramsMegaMenuProps) {
   const [activeProgram, setActiveProgram] = useState<'Internship Program' | 'Placement Provision Program'>('Placement Provision Program');
-  const [activeTopic, setActiveTopic] = useState(programCategories[0]?.branch || '');
+  
+  const currentCategories = activeProgram === 'Internship Program' 
+    ? internshipData 
+    : placementData;
+
+  const [activeTopic, setActiveTopic] = useState(currentCategories[0]?.branch || '');
 
   const programs = [
     { name: 'Internship Program', label: 'INTERNSHIP PROGRAM', icon: <Briefcase size={28} /> },
     { name: 'Placement Provision Program', label: 'PLACEMENT PROVISION PROGRAM', icon: <FileBadge size={28} /> },
   ];
 
-  const activeCourses = programCategories.find(cat => cat.branch === activeTopic)?.items || [];
+  const activeCourses = currentCategories.find(cat => cat.branch === activeTopic)?.items || [];
+
+  const handleProgramChange = (programName: 'Internship Program' | 'Placement Provision Program') => {
+    setActiveProgram(programName);
+    if (programName === 'Internship Program') {
+      setActiveTopic(internshipData[0]?.branch || '');
+    } else {
+      setActiveTopic(placementData[0]?.branch || '');
+    }
+  };
 
   return (
     <motion.div
@@ -49,7 +63,6 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
       variants={megaMenuVariants}
     >
       <div className="grid grid-cols-3">
-        {/* Column 1: Program */}
         <div className="p-6">
           <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
             Program <ArrowRight size={20} className="text-orange-500" />
@@ -60,14 +73,14 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
               return (
                 <button
                   key={prog.name}
-                  onClick={() => setActiveProgram(prog.name as 'Internship Program' | 'Placement Provision Program')}
+                  onClick={() => handleProgramChange(prog.name as 'Internship Program' | 'Placement Provision Program')}
                   className={`relative w-full p-4 rounded-lg text-left transition-all duration-300 flex items-center gap-4 ${
                     isActive
                       ? 'bg-orange-500 text-white shadow-lg font-bold'
                       : 'text-white/80 hover:bg-white/10'
                   }`}
                 >
-                  {isActive && <div className="absolute left-0 top-0 h-full w-1.5  rounded-l-lg" />}
+                  {isActive && <div className="absolute left-0 top-0 h-full w-1.5 bg-orange-500 rounded-l-lg" />}
                   {prog.icon}
                   <span className="text-sm tracking-wide">{prog.label}</span>
                 </button>
@@ -76,13 +89,12 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
           </div>
         </div>
 
-        {/* Column 2: Topic */}
-        <div className="p-6 ">
+        <div className="p-6">
           <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
             Topic <ArrowRight size={20} className="text-orange-400" />
           </h3>
           <div className="space-y-2">
-            {programCategories.map((category) => {
+            {currentCategories.map((category) => {
               const isActive = activeTopic === category.branch;
               return(
                 <button
@@ -102,7 +114,6 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
           </div>
         </div>
 
-        {/* Column 3: Course */}
         <div className="col-span-1 p-6">
           <h3 className="text-lg font-semibold text-orange-500 mb-4 flex items-center gap-2">
             Course <ArrowDown size={20} className="text-orange-400" />
@@ -129,9 +140,7 @@ export default function ProgramsMegaMenu({ programCategories, onClose }: Program
         </div>
       </div>
 
-      {/* Footer: Training Partners */}
       <div className="border-t border-white/10 bg-black/10 px-8 py-4 flex justify-between items-center">
-       
         <div className="flex items-center gap-2">
             <span className="text-xs text-white/60">recognized by</span>
             <div className="w-32 h-8 bg-white/10 rounded flex items-center justify-center font-bold text-orange-800 text-sm">#startupindia</div>

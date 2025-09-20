@@ -41,9 +41,7 @@ export default function Navbar() {
     }
   };
 
-  // --- Data for Navigation & Menus ---
-
-  const programCategories: ProgramCategory[] = [
+  const internshipProgramCategories: ProgramCategory[] = [
     {
       branch: 'CSE / IT',
       items: [
@@ -80,6 +78,17 @@ export default function Navbar() {
       branch: 'Civil',
       items: [
         {name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
+      ]
+    }
+  ];
+
+  const placementProgramCategories: ProgramCategory[] = [
+    {
+      branch: 'Job Guarantee Programs',
+      items: [
+        { name: 'Fullstack Development', href: '/courses/fullstack-development' },
+        { name: 'Human Resources', href: '/courses/human-resource' },
+        { name: 'Digital Marketing', href: '/courses/digital-marketing' },
       ]
     }
   ];
@@ -126,7 +135,8 @@ export default function Navbar() {
             <AnimatePresence>
               {isDesktopDropdownOpen && (
                 <ProgramsMegaMenu
-                  programCategories={programCategories}
+                  internshipData={internshipProgramCategories}
+                  placementData={placementProgramCategories}
                   onClose={() => setIsDesktopDropdownOpen(false)}
                 />
               )}
@@ -184,7 +194,7 @@ export default function Navbar() {
                     className="overflow-hidden"
                   >
                     <div className="pt-2 pb-4 flex flex-col gap-1">
-                      {programCategories.flatMap(cat => cat.items).map(item => (
+                      {internshipProgramCategories.flatMap(cat => cat.items).map(item => (
                         <Link
                           key={item.name}
                           href={item.href}

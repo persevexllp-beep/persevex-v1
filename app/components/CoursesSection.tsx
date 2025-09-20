@@ -273,9 +273,9 @@ const CoursesSection: React.FC<CoursesSectionProps> = ({
   });
 
   return (
-    <div className="relative w-full  h-full min-h-screen text-white flex flex-col lg:flex-row gap-2 justify-center md:justify-center mx-auto px-4 items-center pt- md:pt-0  py-12 md:pb-0">
+    <div className="relative w-full  h-full min-h-screen text-white flex flex-col lg:flex-row gap-2 justify-center md:justify-center mx-auto px-4 items-center  pt- md:pt-0  py-12 md:pb-0">
       {!isMobile && (
-        <div className="md:h-28 lg:h-auto lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
+        <div className="md:h-  lg:h-auto lg:absolute top-16 left-1/2 -translate-x-1/2 z-10 lg:max-w-8xl flex w-full flex-col items-center gap-4 px-4 m">
           <div className="w-full overflow-x-auto scrollbar-hide md:w-fit">
             <div className="relative mx-auto flex flex-wrap justify-center items-center w-fit max-w-full rounded-2xl lg:max-w-8xl p-2 backdrop-blur-sm md:flex-nowrap md:rounded-full md:p-1 md:mx-0">
               <motion.div

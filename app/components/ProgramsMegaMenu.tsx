@@ -142,7 +142,10 @@ export default function ProgramsMegaMenu({
                   key={category.branch}
                   onMouseEnter={() => setActiveTopic(category.branch)}
                   onClick={() => {
-                    router.push("/job-guarantee-program");
+                    if (activeProgram === "Placement Provision Program") {
+                      router.push("/job-guarantee-program");
+                      onClose();
+                    }
                   }}
                   className={`w-full cursor-pointer p-3 rounded-lg text-left transition-colors duration-200 flex items-center justify-between ${
                     isActive

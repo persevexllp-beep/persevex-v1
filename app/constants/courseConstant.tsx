@@ -39,6 +39,8 @@ export interface CourseType {
   programCardsHeading?: string[];
   modules?: ModuleType[];
   projects?: ProjectsType[];
+  skillsCovered?: string[] 
+  keyFeatures?: string[]
 }
 
 export interface ContentType {
@@ -70,6 +72,24 @@ export const managementCourses: CourseType[] = [
     slug: "digital-marketing",
     image: "/digitalmar.webp",
     cardBg_image: "/digital.webp",
+     skillsCovered: [
+    'Search Engine Optimization (SEO)',
+    'Search Engine Marketing (SEM) with Google Ads',
+    'Social Media Marketing (SMM) & Strategy',
+    'Content Marketing & Copywriting',
+    'Email Marketing & Automation',
+    'Web Analytics with Google Analytics 4 (GA4)',
+    'Conversion Rate Optimization (CRO)'
+  ],
+  keyFeatures: [
+    'Guaranteed Interviews with Leading Agencies & Brands',
+    'Manage Live Campaigns with Real Budgets',
+    'Build a Professional Portfolio with Live Projects',
+    'Access to Premium Marketing Tools (e.g., SEMrush)',
+    'Preparation for Google & Meta Certifications',
+    'Learn directly from Agency Experts & Brand Managers',
+    'Personalized Career Coaching & Placement Support'
+  ],
     projects:  [
             {
                 name: 'Email Marketing',
@@ -197,6 +217,24 @@ export const managementCourses: CourseType[] = [
     slug: "human-resource",
     image: "/humanres.webp",
     cardBg_image: "/human.webp",
+    skillsCovered: [
+    'Talent Acquisition & Advanced Interviewing',
+    'Employee Onboarding & Lifecycle Management',
+    'Performance Management Systems',
+    'Compensation & Benefits Design',
+    'Labor Law & HR Compliance',
+    'HR Information Systems (HRIS)',
+    'Strategic HR Business Partnering (HRBP)'
+  ],
+  keyFeatures: [
+    'Placement Assistance with Top Corporates',
+    'Learn from CHROs & Senior HR Leaders',
+    'Real-world Case Studies & HR Scenarios',
+    'Specialized Mock HR Interviews',
+    'Globally Recognized HR Certification Prep',
+    'Resume and LinkedIn Profile Optimization',
+    'Access to an Exclusive HR Professionals Network'
+  ],
     projects: [
             {
                 name: 'Recruitment Strategy',
@@ -458,7 +496,7 @@ export const managementCourses: CourseType[] = [
       "description":
         "Develop a diversified cryptocurrency portfolio based on fundamental analysis and risk tolerance.",
       "image":
-        "https://images.unsplash.com/photo-1621504450183-225ce7e8e129?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "https://images.unsplash.com/photo-1639754390580-2e7437267698?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y3J5cHRvY3VycmVuY3l8ZW58MHx8MHx8fDA%3D"
     },
     {
       "name": "Technical Analysis Trading Plan",
@@ -479,14 +517,14 @@ export const managementCourses: CourseType[] = [
       "description":
         "Analyze and simulate a yield farming strategy on a decentralized finance (DeFi) protocol.",
       "image":
-        "https://images.unsplash.com/photo-1639755498822-e42751f7d730?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "https://images.unsplash.com/photo-1694219782948-afcab5c095d3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8RGVGaXxlbnwwfHwwfHx8MA%3D%3D"
     },
     {
       "name": "Market Sentiment Analysis",
       "description":
         "Use tools to analyze market sentiment from social media and news to predict price movements.",
       "image":
-        "https://images.unsplash.com/photo-1633113087844-368727a3a32f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        "https://images.unsplash.com/photo-1639825752750-5061ded5503b?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1hcmtldCUyMHNlbnRpbWVudCUyMGFuYWx5c2lzfGVufDB8fDB8fHww"
     }
   ],
   "modules": [
@@ -586,6 +624,24 @@ export const technicalCourses: CourseType[] = [
     slug: "web-development",
     image: "/webdevl.webp",
     cardBg_image: "/web.webp",
+    skillsCovered: [
+    'HTML5, CSS3, & Responsive Design',
+    'JavaScript (ES6+) & TypeScript',
+    'React & Next.js for Frontend Mastery',
+    'Node.js & Express for Backend APIs',
+    'MongoDB & SQL Database Management',
+    'REST APIs & GraphQL',
+    'DevOps, CI/CD, & Cloud Deployment'
+  ],
+  keyFeatures: [
+    'Guaranteed Interview Opportunities',
+    'Live Mentorship from Senior Developers',
+    'Build & Deploy 5+ Portfolio-Ready Projects',
+    'Comprehensive Career Services & Mock Interviews',
+    'Flexible Learning Schedule',
+    'Official Certification of Program Completion',
+    'Dedicated Resume & GitHub Portfolio Building Sessions'
+  ],
     projects: [
             {
                 name: 'Responsive Portfolio Website',

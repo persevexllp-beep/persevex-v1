@@ -6,7 +6,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { CourseSectionKey, useCourseScroll } from '../(course-pages)/contexts/courseScrollContext';
 import ProgramsMegaMenu from './ProgramsMegaMenu';
 
-type ProgramItem = { name: string; href: string; };
+type ProgramItem = {  key: string, name: string; href: string; };
 type ProgramCategory = { branch: string; items: ProgramItem[]; };
 
 export default function CoursePageNavbar() {
@@ -15,56 +15,55 @@ export default function CoursePageNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
 
-  // 1. Renamed original data to be specific to internships
   const internshipProgramCategories: ProgramCategory[] = [
     {
       branch: 'CSE / IT',
       items: [
-        { name: 'Machine Learning', href: '/courses/machine-learning' },
-        { name: 'Web Development', href: '/courses/web-development' },
-        { name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
-        { name: 'Cyber Security', href: '/courses/cybersecurity' },
-        { name: 'Data Science', href: '/courses/data-science' },
-        { name: 'Cloud Computing', href: '/courses/cloud-computing' },
+        {key: 'c1', name: 'Machine Learning', href: '/courses/machine-learning' },
+        {key: "c2", name: 'Web Development', href: '/courses/web-development' },
+        {key: 'c3', name: 'Artificial Intelligence', href: '/courses/artificial-intelligence' },
+        {key: 'c4', name: 'Cyber Security', href: '/courses/cybersecurity' },
+        {key: 'c5', name: 'Data Science', href: '/courses/data-science' },
+        {key: 'c6', name: 'Cloud Computing', href: '/courses/cloud-computing' },
       ],
     },
     {
       branch: 'Business & Finance',
       items: [
-        { name: 'Finance', href: '/courses/finance' },
-        { name: 'Digital Marketing', href: '/courses/digital-marketing' },
-        { name: 'Modern Human Resourse', href: '/courses/human-resource' },
+        {key: 'b1', name: 'Finance', href: '/courses/finance' },
+        {key: 'b2', name: 'Digital Marketing', href: '/courses/digital-marketing' },
+        {key: 'b3', name: 'Modern Human Resourse', href: '/courses/human-resource' },
+        {key: 'b4',name: 'Stockmarket & Cryptocurrency', href: '/courses/stock-market-crypto'}
       ],
     },
      {
       branch: 'ECE / EEE',
       items: [
-        { name: 'Embedded Systems', href: '/courses/embedded-systems' },
-        {name: 'Internet of Things(IOT)', href: '/courses/iot'}
+        {key: 'e1', name: 'Embedded Systems', href: '/courses/embedded-systems' },
+        {key: 'e2',name: 'Internet of Things(IOT)', href: '/courses/iot'}
       ],
     },
     {
       branch: 'Mechanical',
       items: [
-        {name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocad'}
+        {key: 'm1', name: 'AutoCAD: 2D & 3D Design', href:'/courses/autocad '}
       ]
     },
     {
       branch: 'Civil',
       items: [
-        {name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
+        {key: 'ci1',name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
       ]
     }
   ];
 
-  // 2. Added the placement program data
   const placementProgramCategories: ProgramCategory[] = [
     {
       branch: 'Job Guarantee Programs',
       items: [
-        { name: 'Fullstack Development', href: '/courses/fullstack-development' },
-        { name: 'Human Resources', href: '/courses/human-resource' },
-        { name: 'Digital Marketing', href: '/courses/digital-marketing' },
+        {key: "j1", name: 'Fullstack Development', href: '/job-guarantee-program/web-development' },
+        {key: "j2", name: 'Human Resources', href: '/job-guarantee-program/human-resource' },
+        {key: "j3", name: 'Digital Marketing', href: '/job-guarantee-program/digital-marketing' },
       ]
     }
   ];
@@ -114,7 +113,6 @@ export default function CoursePageNavbar() {
             </Link>
             <AnimatePresence>
               {isDesktopDropdownOpen && (
-                 // 3. Pass the correct props to the component
                  <ProgramsMegaMenu
                   internshipData={internshipProgramCategories}
                   placementData={placementProgramCategories}
@@ -170,20 +168,36 @@ export default function CoursePageNavbar() {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
+                    className="overflow-hidden "
                   >
                     <div className="pt-2 pb-4 flex flex-col gap-1">
-                      {/* 4. Update the variable name here for consistency */}
-                      {internshipProgramCategories.flatMap(cat => cat.items).map(item => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="py-2 text-base text-gray-300 hover:text-white"
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                      <div>
+                        <h4 className="text-orange-400 font-semibold mt-2 mb-1 px-4 text-center text-sm uppercase tracking-wider">Internship Programs</h4>
+                        {internshipProgramCategories.flatMap(cat => cat.items).map(item => (
+                          <Link
+                            key={item.key}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="block py-2 px-6 text-base text-gray-300 hover:text-white hover:bg-white/10 text-center"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+
+                      <div className="mt-4">
+                        <h4 className="text-orange-400 font-semibold mt-2 mb-1 px-4 text-center text-sm uppercase tracking-wider">Job Guarantee Programs</h4>
+                        {placementProgramCategories.flatMap(cat => cat.items).map(item => (
+                          <Link
+                            key={item.key}
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="block py-2 px-6 text-base text-gray-300 hover:text-white hover:bg-white/10 text-center"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 )}

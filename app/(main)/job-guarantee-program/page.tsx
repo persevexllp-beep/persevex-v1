@@ -6,6 +6,7 @@ import StarField from "@/app/components/StarField";
 import Link from "next/link";
 import { Code, Users, Megaphone, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import ExploreFooterSection from "@/app/components/ExploreFooterSection";
 
 // --- Reusable Card Component ---
 interface ProgramCardProps {
@@ -53,19 +54,19 @@ export default function JobGuaranteeProgramPage() {
             icon: <Code size={28} />,
             title: "Fullstack Development",
             description: "Master both front-end and back-end technologies to build complete web applications from scratch. Become a versatile and in-demand developer.",
-            href: "/courses/fullstack-development"
+            href: "/job-guarantee-program/fullstack-development"
         },
         {
             icon: <Users size={28} />,
             title: "Human Resources",
             description: "Learn modern HR practices, from talent acquisition to employee relations and strategic management, to become a vital asset to any organization.",
-            href: "/courses/human-resource"
+            href: "/job-guarantee-program/human-resource"
         },
         {
             icon: <Megaphone size={28} />,
             title: "Digital Marketing",
             description: "Dive into SEO, SEM, content strategy, and social media marketing to drive growth and build powerful online brands in the digital age.",
-            href: "/courses/digital-marketing"
+            href: "/job-guarantee-program/digital-marketing"
         }
     ];
 
@@ -83,7 +84,7 @@ export default function JobGuaranteeProgramPage() {
             </div>
 
             {/* Page Content */}
-            <div className="relative min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div className="relative min-h-screen flex flex-col items-center justify- p-4 sm:p-6 lg:p-8">
                 <div className="text-center max-w-4xl mx-auto">
                     <motion.h1 
                       initial={{ opacity: 0, y: -20 }}
@@ -115,6 +116,7 @@ export default function JobGuaranteeProgramPage() {
                     ))}
                 </div>
             </div>
+            <ExploreFooterSection />
         </main>
     );
 }

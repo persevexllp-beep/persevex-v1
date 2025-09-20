@@ -15,6 +15,8 @@ export default function CoursePageNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
 
+  // 1. Renamed original data to be specific to internships
+ 
   const internshipProgramCategories: ProgramCategory[] = [
     {
       branch: 'CSE / IT',
@@ -68,6 +70,8 @@ export default function CoursePageNavbar() {
     }
   ];
 
+  
+
   const scrollLinks: { name: string; key: CourseSectionKey }[] = [
     { name: 'Curriculum', key: 'curriculum' },
     { name: 'Projects', key: 'projects' },
@@ -113,6 +117,7 @@ export default function CoursePageNavbar() {
             </Link>
             <AnimatePresence>
               {isDesktopDropdownOpen && (
+                 // 3. Pass the correct props to the component
                  <ProgramsMegaMenu
                   internshipData={internshipProgramCategories}
                   placementData={placementProgramCategories}
@@ -171,6 +176,17 @@ export default function CoursePageNavbar() {
                     className="overflow-hidden "
                   >
                     <div className="pt-2 pb-4 flex flex-col gap-1">
+                      {/* 4. Update the variable name here for consistency */}
+                      {internshipProgramCategories.flatMap(cat => cat.items).map(item => (
+                        <Link
+                          key={item.key}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="py-2 text-base text-gray-300 hover:text-white"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
                       <div>
                         <h4 className="text-orange-400 font-semibold mt-2 mb-1 px-4 text-center text-sm uppercase tracking-wider">Internship Programs</h4>
                         {internshipProgramCategories.flatMap(cat => cat.items).map(item => (

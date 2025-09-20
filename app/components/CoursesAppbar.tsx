@@ -15,7 +15,8 @@ export default function CoursePageNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileProgramsOpen, setIsMobileProgramsOpen] = useState(false);
 
-  const programCategories: ProgramCategory[] = [
+  // 1. Renamed original data to be specific to internships
+  const internshipProgramCategories: ProgramCategory[] = [
     {
       branch: 'CSE / IT',
       items: [
@@ -52,6 +53,18 @@ export default function CoursePageNavbar() {
       branch: 'Civil',
       items: [
         {name: 'AutoCAD: 2D & 3D Design', href: '/courses/autocad'}
+      ]
+    }
+  ];
+
+  // 2. Added the placement program data
+  const placementProgramCategories: ProgramCategory[] = [
+    {
+      branch: 'Job Guarantee Programs',
+      items: [
+        { name: 'Fullstack Development', href: '/courses/fullstack-development' },
+        { name: 'Human Resources', href: '/courses/human-resource' },
+        { name: 'Digital Marketing', href: '/courses/digital-marketing' },
       ]
     }
   ];
@@ -101,8 +114,10 @@ export default function CoursePageNavbar() {
             </Link>
             <AnimatePresence>
               {isDesktopDropdownOpen && (
+                 // 3. Pass the correct props to the component
                  <ProgramsMegaMenu
-                  programCategories={programCategories}
+                  internshipData={internshipProgramCategories}
+                  placementData={placementProgramCategories}
                   onClose={() => setIsDesktopDropdownOpen(false)}
                 />
               )}
@@ -158,7 +173,8 @@ export default function CoursePageNavbar() {
                     className="overflow-hidden"
                   >
                     <div className="pt-2 pb-4 flex flex-col gap-1">
-                      {programCategories.flatMap(cat => cat.items).map(item => (
+                      {/* 4. Update the variable name here for consistency */}
+                      {internshipProgramCategories.flatMap(cat => cat.items).map(item => (
                         <Link
                           key={item.name}
                           href={item.href}

@@ -17,7 +17,7 @@ const planData = {
     "Co-branded internship Certificate*",
     "100% Job Guarantee (T&C Applied)",
   ],
-  paymentLink: "#", // Replace with your actual Razorpay link
+  paymentLink: "https://payments.cashfree.com/forms/REG1100", // Replace with your actual Razorpay link
 };
 
 // Animation variant for the card
@@ -83,6 +83,7 @@ export default function PricingCard() {
 
           <div className="mt-10">
             <a
+            target="_blank"
               href={planData.paymentLink}
               className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-900/40 transition-all duration-300 hover:bg-blue-700 hover:scale-105"
             >

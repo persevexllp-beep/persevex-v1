@@ -1609,8 +1609,8 @@ export const ElectronicsCourses: CourseType[] = [
 export const MechanicalCourses: CourseType[] = [
   {
     id: "a1",
-    title: "AutoCAD: 2D & 3D Design",
-    shortTitle: 'AutoCAD',
+    title: "AutoCAD: 2D & 3D Design (Mechanical)",
+    shortTitle: 'AutoCAD (Mechanical)',
     description:
       "Master 2D drafting and 3D modeling with the industry-standard design software.",
     icon: Search,
@@ -1748,8 +1748,8 @@ export const MechanicalCourses: CourseType[] = [
 export const CivilCourses: CourseType[] = [
 {
     id: "a1",
-    title: "AutoCAD: 2D & 3D Design",
-    shortTitle: 'AutoCAD',
+    title: "AutoCAD: 2D & 3D Design (Civil)",
+    shortTitle: 'AutoCAD (Civil)',
     description:
       "Master 2D drafting and 3D modeling with the industry-standard design software.",
     icon: Search,

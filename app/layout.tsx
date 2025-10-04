@@ -22,7 +22,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        {/* Move the Script and noscript tags INSIDE the body tag */}
         <Script id="fb-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -33,7 +32,12 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '784980750633373');
+            
+            // Initialize both Pixels
+            fbq('init', '784980750633373'); // Your original Pixel ID
+            fbq('init', '202416294177654'); // Your new Pixel ID
+            
+            // This single command sends the PageView event to BOTH initialized pixels
             fbq('track', 'PageView');
           `}
         </Script>
@@ -44,6 +48,15 @@ export default function RootLayout({
             width="1"
             style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=784980750633373&ev=PageView&noscript=1"
+          />
+        </noscript>
+
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=202416294177654&ev=PageView&noscript=1"
           />
         </noscript>
 
